@@ -1,0 +1,13 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "plusBeta": false,
+    "isCreatingSolution": false,
+    "environment": "spo",
+    "version": "1.13.0",
+    "libraryName": "diebold-bit",
+    "libraryId": "9b97428d-da5f-4e2b-867a-8fb425642599",
+    "packageManager": "npm",
+    "isDomainIsolated": false,
+    "componentType": "webpart"
+  }
+}

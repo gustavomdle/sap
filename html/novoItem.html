@@ -1,0 +1,295 @@
+<style>
+    .etapa {
+        border-radius: 5px;
+        padding: 4px;
+        width: 80px;
+        height: 60px;
+        float: left;
+        color: white;
+        margin: 5px;
+        vertical-align: middle;
+        text-align: center;
+        font-size: 10px;
+    }
+
+    .required {
+        color: red;
+    }
+</style>
+
+<div class="container-fluid border">
+
+    <div class="form-group">
+        <div class="form-row">
+            <div class="form-group col-md-8">
+                <span class="required">*</span><label for="txtTitulo">Título</label>
+                <input type="text" class="form-control" id="txtTitulo">
+            </div>
+            <div class="form-group col-md-4">
+                <span class="required">*</span><label for="ddlOrigemBit">Origem BIT</label>
+                <select id="ddlOrigemBit" class="form-control">
+                    <option value="0" selected>Selecione...</option>
+                    <option value="Normal">Engenharia AT</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <span class="required">*</span><label for="txtTitulo">Produto</label>
+            <table>
+                <tr>
+                    <td>
+                        <div class="col-sm-12">
+                            <select multiple="multiple" id="produtos1" class="form-control" name="produto1"
+                                style="height: 194px; width: 300px;">
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="padding-bottom: 10px;"><input type="button" class="btn btn-light"
+                                id="addButtonProduto" value="Adicionar >" alt="Salvar"></div><br>
+                        <input type="button" class="btn btn-light" id="removeButtonProduto" value="< Remover"
+                            alt="Salvar">
+                    </td>
+                    <td>
+                        <div class="col-sm-12">
+                            <select multiple="multiple" id="produtos2" class="form-control" name="produto2"
+                                style="height: 194px; width: 300px;">
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <span class="required">*</span><label for="txtTitulo">Cliente</label>
+            <table>
+                <tr>
+                    <td>
+                        <div class="col-sm-12">
+                            <select multiple="multiple" id="cliente1" class="form-control" name="cliente1"
+                                style="height: 194px; width: 300px;">
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="padding-bottom: 10px;"><input type="button" class="btn btn-light"
+                                id="addButtonCliente" value="Adicionar >" alt="Salvar"></div><br>
+                        <input type="button" class="btn btn-light" id="removeButtonCliente" value="< Remover"
+                            alt="Salvar">
+                    </td>
+                    <td>
+                        <div class="col-sm-12">
+                            <select multiple="multiple" id="cliente2" class="form-control" name="cliente2"
+                                style="height: 194px; width: 300px;">
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-12">
+            <span class="required">*</span><label for="txtTitulo">Aplicação</label>
+            <table>
+                <tr>
+                    <td>
+                        <div class="col-sm-12">
+                            <select multiple="multiple" id="aplicacao1" class="form-control" name="aplicacao1"
+                                style="height: 194px; width: 300px;">
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="padding-bottom: 10px;"><input type="button" class="btn btn-light"
+                                id="addButtonAplicacao" value="Adicionar >" alt="Salvar"></div><br>
+                        <input type="button" class="btn btn-light" id="removeButtonAplicacao" value="< Remover"
+                            alt="Salvar">
+                    </td>
+                    <td>
+                        <div class="col-sm-12">
+                            <select multiple="multiple" id="aplicacao2" class="form-control" name="aplicacao2"
+                                style="height: 194px; width: 300px;">
+                            </select>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <span class="required">*</span><label for="txtDescricao">Descrição</label>
+        <textarea id="txtDescricao" class="form-control" rows="4"></textarea>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <span class="required">*</span><label for="txtSolucao">Solução</label>
+        <textarea id="txtSolucao" class="form-control" rows="4"></textarea>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <span class="required">*</span><label for="txtObservacao">Observação</label>
+        <textarea id="txtObservacao" class="form-control" rows="4"></textarea>
+        </select>
+    </div>
+
+
+
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <span class="required">*</span><label for="ddlPrioridade">Prioridade</label>
+            dfdf
+        </div>
+        <div class="form-group col-md-6">
+            <label for="nroValorTotal">Valor Total</label>
+            dfdfd
+        </div>
+    </div>
+
+</div>
+
+<br><br>
+
+<div class="container-fluid border">
+
+    <h4>DADOS DE ENTREGA</h4>
+
+    <div class="form-group">
+        <span class="required">*</span><label for="txtEndrecoEntrega">Endereço de Entrega</label>
+        <select id="ddlEnderecoEntrega" class="form-control">
+        </select>
+    </div>
+
+    <div class="form-group">
+        <span class="required">*</span><label for="ddlEnderecoFaturamento">Endereço de Faturamento</label>
+        <select id="ddlEnderecoFaturamento" class="form-control">
+        </select>
+    </div>
+
+    <div class="form-group">
+        <span class="required">*</span><label for="ddlEmpresa">Empresa</label>
+        <select id="ddlEmpresa" class="form-control" style="width: 180px;">
+            <option value="0" selected>Selecione...</option>
+            <option value="4">PAM</option>
+            <option value="1">PIE</option>
+        </select>
+    </div>
+
+</div>
+
+<br><br>
+
+<div class="container-fluid border">
+
+    <h4>FATURAMENTO</h4>
+
+    <div class="form-group">
+
+        <span class="required">*</span><label>Forma de Pagamento padrão Diebold Nixdorf 90 dias?</label>
+
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="checkFormaPagamentoPadraoSim"
+                value="1" checked>
+            <label class="form-check-label" for="checkFormaPagamentoPadraoSim">Sim</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="inlineRadioOptions" id="checkFormaPagamentoPadraoNao"
+                value="0">
+            <label class="form-check-label" for="checkFormaPagamentoPadraoNao">Não</label>
+        </div>
+
+    </div>
+
+    <div class="form-group">
+        <span class="required">*</span><label for="txtCasoNegativoCondicaoPagamento">Caso negativo informar condição de
+            pagamento</label>
+        <input type="text" class="form-control" id="txtCasoNegativoCondicaoPagamento">
+    </div>
+
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <span class="required">*</span><label for="ddlCentroCustoDebito">Centro de custo para débito</label>
+            <select id="ddlCentroCustoDebito" class="form-control">
+
+            </select>
+        </div>
+        <div class="form-group col-md-6">
+            <span class="required">*</span><label for="ddlContaContabil">Conta contabil</label>
+            <select id="ddlContaContabil" class="form-control">
+            </select>
+        </div>
+    </div>
+
+</div>
+
+<br><br>
+
+<div class="container-fluid border">
+
+    <h4>ITENS(S)</h4>
+
+
+    <br>
+    <a id="addModalItem" href="#">Adicionar</a>
+    <br>
+
+
+    <div class="table-responsive">
+        <table class="table table-hover" id="tbItens">
+            <thead class="thead-light ">
+                <tr>
+                    <th scope="col">Código</th>
+                    <th scope="col">Descrição</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Quantidade</th>
+                    <th scope="col">Unidade</th>
+                    <th scope="col">Preço de referência</th>
+                    <th scope="col">Preço Total</th>
+                    <th scope="col">Ação</th>
+
+                </tr>
+            </thead>
+            <tbody id="conteudoItem">
+            </tbody>
+        </table>
+    </div>
+
+
+
+
+</div>
+
+<br><br>
+
+<div class="container-fluid border">
+
+    <h4>ANEXOS</h4>
+
+    Tamanho total permitido: 5 mega (soma dos arquivos)
+
+    <br><br>
+
+    <div class="form-group">
+
+        <input class="multi" data-maxsize="1024" type="file" id="input" multiple />
+
+    </div>
+
+</div>
+
+<br><br>
+
+
+<button id="btnSalvar" class="btn btn-secondary">Salvar Rascunho</button>
+<button id="btnIniciarAprovacao" class="btn btn-success">Iniciar Fluxo</button>
