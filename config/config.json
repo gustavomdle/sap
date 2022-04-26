@@ -2,63 +2,26 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
   "version": "2.0",
   "bundles": {
-    "bit-novo-item-web-part": {
+    "sap-nova-proposta-web-part": {
       "components": [
         {
-          "entrypoint": "./lib/webparts/bitNovoItem/BitNovoItemWebPart.js",
-          "manifest": "./src/webparts/bitNovoItem/BitNovoItemWebPart.manifest.json"
+          "entrypoint": "./lib/webparts/sapNovaProposta/SapNovaPropostaWebPart.js",
+          "manifest": "./src/webparts/sapNovaProposta/SapNovaPropostaWebPart.manifest.json"
         }
       ]
     },
-    "bit-detalhes-web-part": {
+    "sap-detalhes-proposta-web-part": {
       "components": [
         {
-          "entrypoint": "./lib/webparts/bitDetalhes/BitDetalhesWebPart.js",
-          "manifest": "./src/webparts/bitDetalhes/BitDetalhesWebPart.manifest.json"
-        }
-      ]
-    },
-    "bit-editar-item-web-part": {
-      "components": [
-        {
-          "entrypoint": "./lib/webparts/bitEditarItem/BitEditarItemWebPart.js",
-          "manifest": "./src/webparts/bitEditarItem/BitEditarItemWebPart.manifest.json"
-        }
-      ]
-    },
-    "bit-todos-itens-web-part": {
-      "components": [
-        {
-          "entrypoint": "./lib/webparts/bitTodosItens/BitTodosItensWebPart.js",
-          "manifest": "./src/webparts/bitTodosItens/BitTodosItensWebPart.manifest.json"
-        }
-      ]
-    },
-    "bit-aprovacao-engenharia-web-part": {
-      "components": [
-        {
-          "entrypoint": "./lib/webparts/bitAprovacaoEngenharia/BitAprovacaoEngenhariaWebPart.js",
-          "manifest": "./src/webparts/bitAprovacaoEngenharia/BitAprovacaoEngenhariaWebPart.manifest.json"
-        }
-      ]
-    },
-    "bit-aprovacao-final-web-part": {
-      "components": [
-        {
-          "entrypoint": "./lib/webparts/bitAprovacaoFinal/BitAprovacaoFinalWebPart.js",
-          "manifest": "./src/webparts/bitAprovacaoFinal/BitAprovacaoFinalWebPart.manifest.json"
+          "entrypoint": "./lib/webparts/sapDetalhesProposta/SapDetalhesPropostaWebPart.js",
+          "manifest": "./src/webparts/sapDetalhesProposta/SapDetalhesPropostaWebPart.manifest.json"
         }
       ]
     }
   },
   "externals": {},
   "localizedResources": {
-    "BitNovoItemWebPartStrings": "lib/webparts/bitNovoItem/loc/{locale}.js",
-    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js",
-    "BitDetalhesWebPartStrings": "lib/webparts/bitDetalhes/loc/{locale}.js",
-    "BitEditarItemWebPartStrings": "lib/webparts/bitEditarItem/loc/{locale}.js",
-    "BitTodosItensWebPartStrings": "lib/webparts/bitTodosItens/loc/{locale}.js",
-    "BitAprovacaoEngenhariaWebPartStrings": "lib/webparts/bitAprovacaoEngenharia/loc/{locale}.js",
-    "BitAprovacaoFinalWebPartStrings": "lib/webparts/bitAprovacaoFinal/loc/{locale}.js"
+    "SapNovaPropostaWebPartStrings": "lib/webparts/sapNovaProposta/loc/{locale}.js",
+    "SapDetalhesPropostaWebPartStrings": "lib/webparts/sapDetalhesProposta/loc/{locale}.js"
   }
 }

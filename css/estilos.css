@@ -1,0 +1,11 @@
+#container{
+    width: 920px;
+}
+
+.required{
+    color: rgb(164, 38, 44);
+}
+
+.card{
+    margin-bottom: 5px;
+}

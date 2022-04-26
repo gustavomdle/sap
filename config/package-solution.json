@@ -1,9 +1,9 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "bit-diebold",
-    "id": "9b97428d-da5f-4e2b-867a-8fb425642599",
-    "version": "1.1.0.2",
+    "name": "diebold-sap",
+    "id": "cee4ae2a-939c-464e-b309-c4a411dc5e74",
+    "version": "1.0.0.2",
     "includeClientSideAssets": true,
     "isDomainIsolated": false,
     "developer": {
@@ -15,6 +15,6 @@
     }
   },
   "paths": {
-    "zippedPackage": "solution/diebold-bit.sppkg"
+    "zippedPackage": "solution/diebold-sap.sppkg"
   }
 }
