@@ -25,6 +25,8 @@ require("../../../../node_modules/bootstrap/dist/css/bootstrap.min.css");
 require("../../../../css/estilos.css");
 
 var _web;
+var _criou = false;
+var _arrArea = [];
 
 export interface IReactGetItemsState {
   itemsRepresentante: [
@@ -38,6 +40,11 @@ export interface IReactGetItemsState {
       "Title": "",
     }],
   itemsProdutos: [
+    {
+      "ID": "",
+      "Title": "",
+    }],
+  itemsAreas: [
     {
       "ID": "",
       "Title": "",
@@ -69,6 +76,11 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
           "Title": "",
         }],
       itemsProdutos: [
+        {
+          "ID": "",
+          "Title": "",
+        }],
+      itemsAreas: [
         {
           "ID": "",
           "Title": "",
@@ -485,12 +497,12 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
 
             <div className="card">
-              <div className="card-header btn" id="headingProduto" data-toggle="collapse" data-target="#collapseProduto" aria-expanded="true" aria-controls="collapseProduto">
+              <div className="card-header btn" id="headingArea" data-toggle="collapse" data-target="#collapseProduto" aria-expanded="true" aria-controls="collapseProduto">
                 <h5 className="mb-0 text-info" >
                   Áreas Responsáveis pela Proposta
                 </h5>
               </div>
-              <div id="collapseProduto" className="collapse show" aria-labelledby="headingOne" >
+              <div id="collapseArea" className="collapse show" aria-labelledby="headingOne" >
 
                 <div className="card-body">
 
@@ -499,20 +511,26 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                     <tr>
                       <td>
                         <div className="col-sm-6">
-                          <select multiple={true} id='ddlProduto1' className="form-control" name="ddlProduto1" style={{ "height": "194px", "width": "350px" }}>
-                            <option className="optProduto" value="Adequação civil">Adequação civil</option>
+                          <select multiple={true} id='ddlArea1' className="form-control" name="ddlArea1" style={{ "height": "194px", "width": "350px" }}>
+
+                            {this.state.itemsAreas.map(function (item, key) {
+                              return (
+                                <option className="optArea" value={item.ID}>{item.Title}</option>
+                              );
+                            })}
+
                           </select>
                         </div>
                       </td>
                       <td>
                         <div>
-                          <input type="button" className="btn btn-light" id="addButtonProduto" value="Adicionar >" alt="Salvar" /></div><br />
-                        <input type="button" className="btn btn-light" id="removeButtonProduto" value="< Remover"
+                          <input type="button" onClick={this.addButtonArea} className="btn btn-light" id="addButtonArea" value="Adicionar >" alt="Salvar" /></div><br />
+                        <input type="button" onClick={this.removeButtonArea} className="btn btn-light" id="removeButtonArea" value="< Remover"
                           alt="Salvar" />
                       </td>
                       <td>
                         <div className="col-sm-6">
-                          <select multiple={true} id="ddlProduto2" className="form-control" name="ddlProduto2" style={{ "height": "194px", "width": "350px" }}>
+                          <select multiple={true} id="ddlArea2" className="form-control" name="ddlArea2" style={{ "height": "194px", "width": "350px" }}>
                           </select>
                         </div>
                       </td>
@@ -592,6 +610,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     var reactHandlerPrazoGarantia = this;
     var reactHandlerOutrosServicos = this;
     var reactHandlerProdutos = this;
+    var reactHandlerAreas = this;
 
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('Representantes')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
@@ -751,6 +770,21 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     });
 
 
+    jquery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      success: function (resultData) {
+        reactHandlerAreas.setState({
+          itemsAreas: resultData.d.results
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+      }
+    });
+
+
+
 
 
   }
@@ -765,108 +799,183 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     $options.appendTo("#ddlProduto1");
   }
 
+  protected addButtonArea = () => {
+    var $options = $('#ddlArea1 option:selected');
+    $options.appendTo("#ddlArea2");
+  }
+
+  protected removeButtonArea = () => {
+    var $options = $('#ddlArea2 option:selected');
+    $options.appendTo("#ddlArea1");
+  }
+
 
   protected salvar(iniciarFluxo) {
 
-    $("#modalConfirmarIniciarFluxo").modal('hide');
+    if (!_criou) {
 
-    console.log("entro no salvar")
+      $("#modalConfirmarIniciarFluxo").modal('hide');
 
-    var tipoAnaliseProposta;
+      console.log("entro no salvar")
 
-    if ($('#checkTipoAnaliseProposta').is(':checked')) { tipoAnaliseProposta = "Proposta" };
-    if ($('#checkTipoAnaliseContrato').is(':checked')) { tipoAnaliseProposta = "Contrato" };
+      var tipoAnaliseProposta;
 
-    var sintese = $("#txtSintese").val();
-    var identificacaoOportunidade = $("#txtIdentificacaoOportunidade").val();
+      if ($('#checkTipoAnaliseProposta').is(':checked')) { tipoAnaliseProposta = "Proposta" };
+      if ($('#checkTipoAnaliseContrato').is(':checked')) { tipoAnaliseProposta = "Contrato" };
 
-    var dataEntregaPropostaCliente = "" + jQuery("#dtDataEntregaPropostaCliente").val() + "";
-    var dataEntregaPropostaClienteDia = dataEntregaPropostaCliente.substring(0, 2);
-    var dataEntregaPropostaClienteMes = dataEntregaPropostaCliente.substring(3, 5);
-    var dataEntregaPropostaClienteAno = dataEntregaPropostaCliente.substring(6, 10);
-    var formDataEntregaPropostaCliente = dataEntregaPropostaClienteAno + "-" + dataEntregaPropostaClienteMes + "-" + dataEntregaPropostaClienteDia;
+      var sintese = $("#txtSintese").val();
+      var identificacaoOportunidade = $("#txtIdentificacaoOportunidade").val();
 
-    var dataFinalQuestionamentos = "" + jQuery("#dtDataFinalQuestionamentos").val() + "";
-    var dataFinalQuestionamentosDia = dataFinalQuestionamentos.substring(0, 2);
-    var dataFinalQuestionamentosMes = dataFinalQuestionamentos.substring(3, 5);
-    var dataFinalQuestionamentosAno = dataFinalQuestionamentos.substring(6, 10);
-    var formDataFinalQuestionamentos = dataFinalQuestionamentosAno + "-" + dataFinalQuestionamentosMes + "-" + dataFinalQuestionamentosDia;
+      var dataEntregaPropostaCliente = "" + jQuery("#dtDataEntregaPropostaCliente").val() + "";
+      var dataEntregaPropostaClienteDia = dataEntregaPropostaCliente.substring(0, 2);
+      var dataEntregaPropostaClienteMes = dataEntregaPropostaCliente.substring(3, 5);
+      var dataEntregaPropostaClienteAno = dataEntregaPropostaCliente.substring(6, 10);
+      var formDataEntregaPropostaCliente = dataEntregaPropostaClienteAno + "-" + dataEntregaPropostaClienteMes + "-" + dataEntregaPropostaClienteDia;
 
-    var dataValidadeProposta = "" + jQuery("#dtDataValidadeProposta").val() + "";
-    var dataValidadePropostaDia = dataValidadeProposta.substring(0, 2);
-    var dataValidadePropostaMes = dataValidadeProposta.substring(3, 5);
-    var dataValidadePropostaAno = dataValidadeProposta.substring(6, 10);
-    var formDataValidadeProposta = dataValidadePropostaAno + "-" + dataValidadePropostaMes + "-" + dataValidadePropostaDia;
+      var dataFinalQuestionamentos = "" + jQuery("#dtDataFinalQuestionamentos").val() + "";
+      var dataFinalQuestionamentosDia = dataFinalQuestionamentos.substring(0, 2);
+      var dataFinalQuestionamentosMes = dataFinalQuestionamentos.substring(3, 5);
+      var dataFinalQuestionamentosAno = dataFinalQuestionamentos.substring(6, 10);
+      var formDataFinalQuestionamentos = dataFinalQuestionamentosAno + "-" + dataFinalQuestionamentosMes + "-" + dataFinalQuestionamentosDia;
 
-    console.log("sintese", sintese);
-    console.log("tipoAnaliseProposta", tipoAnaliseProposta);
-    console.log("identificacaoOportunidade", identificacaoOportunidade);
-    console.log("formDataEntregaPropostaCliente", formDataEntregaPropostaCliente);
-    console.log("formDataFinalQuestionamentos", formDataFinalQuestionamentos);
-    console.log("formDataValidadeProposta", formDataValidadeProposta);
+      var dataValidadeProposta = "" + jQuery("#dtDataValidadeProposta").val() + "";
+      var dataValidadePropostaDia = dataValidadeProposta.substring(0, 2);
+      var dataValidadePropostaMes = dataValidadeProposta.substring(3, 5);
+      var dataValidadePropostaAno = dataValidadeProposta.substring(6, 10);
+      var formDataValidadeProposta = dataValidadePropostaAno + "-" + dataValidadePropostaMes + "-" + dataValidadePropostaDia;
 
-    var representante = $("#ddlRepresentante").val();
-    var cliente = $("#ddlCliente").val();
-    var propostaRevisadaReferencia = $("#txtPropostaRevisadaReferencia").val();
-    var SST = $("#txtSST").val();
-    var condicoesPagamento = $("#txtCondicoesPagamento").val();
-    var dadosProposta = $("#txtDadosProposta").val();
-    var justificativaFinal = $("#txtJustificativa").val();
+      console.log("sintese", sintese);
+      console.log("tipoAnaliseProposta", tipoAnaliseProposta);
+      console.log("identificacaoOportunidade", identificacaoOportunidade);
+      console.log("formDataEntregaPropostaCliente", formDataEntregaPropostaCliente);
+      console.log("formDataFinalQuestionamentos", formDataFinalQuestionamentos);
+      console.log("formDataValidadeProposta", formDataValidadeProposta);
 
-    var arrSegmento = [];
-    $.each($("input[name='checkSegmento']:checked"), function () {
-      arrSegmento.push($(this).val());
-    });
+      var representante = $("#ddlRepresentante").val();
+      var cliente = $("#ddlCliente").val();
+      var propostaRevisadaReferencia = $("#txtPropostaRevisadaReferencia").val();
+      var SST = $("#txtSST").val();
+      var condicoesPagamento = $("#txtCondicoesPagamento").val();
+      var dadosProposta = $("#txtDadosProposta").val();
+      var justificativaFinal = $("#txtJustificativa").val();
 
-    var arrSetor = [];
-    $.each($("input[name='checkSetor']:checked"), function () {
-      arrSetor.push($(this).val());
-    });
-
-    var arrModalidade = [];
-    $.each($("input[name='checkModalidade']:checked"), function () {
-      arrModalidade.push($(this).val());
-    });
-
-    var numeroEditalRFPRFQRFI = $("#txtNumeroEditalRFPRFQRFI").val();
-    var quantidade = $("#txtQuantidade").val();
-
-    var arrInstalacao  = [];
-    $.each($("input[name='checkInstalacao']:checked"), function () {
-      arrInstalacao.push($(this).val());
-    });
-
-    
-    _web.lists
-      .getByTitle("PropostasSAP")
-      .items.add({
-        Title: sintese,
-        TipoAnalise: tipoAnaliseProposta,
-        IdentificacaoOportunidade: identificacaoOportunidade,
-        DataEntregaPropostaCliente: formDataEntregaPropostaCliente,
-        DataFinalQuestionamentos: formDataFinalQuestionamentos,
-        DataValidadeProposta: formDataValidadeProposta,
-        RepresentanteId: representante,
-        ClienteId: cliente,
-        PropostaRevisadaReferencia: propostaRevisadaReferencia,
-        SST: SST,
-        CondicoesPagamento: condicoesPagamento,
-        DadosProposta: dadosProposta,
-        JustificativaFinal: justificativaFinal,
-        Segmento: { "results": arrSegmento },
-        Setor: arrSegmento[0],
-        Modalidade: arrModalidade[0],
-        NumeroEditalRFPRFQRFI: numeroEditalRFPRFQRFI,
-        Quantidade: quantidade,
-        Instalacao: arrInstalacao[0]
-      })
-      .then(response => {
-        console.log("Gravou!!");
-        jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
-      }).catch((error: any) => {
-        console.log(error);
-
+      var arrSegmento = [];
+      $.each($("input[name='checkSegmento']:checked"), function () {
+        arrSegmento.push($(this).val());
       });
+
+      var arrSetor = [];
+      $.each($("input[name='checkSetor']:checked"), function () {
+        arrSetor.push($(this).val());
+      });
+
+      var arrModalidade = [];
+      $.each($("input[name='checkModalidade']:checked"), function () {
+        arrModalidade.push($(this).val());
+      });
+
+      var numeroEditalRFPRFQRFI = $("#txtNumeroEditalRFPRFQRFI").val();
+      var quantidade = $("#txtQuantidade").val();
+
+      var arrInstalacao = [];
+      $.each($("input[name='checkInstalacao']:checked"), function () {
+        arrInstalacao.push($(this).val());
+      });
+
+      var arrGarantia = [];
+      $.each($("input[name='checkGarantia']:checked"), function () {
+        arrGarantia.push($(this).val());
+      });
+
+      var arrTipoGarantia = [];
+      $.each($("input[name='checkTipoGarantia']:checked"), function () {
+        arrTipoGarantia.push($(this).val());
+      });
+
+      var arrPrazoGarantia = [];
+      $.each($("input[name='checkPrazoGarantia']:checked"), function () {
+        arrPrazoGarantia.push($(this).val());
+      });
+
+      var arrOutrosServicos = [];
+      $.each($("input[name='checkOutrosServicos']:checked"), function () {
+        arrOutrosServicos.push($(this).val());
+      });
+
+      var arrProduto = Array.prototype.slice.call(document.querySelectorAll('#ddlProduto2 option:checked'), 0).map(function (v, i, a) {
+        return v.value;
+      });
+
+      _arrArea = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
+        return v.value;
+      });
+
+      _web.lists
+        .getByTitle("PropostasSAP")
+        .items.add({
+          Title: sintese,
+          TipoAnalise: tipoAnaliseProposta,
+          IdentificacaoOportunidade: identificacaoOportunidade,
+          DataEntregaPropostaCliente: formDataEntregaPropostaCliente,
+          DataFinalQuestionamentos: formDataFinalQuestionamentos,
+          DataValidadeProposta: formDataValidadeProposta,
+          RepresentanteId: representante,
+          ClienteId: cliente,
+          PropostaRevisadaReferencia: propostaRevisadaReferencia,
+          SST: SST,
+          CondicoesPagamento: condicoesPagamento,
+          DadosProposta: dadosProposta,
+          JustificativaFinal: justificativaFinal,
+          Segmento: { "results": arrSegmento },
+          Setor: arrSegmento[0],
+          Modalidade: arrModalidade[0],
+          NumeroEditalRFPRFQRFI: numeroEditalRFPRFQRFI,
+          Quantidade: quantidade,
+          Instalacao: arrInstalacao[0],
+          Garantia: arrGarantia[0],
+          TipoGarantia: arrTipoGarantia[0],
+          PrazoGarantia: arrPrazoGarantia[0],
+          OutrosServicos: { "results": arrOutrosServicos },
+          ProdutoId: { "results": arrProduto }
+        })
+        .then(response => {
+
+          var idProposta = response.data.ID;
+
+          console.log(idProposta);
+
+
+          for (var i = 0; i < _arrArea.length; i++) {
+
+            console.log("_arrArea[i]", _arrArea[i]);
+
+            _criou = true;
+
+            _web.lists
+              .getByTitle("Tarefas")
+              .items.add({
+                Title: _arrArea[i],
+                PropostaId: idProposta,
+                DataPlanejadaTermino: formDataEntregaPropostaCliente
+              })
+              .then(response => {
+
+                console.log("Gravou!!");
+                jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
+
+              }).catch((error: any) => {
+                console.log(error);
+              });
+
+          };
+
+
+
+        }).catch((error: any) => {
+          console.log(error);
+        });
+
+    }
 
   }
 
