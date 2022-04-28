@@ -1,11 +1,28 @@
-#container{
+#container {
     width: 920px;
 }
 
-.required{
+.required {
     color: rgb(164, 38, 44);
 }
 
-.card{
+.card {
     margin-bottom: 5px;
+}
+
+.fieldGroup-146 {
+    border: 0px;
+    background-color: transparent;
+    height: 25px;
+    font-family: inherit;
+
+}
+
+.field-147 {
+    color: #495057;
+    font-size: 1rem;
+}
+
+.icon-156 {
+    padding: 4px 5px 5px;
 }

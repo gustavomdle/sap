@@ -12,21 +12,43 @@ import "@pnp/sp/folders";
 import { Web } from "sp-pnp-js";
 import pnp from "sp-pnp-js";
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
-import { allowOverscrollOnElement } from 'office-ui-fabric-react';
+import { allowOverscrollOnElement, DatePicker } from 'office-ui-fabric-react';
 import { PrimaryButton, Stack, MessageBar, MessageBarType } from 'office-ui-fabric-react';
+import { DateTimePicker, DateConvention, TimeConvention } from '@pnp/spfx-controls-react/lib/DateTimePicker';
+
+
+
+//import * as Moment from 'moment';
+//import 'react-dates/initialize';
+//import 'react-dates/lib/css/_datepicker.css';
+//import { DateRangePicker, SingleDatePicker, DayPickerRangeController } from 'react-dates';
+//import { SPComponentLoader } from '@microsoft/sp-loader';
+//import 'jqueryui'
+//import 'jqueryui';
+//import 'jquery-ui-bundle';
+
+
 //import "jquery-mask-plugin";
 
 import InputMask from 'react-input-mask';
 import { deprecationHandler } from 'moment';
 
-//import 'jquery-mask-plugin/dist/jquery.mask.min';
+const divStyle = {
+  padding: '0 0 0 20px'
+};
 
+//import 'jquery-mask-plugin/dist/jquery.mask.min';
 require("../../../../node_modules/bootstrap/dist/css/bootstrap.min.css");
 require("../../../../css/estilos.css");
 
 var _web;
 var _criou = false;
-var _arrArea = [];
+var _arrAreaId = [];
+var _arrAreaTexto = [];
+
+export interface ISamplePnPDateTimePickerWebpartState {
+
+}
 
 export interface IReactGetItemsState {
   itemsRepresentante: [
@@ -57,6 +79,9 @@ export interface IReactGetItemsState {
   itemsTipoGarantia: [];
   itemsPrazoGarantia: [];
   itemsOutrosServicos: [];
+  startDate: any;
+  endDate: any;
+  focusedInput: any;
 
 }
 
@@ -93,6 +118,9 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       itemsTipoGarantia: [],
       itemsPrazoGarantia: [],
       itemsOutrosServicos: [],
+      startDate: "",
+      endDate: "",
+      focusedInput: "any",
     };
   }
 
@@ -101,26 +129,27 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
     _web = new Web(this.props.context.pageContext.web.absoluteUrl);
 
-    document
-      .getElementById("btnSalvar")
-      .addEventListener("click", (e: Event) => this.salvar(false));
+    // jQuery("#dtDataEntrPropostaCliente").datepicker();
 
     document
       .getElementById("btnIniciarAprovacao")
-      .addEventListener("click", (e: Event) => jQuery("#modalConfirmarIniciarFluxo").modal({ backdrop: 'static', keyboard: false }));
+      .addEventListener("click", (e: Event) => this.validar());
 
 
     document
       .getElementById("btIniciarFluxo")
-      .addEventListener("click", (e: Event) => this.salvar(true));
+      .addEventListener("click", (e: Event) => this.salvar());
 
     document
       .getElementById("btnSucesso")
       .addEventListener("click", (e: Event) => this.fecharSucesso());
 
 
-    this.handler();
+    //var $options = $('#ddlProduto1 option:selected');
+    //$options.appendTo("#ddlProduto2");
 
+
+    this.handler();
 
 
   }
@@ -167,13 +196,13 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                   </div>
                   <div className="form-group">
                     <div className="form-row">
-                      <div className="form-group col-md-6">
+                      <div className="form-group col-md-9">
                         <label htmlFor="txtSintese">Síntese</label><span className="required"> *</span>
                         <input type="text" className="form-control" id="txtSintese" />
                       </div>
-                      <div className="form-group col-md-6">
+                      <div className="form-group col-md-3">
                         <label htmlFor="txtIdentificacaoOportunidade">Identificação da Oportunidade </label><span className="required"> *</span>
-                        <input type="text" className="form-control" id="txtIdentificacaoOportunidade" />
+                        <InputMask mask="F999999" className="form-control" maskChar={null} id="txtIdentificacaoOportunidade" />
                       </div>
                     </div>
                   </div>
@@ -182,15 +211,15 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                     <div className="form-row">
                       <div className="form-group col-md-4">
                         <label htmlFor="dtDataEntregaPropostaCliente">Data da entrega da Proposta ao Cliente</label><span className="required"> *</span>
-                        <InputMask mask="99/99/9999" className="form-control" maskChar={null} id="dtDataEntregaPropostaCliente" />
+                        <DatePicker minDate={this.addDaysWRONG()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataEntregaPropCliente' />
                       </div>
                       <div className="form-group col-md-4">
-                        <label htmlFor="dtDataFinalQuestionamentos">Data final de questionamentos</label><span className="required"> *</span>
-                        <InputMask mask="99/99/9999" className="form-control" maskChar={null} id="dtDataFinalQuestionamentos" />
+                        <label htmlFor="dtDataFinalQuestionamentos">Data final de questionamentos</label>
+                        <DatePicker minDate={new Date()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataFinalQuestionamentos' />
                       </div>
                       <div className="form-group col-md-4">
-                        <label htmlFor="dtDataValidadeProposta">Data de validade da Proposta</label><span className="required"> *</span>
-                        <InputMask mask="99/99/9999" className="form-control" maskChar={null} id="dtDataValidadeProposta" />
+                        <label htmlFor="dtDataValidadeProposta">Data de validade da Proposta</label>
+                        <DatePicker minDate={new Date()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataValidadeProposta' />
                       </div>
                     </div>
                   </div>
@@ -224,16 +253,12 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                   <div className="form-group">
                     <div className="form-row">
-                      <div className="form-group col-md-4">
-                        <label htmlFor="txtPropostaRevisadaReferencia">Proposta revisada/referência</label><span className="required"> *</span>
+                      <div className="form-group col-md-8">
+                        <label htmlFor="txtPropostaRevisadaReferencia">Proposta revisada/referência</label>
                         <input type="text" className="form-control" id="txtPropostaRevisadaReferencia" />
                       </div>
                       <div className="form-group col-md-4">
-                        <label htmlFor="txtSST">SST</label><span className="required"> *</span>
-                        <input type="text" className="form-control" id="txtSST" />
-                      </div>
-                      <div className="form-group col-md-4">
-                        <label htmlFor="txtCondicoesPagamento">Condições de pagamento </label><span className="required"> *</span>
+                        <label htmlFor="txtCondicoesPagamento">Condições de pagamento </label>
                         <input type="text" className="form-control" id="txtCondicoesPagamento" />
                       </div>
                     </div>
@@ -256,11 +281,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                   <div className="form-group">
                     <label htmlFor="txtDadosProposta">Dados da Proposta</label><span className="required"> *</span>
                     <textarea id="txtDadosProposta" className="form-control" rows={4}></textarea>
-                  </div>
-
-                  <div className="form-group">
-                    <label htmlFor="txtJustificativa">Justificativa</label> <span className="required"> *</span>
-                    <textarea id="txtJustificativa" className="form-control" rows={4}></textarea>
                   </div>
 
                 </div>
@@ -335,7 +355,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="txtNumeroEditalRFPRFQRFI">Número do Edital, RFP, RFQ ou RFI </label> <span className="required"> *</span>
+                    <label htmlFor="txtNumeroEditalRFPRFQRFI">Número do Edital, RFP, RFQ ou RFI </label>
                     <input type="text" className="form-control" id="txtNumeroEditalRFPRFQRFI" />
                   </div>
 
@@ -396,7 +416,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                       </div>
                       <div className="form-group col-md-3">
-                        <label htmlFor="txtTitulo">Tipo de garantia </label><span className="required"> *</span><br></br>
+                        <label htmlFor="txtTitulo">Tipo de garantia </label><br></br>
 
                         {this.state.itemsTipoGarantia.map(function (item, key) {
 
@@ -437,7 +457,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                       </div>
                       <div className="form-group col-md-2">
-                        <label htmlFor="txtTitulo">Outros serviços</label><span className="required"> *</span><br></br>
+                        <label htmlFor="txtTitulo">Outros serviços</label><br></br>
 
                         {this.state.itemsOutrosServicos.map(function (item, key) {
 
@@ -506,7 +526,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                 <div className="card-body">
 
-                  <label htmlFor="ddlProduto">Áreas</label><span className={styles.required}> *</span>
+                  <label htmlFor="ddlProduto">Áreas</label><span className="required"> *</span>
                   <table>
                     <tr>
                       <td>
@@ -517,6 +537,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                               return (
                                 <option className="optArea" value={item.ID}>{item.Title}</option>
                               );
+
                             })}
 
                           </select>
@@ -543,7 +564,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
             <br></br>
 
             <div className="text-right">
-              <button id="btnSalvar" className="btn btn-secondary">Salvar</button>&nbsp;
               <button id="btnIniciarAprovacao" className="btn btn-success" >Enviar para Aprovação</button>
             </div>
 
@@ -597,7 +617,22 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     );
   }
 
-  protected handler() {
+  private onFormatDate = (date: Date): string => {
+    //return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
+    return ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
+  };
+
+
+  private addDaysWRONG() {
+
+    var date = new Date();
+    var result = new Date();
+    result.setDate(date.getDate() + 5);
+    return result;
+  }
+
+
+  protected async handler() {
 
     var reactHandlerRepresentante = this;
     var reactHandlerClientes = this;
@@ -770,6 +805,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     });
 
 
+    /*
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
       type: "GET",
@@ -782,6 +818,31 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       error: function (jqXHR, textStatus, errorThrown) {
       }
     });
+    */
+
+
+
+    let montahtml = "";
+    await _web.lists
+      .getByTitle("Areas")
+      .items.top(30).orderBy("Title", true)
+      .get()
+      .then(item => {
+        montahtml = `<option value="0">Selecione</option>`;
+        item.forEach(element => {
+          montahtml += `<option className="optArea" value="${element.ID}">${element.Title}</option>`;
+        });
+
+        //console.log("montahtml", montahtml);
+
+        $("#ddlArea1").html(montahtml);
+      });
+
+    // $('#ddlArea1').find('option[text="Comercial"]').prop('selected', true);
+    jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Comercial"; }).prop('selected', true);
+    var $options = $('#ddlArea1 option:selected');
+    $options.appendTo("#ddlArea2");
+
 
 
 
@@ -809,8 +870,200 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     $options.appendTo("#ddlArea1");
   }
 
+  protected validar() {
 
-  protected salvar(iniciarFluxo) {
+    console.log("Entrou na validação");
+
+    var tipoAnaliseProposta = "";
+
+    if ($('#checkTipoAnaliseProposta').is(':checked')) { tipoAnaliseProposta = "Proposta" };
+    if ($('#checkTipoAnaliseContrato').is(':checked')) { tipoAnaliseProposta = "Contrato" };
+
+    var sintese = $("#txtSintese").val();
+    var identificacaoOportunidade = $("#txtIdentificacaoOportunidade").val();
+    var dataEntregaPropostaCliente = "" + jQuery("#dtDataEntregaPropCliente-label").val() + "";
+    var dataFinalQuestionamentos = "" + jQuery("#dtDataFinalQuestionamentos-label").val() + "";
+    var dataValidadeProposta = "" + jQuery("#dtDataValidadeProposta-label").val() + "";
+    var representante = $("#ddlRepresentante").val();
+    var cliente = $("#ddlCliente").val();
+    var dadosProposta = $("#txtDadosProposta").val();
+
+    var arrSegmento = [];
+    $.each($("input[name='checkSegmento']:checked"), function () {
+      arrSegmento.push($(this).val());
+    });
+
+    var arrSetor = [];
+    $.each($("input[name='checkSetor']:checked"), function () {
+      arrSetor.push($(this).val());
+    });
+
+    var arrModalidade = [];
+    $.each($("input[name='checkModalidade']:checked"), function () {
+      arrModalidade.push($(this).val());
+    });
+
+    var quantidade = $("#txtQuantidade").val();
+
+    var arrInstalacao = [];
+    $.each($("input[name='checkInstalacao']:checked"), function () {
+      arrInstalacao.push($(this).val());
+    });
+
+    var arrGarantia = [];
+    $.each($("input[name='checkGarantia']:checked"), function () {
+      arrGarantia.push($(this).val());
+    });
+
+    var arrTipoGarantia = [];
+    $.each($("input[name='checkTipoGarantia']:checked"), function () {
+      arrTipoGarantia.push($(this).val());
+    });
+
+    var arrPrazoGarantia = [];
+    $.each($("input[name='checkPrazoGarantia']:checked"), function () {
+      arrPrazoGarantia.push($(this).val());
+    });
+
+    var arrOutrosServicos = [];
+    $.each($("input[name='checkOutrosServicos']:checked"), function () {
+      arrOutrosServicos.push($(this).val());
+    });
+
+    var arrProduto = Array.prototype.slice.call(document.querySelectorAll('#ddlProduto2 option:checked'), 0).map(function (v, i, a) {
+      return v.value;
+    });
+
+    _arrAreaId = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
+      return v.value;
+    });
+
+    _arrAreaTexto = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
+      return v.text;
+    });
+
+    if (tipoAnaliseProposta == "") {
+      alert("Escolha o Tipo de Análise!");
+      document.getElementById('headingResumoProposta').scrollIntoView();
+      return false;
+    }
+
+    if (sintese == "") {
+      alert("Forneça a Síntese!");
+      document.getElementById('headingResumoProposta').scrollIntoView();
+      return false;
+    }
+
+    if (identificacaoOportunidade == "") {
+      alert("Forneça a Identificação da Oportunidade!");
+      document.getElementById('headingResumoProposta').scrollIntoView();
+      return false;
+    }
+
+    if (dataEntregaPropostaCliente == "") {
+      alert("Forneça a Data de Entrega da Proposta!");
+      document.getElementById('headingResumoProposta').scrollIntoView();
+      return false;
+    }
+
+    if (dataFinalQuestionamentos == "") {
+      alert("Forneça a data Final dos Questionamentos!");
+      document.getElementById('headingResumoProposta').scrollIntoView();
+      return false;
+    }
+
+    if (dataValidadeProposta == "") {
+      alert("Forneça a Data de Validade da Proposta!");
+      document.getElementById('headingResumoProposta').scrollIntoView();
+      return false;
+    }
+
+    if (representante == "0") {
+      alert("Escolha o Representante!");
+      document.getElementById('headingResumoProposta').scrollIntoView();
+      return false;
+
+    }
+
+    if (cliente == "0") {
+      alert("Escolha o Cliente!");
+      document.getElementById('headingResumoProposta').scrollIntoView();
+      return false;
+
+    }
+
+    if (dadosProposta == "") {
+      alert("Forneça os Dados da Proposta!");
+      document.getElementById('headingDescricaoDetalhada').scrollIntoView();
+      return false;
+    }
+
+    if (arrSegmento.length == 0) {
+      alert("Escolha o Segmento!");
+      document.getElementById('headingOportunidade').scrollIntoView();
+      return false;
+    }
+
+    if (arrSetor.length == 0) {
+      alert("Escolha o Setor!");
+      document.getElementById('headingOportunidade').scrollIntoView();
+      return false;
+    }
+
+    if (arrModalidade.length == 0) {
+      alert("Escolha a Modalidade!");
+      document.getElementById('headingOportunidade').scrollIntoView();
+      return false;
+    }
+
+    if (quantidade == "") {
+      alert("Forneça a Quantidade do Produto!");
+      document.getElementById('headingProduto').scrollIntoView();
+      return false;
+    }
+
+    if (arrInstalacao.length == 0) {
+      alert("Escolha a Instalação!");
+      document.getElementById('headingProduto').scrollIntoView();
+      return false;
+    }
+
+    if (arrGarantia.length == 0) {
+      alert("Escolha a Garantia!");
+      document.getElementById('headingProduto').scrollIntoView();
+      return false;
+    }
+
+    if (arrPrazoGarantia.length == 0) {
+      alert("Escolha a o Prazo de Garantia!");
+      document.getElementById('headingProduto').scrollIntoView();
+      return false;
+    }
+
+    if (arrProduto.length == 0) {
+      alert("Escolha o Produto!");
+      document.getElementById('headingProduto').scrollIntoView();
+      return false;
+    }
+
+    /*
+    if (_arrAreaTexto.length == 0) {
+      alert("Escolha as Áreas Responsáveis!");
+      document.getElementById('headingArea').scrollIntoView();
+      return false;
+    }
+    */
+
+    jQuery("#modalConfirmarIniciarFluxo").modal({ backdrop: 'static', keyboard: false });
+
+
+  }
+
+
+  protected salvar() {
+
+    $("#btnSalvar").prop("disabled", true);
+    $("#btnIniciarAprovacao").prop("disabled", true);
 
     if (!_criou) {
 
@@ -818,7 +1071,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
       console.log("entro no salvar")
 
-      var tipoAnaliseProposta;
+      var tipoAnaliseProposta = "";
 
       if ($('#checkTipoAnaliseProposta').is(':checked')) { tipoAnaliseProposta = "Proposta" };
       if ($('#checkTipoAnaliseContrato').is(':checked')) { tipoAnaliseProposta = "Contrato" };
@@ -826,19 +1079,19 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       var sintese = $("#txtSintese").val();
       var identificacaoOportunidade = $("#txtIdentificacaoOportunidade").val();
 
-      var dataEntregaPropostaCliente = "" + jQuery("#dtDataEntregaPropostaCliente").val() + "";
+      var dataEntregaPropostaCliente = "" + jQuery("#dtDataEntregaPropCliente-label").val() + "";
       var dataEntregaPropostaClienteDia = dataEntregaPropostaCliente.substring(0, 2);
       var dataEntregaPropostaClienteMes = dataEntregaPropostaCliente.substring(3, 5);
       var dataEntregaPropostaClienteAno = dataEntregaPropostaCliente.substring(6, 10);
       var formDataEntregaPropostaCliente = dataEntregaPropostaClienteAno + "-" + dataEntregaPropostaClienteMes + "-" + dataEntregaPropostaClienteDia;
 
-      var dataFinalQuestionamentos = "" + jQuery("#dtDataFinalQuestionamentos").val() + "";
+      var dataFinalQuestionamentos = "" + jQuery("#dtDataFinalQuestionamentos-label").val() + "";
       var dataFinalQuestionamentosDia = dataFinalQuestionamentos.substring(0, 2);
       var dataFinalQuestionamentosMes = dataFinalQuestionamentos.substring(3, 5);
       var dataFinalQuestionamentosAno = dataFinalQuestionamentos.substring(6, 10);
       var formDataFinalQuestionamentos = dataFinalQuestionamentosAno + "-" + dataFinalQuestionamentosMes + "-" + dataFinalQuestionamentosDia;
 
-      var dataValidadeProposta = "" + jQuery("#dtDataValidadeProposta").val() + "";
+      var dataValidadeProposta = "" + jQuery("#dtDataValidadeProposta-label").val() + "";
       var dataValidadePropostaDia = dataValidadeProposta.substring(0, 2);
       var dataValidadePropostaMes = dataValidadeProposta.substring(3, 5);
       var dataValidadePropostaAno = dataValidadeProposta.substring(6, 10);
@@ -906,9 +1159,15 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         return v.value;
       });
 
-      _arrArea = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
+      _arrAreaId = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
         return v.value;
       });
+
+      _arrAreaTexto = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
+        return v.text;
+      });
+
+      console.log("chegou aqui!!!")
 
       _web.lists
         .getByTitle("PropostasSAP")
@@ -944,19 +1203,20 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
           console.log(idProposta);
 
+          for (var i = 0; i < _arrAreaId.length; i++) {
 
-          for (var i = 0; i < _arrArea.length; i++) {
-
-            console.log("_arrArea[i]", _arrArea[i]);
+            console.log("_arrAreaId[i]", _arrAreaId[i]);
+            console.log("_arrAreaTexto[i]", _arrAreaTexto[i]);
 
             _criou = true;
 
             _web.lists
               .getByTitle("Tarefas")
               .items.add({
-                Title: _arrArea[i],
+                Title: _arrAreaTexto[i],
                 PropostaId: idProposta,
-                DataPlanejadaTermino: formDataEntregaPropostaCliente
+                DataPlanejadaTermino: formDataEntregaPropostaCliente,
+                GrupoSharepointId: _arrAreaId[i]
               })
               .then(response => {
 

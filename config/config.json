@@ -19,7 +19,8 @@
       ]
     }
   },
-  "externals": {},
+  "externals": {
+  },
   "localizedResources": {
     "SapNovaPropostaWebPartStrings": "lib/webparts/sapNovaProposta/loc/{locale}.js",
     "SapDetalhesPropostaWebPartStrings": "lib/webparts/sapDetalhesProposta/loc/{locale}.js"
