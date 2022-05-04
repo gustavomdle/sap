@@ -1,0 +1,202 @@
+import * as React from 'react';
+import styles from './SapTodasPropostas.module.scss';
+import { ISapTodasPropostasProps } from './ISapTodasPropostasProps';
+import { escape } from '@microsoft/sp-lodash-subset';
+import * as jQuery from "jquery";
+
+//Importação relacionada a react-bootstrap-table-next    
+//Import related to react-bootstrap-table-next    
+import BootstrapTable from 'react-bootstrap-table-next';
+//Import from @pnp/sp    
+import { sp } from "@pnp/sp";
+import "@pnp/sp/webs";
+import "@pnp/sp/lists/web";
+import "@pnp/sp/items/list";
+//import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
+import { selectFilter } from 'react-bootstrap-table2-filter';
+import { numberFilter } from 'react-bootstrap-table2-filter';
+import { Comparator } from 'react-bootstrap-table2-filter';
+
+require("../../../../node_modules/bootstrap/dist/css/bootstrap.min.css");
+require("../../../../css/estilos.css");
+
+export interface IShowEmployeeStates {
+  employeeList: any[]
+}
+
+const selectOptions = {
+  0: 'Aprovado',
+  1: 'Em análise',
+  2: 'Encerrada pelo Sistema',
+  3: 'Não vencedora',
+  4: 'Proposta Enviada',
+  5: 'Reprovada',
+  6: 'Vencedora',
+};
+
+
+const customFilterID = textFilter({
+  placeholder: ' ',  // custom the input placeholder
+});
+
+const customFilterNumero = textFilter({
+  placeholder: ' ',  // custom the input placeholder
+});
+
+const customFilterIDOportunidade = textFilter({
+  placeholder: ' ',  // custom the input placeholder
+});
+
+const customFilterIDSintese = textFilter({
+  placeholder: ' ',  // custom the input placeholder
+});
+
+const customFilterCliente = textFilter({
+  placeholder: ' ',  // custom the input placeholder
+});
+
+const customFilterRepresentante = textFilter({
+  placeholder: ' ',  // custom the input placeholder
+});
+
+
+
+
+const empTablecolumns = [
+  {
+    dataField: "ID",
+    text: "ID",
+    headerStyle: { backgroundColor: '#dee2e6' },
+    sort: true,
+    filter: customFilterID
+  },
+  {
+    dataField: "Numero",
+    text: "Número",
+    headerStyle: { backgroundColor: '#dee2e6' },
+    sort: true,
+    filter: customFilterNumero
+  },
+  {
+    dataField: "IdentificacaoOportunidade",
+    text: "ID Oportunidade",
+    headerStyle: { backgroundColor: '#dee2e6' },
+    sort: true,
+    filter: customFilterIDOportunidade
+  },
+  {
+    dataField: "Title",
+    text: "Síntese",
+    headerStyle: { backgroundColor: '#dee2e6' },
+    sort: true,
+    filter: customFilterIDSintese
+  },
+  {
+    dataField: "Cliente.Title",
+    text: "Cliente",
+    headerStyle: { backgroundColor: '#dee2e6' },
+    sort: true,
+    filter: customFilterCliente
+  },
+  {
+    dataField: "Representante.Title",
+    text: "Representante",
+    headerStyle: { backgroundColor: '#dee2e6' },
+    sort: true,
+    filter: customFilterRepresentante
+  },
+  {
+    dataField: "Status",
+    text: "Status",
+    headerStyle: { backgroundColor: '#dee2e6' },
+    sort: true,
+    filter: selectFilter({
+      options: selectOptions
+    })
+  },
+  {
+    dataField: "",
+    text: "",
+    headerStyle: { "backgroundColor": "#dee2e6", "width": "180px" },
+    formatter: (rowContent, row) => {
+      var id = row.ID;
+      return (
+        <><button onClick={id} className="btn btn-info">Exibir</button>&nbsp;
+          <button onClick={id} className="btn btn-danger">Editar</button></>
+
+      )
+    }
+  }
+
+];
+
+const paginationOptions = {
+  sizePerPage: 3,
+  hideSizePerPage: true,
+  hidePageListOnlyOnePage: true
+};
+
+const priceFilter = textFilter({
+  placeholder: 'My Custom PlaceHolder',  // custom the input placeholder
+});
+
+
+export default class SapTodasPropostas extends React.Component<ISapTodasPropostasProps, IShowEmployeeStates> {
+
+
+
+  constructor(props: ISapTodasPropostasProps) {
+    super(props);
+    this.state = {
+      employeeList: []
+    }
+  }
+
+  public componentDidMount() {
+
+    var reactHandlerRepresentante = this;
+
+    jQuery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$top=4999&$orderby= Title&$select=ID,Title,Numero,IdentificacaoOportunidade,Title,Cliente/Title,Representante/Title,Status&$expand=Cliente,Representante`,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      success: function (resultData) {
+        // console.log("resultData.d.results", resultData.d.results)
+        reactHandlerRepresentante.setState({
+          employeeList: resultData.d.results
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+      }
+    });
+
+
+  }
+
+
+  Buscar(): any {
+    throw new Error('Method not implemented.');
+  }
+
+
+  public render(): React.ReactElement<ISapTodasPropostasProps> {
+
+
+
+
+    return (
+
+
+      <div className={styles.container}>
+        <BootstrapTable hover={true} className="gridTodosItens" id="gridTodosItens" keyField='id' data={this.state.employeeList} columns={empTablecolumns} headerClasses="header-class" pagination={paginationFactory(paginationOptions)} filter={filterFactory(priceFilter)} />
+      </div>
+
+
+    );
+  }
+
+
+
+}

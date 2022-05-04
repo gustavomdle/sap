@@ -11,6 +11,7 @@ import "@pnp/sp/webs";
 import "@pnp/sp/folders";
 import { Web } from "sp-pnp-js";
 import pnp from "sp-pnp-js";
+import { ICamlQuery } from '@pnp/sp/lists';
 import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
 import { allowOverscrollOnElement, DatePicker } from 'office-ui-fabric-react';
 import { PrimaryButton, Stack, MessageBar, MessageBarType } from 'office-ui-fabric-react';
@@ -45,6 +46,9 @@ var _web;
 var _criou = false;
 var _arrAreaId = [];
 var _arrAreaTexto = [];
+var _caminho;
+var _idProposta;
+var _size: number = 0;
 
 export interface ISamplePnPDateTimePickerWebpartState {
 
@@ -129,6 +133,10 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
     _web = new Web(this.props.context.pageContext.web.absoluteUrl);
 
+    _caminho = this.props.context.pageContext.web.serverRelativeUrl;
+
+    console.log("_caminho", _caminho);
+
     // jQuery("#dtDataEntrPropostaCliente").datepicker();
 
     document
@@ -147,6 +155,13 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
     //var $options = $('#ddlProduto1 option:selected');
     //$options.appendTo("#ddlProduto2");
+
+
+    $("#conteudoLoading").html(`<br/><br/><img style="height: 80px; width: 80px" src='${_caminho}/Images1/loading.gif'/>
+    <br/>Aguarde....<br/><br/>
+    Dependendo do tamanho do anexo e a velocidade<br>
+     da Internet essa ação pode demorar um pouco. <br>
+     Não fechar a janela!<br/><br/>`);
 
 
     this.handler();
@@ -517,7 +532,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
 
             <div className="card">
-              <div className="card-header btn" id="headingArea" data-toggle="collapse" data-target="#collapseProduto" aria-expanded="true" aria-controls="collapseProduto">
+              <div className="card-header btn" id="headingArea" data-toggle="collapse" data-target="#collapseArea" aria-expanded="true" aria-controls="collapseArea">
                 <h5 className="mb-0 text-info" >
                   Áreas Responsáveis pela Proposta
                 </h5>
@@ -561,6 +576,24 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
               </div>
             </div>
 
+
+            <div className="card">
+              <div className="card-header btn" id="headingAnexos" data-toggle="collapse" data-target="#collapseAnexos" aria-expanded="true" aria-controls="collapseAnexos">
+                <h5 className="mb-0 text-info" >
+                  Anexos
+                </h5>
+              </div>
+              <div id="collapseAnexos" className="collapse show" aria-labelledby="headingOne" >
+
+                <div className="card-body">
+
+                  <label htmlFor="ddlProduto">Anexo</label><span className="required"> *</span><br />
+                  <input className="multi" data-maxsize="1024" type="file" id="input" multiple />
+
+                </div>
+              </div>
+            </div>
+
             <br></br>
 
             <div className="text-right">
@@ -593,6 +626,16 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
           </div>
         </div>
 
+        <div className="modal fade" id="modalCarregando" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div>
+            <div className="modal-dialog" role="document">
+              <div className="modal-content">
+                <div id='conteudoLoading' className='carregando'></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
         <div className="modal fade" id="modalSucesso" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div className="modal-dialog" role="document">
@@ -609,7 +652,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
             </div>
           </div>
         </div>
-
 
       </>
 
@@ -794,6 +836,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('Produtos')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
       type: "GET",
+      async: false,
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
         reactHandlerProdutos.setState({
@@ -805,7 +848,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     });
 
 
-    /*
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
       type: "GET",
@@ -818,35 +860,19 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       error: function (jqXHR, textStatus, errorThrown) {
       }
     });
-    */
 
 
+    setTimeout(function () {
 
-    let montahtml = "";
-    await _web.lists
-      .getByTitle("Areas")
-      .items.top(30).orderBy("Title", true)
-      .get()
-      .then(item => {
-        montahtml = `<option value="0">Selecione</option>`;
-        item.forEach(element => {
-          montahtml += `<option className="optArea" value="${element.ID}">${element.Title}</option>`;
-        });
-
-        //console.log("montahtml", montahtml);
-
-        $("#ddlArea1").html(montahtml);
-      });
-
-    // $('#ddlArea1').find('option[text="Comercial"]').prop('selected', true);
-    jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Comercial"; }).prop('selected', true);
-    var $options = $('#ddlArea1 option:selected');
-    $options.appendTo("#ddlArea2");
+      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Comercial"; }).prop('selected', true);
+      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Jurídico"; }).prop('selected', true);
+      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Representante"; }).prop('selected', true);
+      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Propostas"; }).prop('selected', true);
+      var $options = $('#ddlArea1 option:selected');
+      $options.appendTo("#ddlArea2");
 
 
-
-
-
+    }, 2000);
 
   }
 
@@ -1054,6 +1080,31 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     }
     */
 
+    var files = (document.querySelector("#input") as HTMLInputElement).files;
+
+    if (files.length > 0) {
+
+      console.log("files.length", files.length);
+
+      for (var i = 0; i <= files.length - 1; i++) {
+
+        var fsize = files.item(i).size;
+        _size = _size + fsize;
+
+        console.log("fsize", fsize);
+
+      }
+
+      if (_size > 15000000) {
+        alert("A soma dos arquivos não pode ser maior que 15mega!");
+        _size = 0;
+        return false;
+      }
+
+    }
+
+    //fim valida arquivo
+
     jQuery("#modalConfirmarIniciarFluxo").modal({ backdrop: 'static', keyboard: false });
 
 
@@ -1068,10 +1119,21 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     if (!_criou) {
 
       $("#modalConfirmarIniciarFluxo").modal('hide');
+      jQuery("#modalCarregando").modal({ backdrop: 'static', keyboard: false });
+
+      //return false;
 
       console.log("entro no salvar")
 
       var tipoAnaliseProposta = "";
+
+      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Comercial"; }).prop('selected', true);
+      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Jurídico"; }).prop('selected', true);
+      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Representante"; }).prop('selected', true);
+      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Propostas"; }).prop('selected', true);
+      var $options = $('#ddlArea1 option:selected');
+      $options.appendTo("#ddlArea2");
+
 
       if ($('#checkTipoAnaliseProposta').is(':checked')) { tipoAnaliseProposta = "Proposta" };
       if ($('#checkTipoAnaliseContrato').is(':checked')) { tipoAnaliseProposta = "Contrato" };
@@ -1155,15 +1217,15 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         arrOutrosServicos.push($(this).val());
       });
 
-      var arrProduto = Array.prototype.slice.call(document.querySelectorAll('#ddlProduto2 option:checked'), 0).map(function (v, i, a) {
+      var arrProduto = Array.prototype.slice.call(document.querySelectorAll('#ddlProduto2 option'), 0).map(function (v, i, a) {
         return v.value;
       });
 
-      _arrAreaId = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
+      _arrAreaId = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option'), 0).map(function (v, i, a) {
         return v.value;
       });
 
-      _arrAreaTexto = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
+      _arrAreaTexto = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option'), 0).map(function (v, i, a) {
         return v.text;
       });
 
@@ -1199,9 +1261,9 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         })
         .then(response => {
 
-          var idProposta = response.data.ID;
+          _idProposta = response.data.ID;
 
-          console.log(idProposta);
+          console.log(_idProposta);
 
           for (var i = 0; i < _arrAreaId.length; i++) {
 
@@ -1214,22 +1276,19 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
               .getByTitle("Tarefas")
               .items.add({
                 Title: _arrAreaTexto[i],
-                PropostaId: idProposta,
+                PropostaId: _idProposta,
                 DataPlanejadaTermino: formDataEntregaPropostaCliente,
                 GrupoSharepointId: _arrAreaId[i]
               })
               .then(response => {
 
-                console.log("Gravou!!");
-                jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
+                this.upload();
 
               }).catch((error: any) => {
                 console.log(error);
               });
 
-          };
-
-
+          }
 
         }).catch((error: any) => {
           console.log(error);
@@ -1240,12 +1299,69 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
   }
 
 
-  fecharSucesso() {
+
+  protected upload() {
+
+    var files = (document.querySelector("#input") as HTMLInputElement).files;
+    var file = files[0];
+
+    //console.log("files.length", files.length);
+
+    if (files.length != 0) {
+
+      _web.lists.getByTitle("AnexosSAP").rootFolder.folders.add(`${_idProposta}`).then(data => {
+
+        for (var i = 0; i < files.length; i++) {
+
+          var nomeArquivo = files[i].name;
+          var rplNomeArquivo = nomeArquivo.replace(/[^0123456789.,a-zA-Z]/g, '');
+
+          //alert(rplNomeArquivo);
+          //Upload a file to the SharePoint Library
+          _web.getFolderByServerRelativeUrl(`${_caminho}/AnexosSAP/${_idProposta}`)
+            //.files.add(files[i].name, files[i], true)
+            .files.add(rplNomeArquivo, files[i], true)
+            .then(function (data) {
+              if (i == files.length) {
+
+                console.log("anexou:" + rplNomeArquivo);
+                $("#conteudoLoading").modal('hide');
+                jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
+                //window.location.href = `home.aspx`;
+              }
+            });
+
+        }
+
+      }).catch(err => {
+        console.log("err", err);
+      });
+
+      //const folderAddResult = _web.folders.add(`${_caminho}/Anexos/${_idProposta}`);
+      //console.log("foi");
+
+    } else {
+
+      console.log("Gravou!!");
+      $("#conteudoLoading").modal('hide');
+      jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
+
+    }
+
+  }
+
+
+
+
+  protected fecharSucesso() {
 
     $("#modalSucesso").modal('hide');
     window.location.href = `Nova-Proposta-SAP.aspx`;
 
   }
+
+
+
 
 
 
