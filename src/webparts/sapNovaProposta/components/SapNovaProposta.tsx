@@ -474,7 +474,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                       </div>
                       <div className="form-group col-md-8">
-                        <label htmlFor="ddlProduto">Produto</label><span className={styles.required}> *</span>
+                        <label htmlFor="ddlProduto">Produto</label><span className="required"> *</span>
                         <table>
                           <tr>
                             <td>
@@ -1306,16 +1306,16 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                       }
 
-
                     }).catch((error: any) => {
                       console.log(error);
-
                     })
 
                 }).catch((error: any) => {
                   console.log(error);
 
-                })
+                }).catch((error: any) => {
+                  console.log(error);
+                });
 
 
             },

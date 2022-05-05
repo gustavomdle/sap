@@ -16,9 +16,11 @@ import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/People
 import { allowOverscrollOnElement, DatePicker } from 'office-ui-fabric-react';
 import { PrimaryButton, Stack, MessageBar, MessageBarType } from 'office-ui-fabric-react';
 import { DateTimePicker, DateConvention, TimeConvention } from '@pnp/spfx-controls-react/lib/DateTimePicker';
+import { UrlQueryParameterCollection, Version } from '@microsoft/sp-core-library';
 
 import InputMask from 'react-input-mask';
 import { deprecationHandler } from 'moment';
+import { dateToNumber } from '@pnp/spfx-controls-react';
 
 const divStyle = {
   padding: '0 0 0 20px'
@@ -37,6 +39,10 @@ var _size: number = 0;
 var _nroAtual: number = 0;
 var _nroNovo: number = 0;
 var _representante;
+var _dataEntregaPropostaCliente;
+var _datadataFinalQuestionamentos;
+var _dataValidadeProposta;
+var _cliente;
 
 export interface IReactGetItemsState {
   itemsRepresentante: [
@@ -70,6 +76,7 @@ export interface IReactGetItemsState {
   startDate: any;
   endDate: any;
   focusedInput: any;
+  itemsDataEntregaPropostaCliente: any
 
 }
 
@@ -109,6 +116,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
       startDate: "",
       endDate: "",
       focusedInput: "any",
+      itemsDataEntregaPropostaCliente: ""
     };
   }
 
@@ -119,6 +127,9 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     _caminho = this.props.context.pageContext.web.serverRelativeUrl;
 
     console.log("_caminho", _caminho);
+
+    var queryParms = new UrlQueryParameterCollection(window.location.href);
+    _idProposta = parseInt(queryParms.getValue("PropostasID"));
 
     // jQuery("#dtDataEntrPropostaCliente").datepicker();
 
@@ -200,7 +211,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                       </div>
                       <div className="form-group col-md-3">
                         <label htmlFor="txtIdentificacaoOportunidade">Identificação da Oportunidade </label><span className="required"> *</span>
-                        <InputMask mask="F999999" className="form-control" maskChar={null} id="txtIdentificacaoOportunidade" />
+                        <input type="text" className="form-control" id="txtIdentificacaoOportunidade" />
                       </div>
                     </div>
                   </div>
@@ -209,15 +220,15 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                     <div className="form-row">
                       <div className="form-group col-md-4">
                         <label htmlFor="dtDataEntregaPropostaCliente">Data da entrega da Proposta ao Cliente</label><span className="required"> *</span>
-                        <DatePicker minDate={this.addDaysWRONG()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataEntregaPropCliente' />
+                        <DatePicker minDate={this.addDaysWRONG()} value={_dataEntregaPropostaCliente} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataEntregaPropCliente' />
                       </div>
                       <div className="form-group col-md-4">
                         <label htmlFor="dtDataFinalQuestionamentos">Data final de questionamentos</label>
-                        <DatePicker minDate={new Date()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataFinalQuestionamentos' />
+                        <DatePicker minDate={new Date()} value={_datadataFinalQuestionamentos} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataFinalQuestionamentos' />
                       </div>
                       <div className="form-group col-md-4">
                         <label htmlFor="dtDataValidadeProposta">Data de validade da Proposta</label>
-                        <DatePicker minDate={new Date()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataValidadeProposta' />
+                        <DatePicker minDate={new Date()} value={_dataValidadeProposta} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataValidadeProposta' />
                       </div>
                     </div>
                   </div>
@@ -226,7 +237,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                     <div className="form-row">
                       <div className="form-group col-md-6">
                         <label htmlFor="ddlRepresentante">Representante</label><span className="required"> *</span>
-                        <select id="ddlRepresentante" className="form-control">
+                        <select id="ddlRepresentante" className="form-control" value={_representante}>
                           <option value="0" selected>Selecione...</option>
                           {this.state.itemsRepresentante.map(function (item, key) {
                             return (
@@ -237,7 +248,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                       </div>
                       <div className="form-group col-md-6">
                         <label htmlFor="ddlCliente">Cliente </label><span className="required"> *</span>
-                        <select id="ddlCliente" className="form-control">
+                        <select id="ddlCliente" className="form-control" value={_cliente}>
                           <option value="0" selected>Selecione...</option>
                           {this.state.itemsClientes.map(function (item, key) {
                             return (
@@ -473,7 +484,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
                       </div>
                       <div className="form-group col-md-8">
-                        <label htmlFor="ddlProduto">Produto</label><span className={styles.required}> *</span>
+                        <label htmlFor="ddlProduto">Produto</label><span className="required"> *</span>
                         <table>
                           <tr>
                             <td>
@@ -677,6 +688,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('Representantes')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
       type: "GET",
+      async: false,
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
         reactHandlerRepresentante.setState({
@@ -859,6 +871,9 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
     }, 2000);
 
+
+    this.getProposta();
+
   }
 
   protected addButtonProduto = () => {
@@ -879,6 +894,92 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
   protected removeButtonArea = () => {
     var $options = $('#ddlArea2 option:selected');
     $options.appendTo("#ddlArea1");
+  }
+
+
+  protected getProposta() {
+
+    console.log("entrou no proposta");
+
+    jQuery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta&$expand=Representante,Cliente&$filter=ID eq ` + _idProposta,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      async: false,
+      success: async function (resultData) {
+
+        console.log("resultData Proposta", resultData);
+
+        if (resultData.d.results.length > 0) {
+
+          for (var i = 0; i < resultData.d.results.length; i++) {
+
+            var tipoAnalise = resultData.d.results[i].TipoAnalise;
+
+            console.log("resultData.d.results[i].DataEntregaPropostaCliente", resultData.d.results[i].DataEntregaPropostaCliente)
+
+            var dataEntregaPropostaCliente = resultData.d.results[i].DataEntregaPropostaCliente;
+            var dataFinalQuestionamentos = resultData.d.results[i].DataFinalQuestionamentos;
+            var dataValidadeProposta = resultData.d.results[i].DataValidadeProposta;
+
+            if (dataEntregaPropostaCliente != null) {
+
+              var dtDataEntregaPropostaCliente = new Date(dataEntregaPropostaCliente);
+              _dataEntregaPropostaCliente = dtDataEntregaPropostaCliente;
+
+            } else _dataEntregaPropostaCliente = null;
+
+
+            if (dataFinalQuestionamentos != null) {
+
+              var dtdataFinalQuestionamentos = new Date(dataFinalQuestionamentos);
+              _datadataFinalQuestionamentos = dtdataFinalQuestionamentos;
+
+            } else _datadataFinalQuestionamentos = null;
+
+
+            if (dataValidadeProposta != null) {
+
+              var dtDataValidadeProposta = new Date(dataValidadeProposta);
+              _dataValidadeProposta = dtDataValidadeProposta;
+
+            } else _dataValidadeProposta = null;
+
+
+            if (tipoAnalise == "Proposta") jQuery("#checkTipoAnaliseProposta").attr('checked', 'true');
+            else if (tipoAnalise == "Contrato") jQuery("#checkTipoAnaliseContrato").attr('checked', 'true');
+
+            console.log("resultData.d.results[i].Representante.ID", resultData.d.results[i].Representante.ID);
+
+            jQuery("#txtSintese").val(resultData.d.results[i].Title);
+            jQuery("#txtIdentificacaoOportunidade").val(resultData.d.results[i].IdentificacaoOportunidade);
+
+            _representante = resultData.d.results[i].Representante.ID;
+            _cliente = resultData.d.results[i].Cliente.ID;
+
+            var dadosProposta = resultData.d.results[i].DadosProposta;
+
+            console.log(dadosProposta,dadosProposta);
+
+            jQuery("#txtPropostaRevisadaReferencia").val(resultData.d.results[i].PropostaRevisadaReferencia);
+            jQuery("#txtCondicoesPagamento").val(resultData.d.results[i].CondicoesPagamento);
+            jQuery("#txtDadosProposta").val(resultData.d.results[i].DadosProposta);
+         
+
+          }
+
+        }
+
+
+
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+      }
+
+
+
+    })
+
   }
 
   protected validar() {
@@ -1252,7 +1353,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
           console.log(_idProposta);
 
           jquery.ajax({
-            url: `${this.props.siteurl}/_api/web/lists/getbytitle('Representantes')/items?$filter=ID eq ` + representante,
+            url: `${this.props.siteurl}/_api/web/lists/getbytitle('Representantes')/items?$filter=ID eq ` + _idProposta,
             type: "GET",
             headers: { 'Accept': 'application/json; odata=verbose;' },
             async: false,
