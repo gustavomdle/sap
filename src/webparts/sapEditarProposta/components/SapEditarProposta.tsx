@@ -1,6 +1,6 @@
 import * as React from 'react';
-import styles from './SapNovaProposta.module.scss';
-import { ISapNovaPropostaProps } from './ISapNovaPropostaProps';
+import styles from './SapEditarProposta.module.scss';
+import { ISapEditarPropostaProps } from './ISapEditarPropostaProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import * as jquery from 'jquery';
 import * as $ from "jquery";
@@ -73,9 +73,9 @@ export interface IReactGetItemsState {
 
 }
 
-export default class SapNovaProposta extends React.Component<ISapNovaPropostaProps, IReactGetItemsState> {
+export default class SapEditarProposta extends React.Component<ISapEditarPropostaProps, IReactGetItemsState> {
 
-  public constructor(props: ISapNovaPropostaProps, state: IReactGetItemsState) {
+  public constructor(props: ISapEditarPropostaProps, state: IReactGetItemsState) {
     super(props);
     this.state = {
       itemsRepresentante: [
@@ -111,7 +111,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       focusedInput: "any",
     };
   }
-
 
   public componentDidMount() {
 
@@ -154,7 +153,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
   }
 
 
-  public render(): React.ReactElement<ISapNovaPropostaProps> {
+  public render(): React.ReactElement<ISapEditarPropostaProps> {
     return (
 
 
@@ -643,6 +642,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
     );
   }
+
 
   private onFormatDate = (date: Date): string => {
     //return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
@@ -1393,6 +1393,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     window.location.href = `Propostas.aspx`;
 
   }
+
 
 
 

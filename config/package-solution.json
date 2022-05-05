@@ -3,7 +3,7 @@
   "solution": {
     "name": "diebold-sap",
     "id": "cee4ae2a-939c-464e-b309-c4a411dc5e74",
-    "version": "1.0.0.3",
+    "version": "1.0.0.5",
     "includeClientSideAssets": true,
     "isDomainIsolated": false,
     "developer": {

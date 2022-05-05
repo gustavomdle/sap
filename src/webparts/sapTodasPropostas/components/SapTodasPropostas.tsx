@@ -12,12 +12,15 @@ import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists/web";
 import "@pnp/sp/items/list";
-//import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
+
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
 import { selectFilter } from 'react-bootstrap-table2-filter';
 import { numberFilter } from 'react-bootstrap-table2-filter';
 import { Comparator } from 'react-bootstrap-table2-filter';
+
+import 'react-bootstrap-table2-paginator/dist/react-bootstrap-table2-paginator.min.css';
+import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 
 require("../../../../node_modules/bootstrap/dist/css/bootstrap.min.css");
 require("../../../../css/estilos.css");
@@ -61,6 +64,11 @@ const customFilterRepresentante = textFilter({
   placeholder: ' ',  // custom the input placeholder
 });
 
+const customFilterStatus = selectFilter({
+  placeholder: 'Selecione',  // custom the input placeholder
+});
+
+
 
 
 
@@ -68,49 +76,49 @@ const empTablecolumns = [
   {
     dataField: "ID",
     text: "ID",
-    headerStyle: { backgroundColor: '#dee2e6' },
+    headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilterID
   },
   {
     dataField: "Numero",
     text: "Número",
-    headerStyle: { backgroundColor: '#dee2e6' },
+    headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilterNumero
   },
   {
     dataField: "IdentificacaoOportunidade",
     text: "ID Oportunidade",
-    headerStyle: { backgroundColor: '#dee2e6' },
+    headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilterIDOportunidade
   },
   {
     dataField: "Title",
     text: "Síntese",
-    headerStyle: { backgroundColor: '#dee2e6' },
+    headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilterIDSintese
   },
   {
     dataField: "Cliente.Title",
     text: "Cliente",
-    headerStyle: { backgroundColor: '#dee2e6' },
+    headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilterCliente
   },
   {
     dataField: "Representante.Title",
     text: "Representante",
-    headerStyle: { backgroundColor: '#dee2e6' },
+    headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilterRepresentante
   },
   {
     dataField: "Status",
     text: "Status",
-    headerStyle: { backgroundColor: '#dee2e6' },
+    headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: selectFilter({
       options: selectOptions
@@ -119,12 +127,13 @@ const empTablecolumns = [
   {
     dataField: "",
     text: "",
-    headerStyle: { "backgroundColor": "#dee2e6", "width": "180px" },
+    headerStyle: { "backgroundColor": "#bee5eb", "width": "180px" },
     formatter: (rowContent, row) => {
       var id = row.ID;
+      var urlEditar = `Propostas-SAP-Editar.aspx?PropostasID=` + id;
       return (
         <><button onClick={id} className="btn btn-info">Exibir</button>&nbsp;
-          <button onClick={id} className="btn btn-danger">Editar</button></>
+        <a href={urlEditar}><button className="btn btn-danger">Editar</button></a></>
 
       )
     }
@@ -133,7 +142,7 @@ const empTablecolumns = [
 ];
 
 const paginationOptions = {
-  sizePerPage: 3,
+  sizePerPage: 5,
   hideSizePerPage: true,
   hidePageListOnlyOnePage: true
 };
@@ -141,6 +150,7 @@ const paginationOptions = {
 const priceFilter = textFilter({
   placeholder: 'My Custom PlaceHolder',  // custom the input placeholder
 });
+
 
 
 export default class SapTodasPropostas extends React.Component<ISapTodasPropostasProps, IShowEmployeeStates> {
@@ -159,7 +169,7 @@ export default class SapTodasPropostas extends React.Component<ISapTodasProposta
     var reactHandlerRepresentante = this;
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$top=4999&$orderby= Title&$select=ID,Title,Numero,IdentificacaoOportunidade,Title,Cliente/Title,Representante/Title,Status&$expand=Cliente,Representante`,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$top=4999&$orderby= ID desc&$select=ID,Title,Numero,IdentificacaoOportunidade,Title,Cliente/Title,Representante/Title,Status&$expand=Cliente,Representante`,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
@@ -190,7 +200,7 @@ export default class SapTodasPropostas extends React.Component<ISapTodasProposta
 
 
       <div className={styles.container}>
-        <BootstrapTable hover={true} className="gridTodosItens" id="gridTodosItens" keyField='id' data={this.state.employeeList} columns={empTablecolumns} headerClasses="header-class" pagination={paginationFactory(paginationOptions)} filter={filterFactory(priceFilter)} />
+        <BootstrapTable bootstrap4 responsive condensed hover={true} className="gridTodosItens" id="gridTodosItens" keyField='id' data={this.state.employeeList} columns={empTablecolumns} headerClasses="header-class" pagination={paginationFactory(paginationOptions)} filter={filterFactory(priceFilter)} />
       </div>
 
 

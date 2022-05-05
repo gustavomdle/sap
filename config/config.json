@@ -25,12 +25,21 @@
           "manifest": "./src/webparts/sapTodasPropostas/SapTodasPropostasWebPart.manifest.json"
         }
       ]
+    },
+    "sap-editar-proposta-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/sapEditarProposta/SapEditarPropostaWebPart.js",
+          "manifest": "./src/webparts/sapEditarProposta/SapEditarPropostaWebPart.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
   "localizedResources": {
     "SapNovaPropostaWebPartStrings": "lib/webparts/sapNovaProposta/loc/{locale}.js",
     "SapDetalhesPropostaWebPartStrings": "lib/webparts/sapDetalhesProposta/loc/{locale}.js",
-    "SapTodasPropostasWebPartStrings": "lib/webparts/sapTodasPropostas/loc/{locale}.js"
+    "SapTodasPropostasWebPartStrings": "lib/webparts/sapTodasPropostas/loc/{locale}.js",
+    "SapEditarPropostaWebPartStrings": "lib/webparts/sapEditarProposta/loc/{locale}.js"
   }
 }

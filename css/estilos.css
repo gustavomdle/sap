@@ -31,9 +31,11 @@
     text-align: center;
 }
 
+/*
 .my-hovertable > tbody > tr.mytable-hover-row:hover {
     background-color: rgba(212, 24, 24, 0.822) !important;
 }
+*/
 
 #gridTodosItens{
     width: 1280px;
