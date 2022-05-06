@@ -34,6 +34,7 @@
     "react-datepicker": "^4.7.0",
     "react-dates": "^21.8.0",
     "react-dom": "16.13.1",
+    "react-draft-wysiwyg": "^1.14.7",
     "react-input-mask": "^2.0.4",
     "sp-pnp-js": "^3.0.10"
   },

@@ -23,7 +23,7 @@ export default class SapNovaPropostaWebPart extends BaseClientSideWebPart<ISapNo
       {
         description: this.properties.description,
         context: this.context,
-        siteurl: this.context.pageContext.web.absoluteUrl
+        siteurl: this.context.pageContext.web.absoluteUrl,
       }
     );
 

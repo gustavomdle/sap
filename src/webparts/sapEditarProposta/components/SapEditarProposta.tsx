@@ -17,6 +17,8 @@ import { allowOverscrollOnElement, DatePicker } from 'office-ui-fabric-react';
 import { PrimaryButton, Stack, MessageBar, MessageBarType } from 'office-ui-fabric-react';
 import { DateTimePicker, DateConvention, TimeConvention } from '@pnp/spfx-controls-react/lib/DateTimePicker';
 import { UrlQueryParameterCollection, Version } from '@microsoft/sp-core-library';
+import { RichText } from "@pnp/spfx-controls-react/lib/RichText";
+
 
 import InputMask from 'react-input-mask';
 import { deprecationHandler } from 'moment';
@@ -43,6 +45,9 @@ var _dataEntregaPropostaCliente;
 var _datadataFinalQuestionamentos;
 var _dataValidadeProposta;
 var _cliente;
+var _dadosProposta;
+var _arrSegmento = [];
+var _arrSetor = [];
 
 export interface IReactGetItemsState {
   itemsRepresentante: [
@@ -289,8 +294,10 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
                   <div className="form-group">
                     <label htmlFor="txtDadosProposta">Dados da Proposta</label><span className="required"> *</span>
-                    <textarea id="txtDadosProposta" className="form-control" rows={4}></textarea>
-                  </div>
+                    <RichText className="editorRichTex" value={_dadosProposta}
+                      onChange={(text) => this.onTextChange(text)}
+                    />
+                    </div>
 
                 </div>
               </div>
@@ -311,10 +318,14 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                         <label htmlFor="txtTitulo">Segmento</label><span className="required"> *</span>
                         {this.state.itemsSegmento.map(function (item, key) {
 
+                          var checado = false;
+
+                          checado = _arrSegmento.indexOf(item) !== -1
+
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkSegmento' type="checkbox" value={item} />
+                              <input className="form-check-input" name='checkSegmento' checked={_arrSegmento.indexOf(item) !== -1} type="checkbox" value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -329,10 +340,16 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
                         {this.state.itemsSetor.map(function (item, key) {
 
+                          console.log("item",item);
+                          console.log("_arrSetor",_arrSetor);
+
+                          var checado = false;
+                         // if(_arrSetor[0] == item) checado = true;
+
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" type="radio" name="checkSetor" value={item} />
+                              <input className="form-check-input" type="radio" checked={checado} name="checkSetor" value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -655,6 +672,12 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
   }
 
 
+  private onTextChange = (newText: string) => {
+    _dadosProposta = newText;
+    return newText;
+  }
+
+
   private onFormatDate = (date: Date): string => {
     //return date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear();
     return ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
@@ -902,7 +925,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     console.log("entrou no proposta");
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta&$expand=Representante,Cliente&$filter=ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor&$expand=Representante,Cliente&$filter=ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -957,14 +980,20 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
             _representante = resultData.d.results[i].Representante.ID;
             _cliente = resultData.d.results[i].Cliente.ID;
 
-            var dadosProposta = resultData.d.results[i].DadosProposta;
-
-            console.log(dadosProposta,dadosProposta);
+            _dadosProposta = resultData.d.results[i].DadosProposta;
 
             jQuery("#txtPropostaRevisadaReferencia").val(resultData.d.results[i].PropostaRevisadaReferencia);
             jQuery("#txtCondicoesPagamento").val(resultData.d.results[i].CondicoesPagamento);
             jQuery("#txtDadosProposta").val(resultData.d.results[i].DadosProposta);
-         
+
+
+            _arrSegmento = resultData.d.results[i].Segmento.results;
+
+            _arrSetor = resultData.d.results[i].Setor.results;
+
+            console.log("_arrSetor1",_arrSetor);
+
+          
 
           }
 
@@ -1258,7 +1287,6 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
       var propostaRevisadaReferencia = $("#txtPropostaRevisadaReferencia").val();
       var SST = $("#txtSST").val();
       var condicoesPagamento = $("#txtCondicoesPagamento").val();
-      var dadosProposta = $("#txtDadosProposta").val();
       var justificativaFinal = $("#txtJustificativa").val();
 
       var arrSegmento = [];
@@ -1332,7 +1360,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
           PropostaRevisadaReferencia: propostaRevisadaReferencia,
           SST: SST,
           CondicoesPagamento: condicoesPagamento,
-          DadosProposta: dadosProposta,
+          DadosProposta: _dadosProposta,
           JustificativaFinal: justificativaFinal,
           Segmento: { "results": arrSegmento },
           Setor: arrSegmento[0],

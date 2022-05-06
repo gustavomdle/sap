@@ -40,6 +40,8 @@
     "SapNovaPropostaWebPartStrings": "lib/webparts/sapNovaProposta/loc/{locale}.js",
     "SapDetalhesPropostaWebPartStrings": "lib/webparts/sapDetalhesProposta/loc/{locale}.js",
     "SapTodasPropostasWebPartStrings": "lib/webparts/sapTodasPropostas/loc/{locale}.js",
-    "SapEditarPropostaWebPartStrings": "lib/webparts/sapEditarProposta/loc/{locale}.js"
+    "SapEditarPropostaWebPartStrings": "lib/webparts/sapEditarProposta/loc/{locale}.js",
+    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js"
+
   }
 }

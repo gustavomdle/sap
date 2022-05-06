@@ -16,6 +16,8 @@ import { PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/People
 import { allowOverscrollOnElement, DatePicker } from 'office-ui-fabric-react';
 import { PrimaryButton, Stack, MessageBar, MessageBarType } from 'office-ui-fabric-react';
 import { DateTimePicker, DateConvention, TimeConvention } from '@pnp/spfx-controls-react/lib/DateTimePicker';
+import { RichText } from "@pnp/spfx-controls-react/lib/RichText";
+
 
 import InputMask from 'react-input-mask';
 import { deprecationHandler } from 'moment';
@@ -37,6 +39,7 @@ var _size: number = 0;
 var _nroAtual: number = 0;
 var _nroNovo: number = 0;
 var _representante;
+var _dadosProposta;
 
 export interface IReactGetItemsState {
   itemsRepresentante: [
@@ -279,7 +282,9 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                   <div className="form-group">
                     <label htmlFor="txtDadosProposta">Dados da Proposta</label><span className="required"> *</span>
-                    <textarea id="txtDadosProposta" className="form-control" rows={4}></textarea>
+                    <RichText value="" 
+                      onChange={(text) => this.onTextChange(text)}
+                    />
                   </div>
 
                 </div>
@@ -649,6 +654,11 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     return ("0" + date.getDate()).slice(-2) + '/' + ("0" + (date.getMonth() + 1)).slice(-2) + '/' + date.getFullYear();
   };
 
+
+  private onTextChange = (newText: string) => {
+    _dadosProposta = newText;
+    return newText;
+  }
 
   private addDaysWRONG() {
 
@@ -1157,7 +1167,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       var propostaRevisadaReferencia = $("#txtPropostaRevisadaReferencia").val();
       var SST = $("#txtSST").val();
       var condicoesPagamento = $("#txtCondicoesPagamento").val();
-      var dadosProposta = $("#txtDadosProposta").val();
       var justificativaFinal = $("#txtJustificativa").val();
 
       var arrSegmento = [];
@@ -1231,10 +1240,10 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
           PropostaRevisadaReferencia: propostaRevisadaReferencia,
           SST: SST,
           CondicoesPagamento: condicoesPagamento,
-          DadosProposta: dadosProposta,
+          DadosProposta: _dadosProposta,
           JustificativaFinal: justificativaFinal,
           Segmento: { "results": arrSegmento },
-          Setor: arrSegmento[0],
+          Setor: arrSetor[0],
           Modalidade: arrModalidade[0],
           NumeroEditalRFPRFQRFI: numeroEditalRFPRFQRFI,
           Quantidade: quantidade,
