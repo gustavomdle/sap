@@ -1390,7 +1390,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
       console.log("Gravou!!");
       $("#conteudoLoading").modal('hide');
-      jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
+      jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false });
 
     }
 
