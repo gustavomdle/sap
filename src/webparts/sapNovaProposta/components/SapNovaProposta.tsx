@@ -952,15 +952,15 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       arrOutrosServicos.push($(this).val());
     });
 
-    var arrProduto = Array.prototype.slice.call(document.querySelectorAll('#ddlProduto2 option:checked'), 0).map(function (v, i, a) {
+    var arrProduto = Array.prototype.slice.call(document.querySelectorAll('#ddlProduto2 option'), 0).map(function (v, i, a) {
       return v.value;
     });
 
-    _arrAreaId = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
+    _arrAreaId = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option'), 0).map(function (v, i, a) {
       return v.value;
     });
 
-    _arrAreaTexto = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
+    _arrAreaTexto = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option'), 0).map(function (v, i, a) {
       return v.text;
     });
 

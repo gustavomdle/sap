@@ -18,6 +18,7 @@ import { PrimaryButton, Stack, MessageBar, MessageBarType } from 'office-ui-fabr
 import { DateTimePicker, DateConvention, TimeConvention } from '@pnp/spfx-controls-react/lib/DateTimePicker';
 import { UrlQueryParameterCollection, Version } from '@microsoft/sp-core-library';
 import { RichText } from "@pnp/spfx-controls-react/lib/RichText";
+import "@pnp/sp/files";
 
 
 import InputMask from 'react-input-mask';
@@ -48,6 +49,19 @@ var _cliente;
 var _dadosProposta;
 var _arrSegmento = [];
 var _arrSetor = [];
+var _arrModalidade = [];
+var _instalacao = [];
+var _garantia = [];
+var _tipoGarantia = [];
+var _prazoGarantia = [];
+var _arrOutrosServicos = [];
+var _arrProduto = [];
+var _arrAreas = [];
+var _serverRelativeUrl;
+var _nomeArquivo;
+var _elemento;
+var _elemento2;
+var _siteurl;
 
 export interface IReactGetItemsState {
   itemsRepresentante: [
@@ -150,6 +164,17 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     document
       .getElementById("btnSucesso")
       .addEventListener("click", (e: Event) => this.fecharSucesso());
+
+    document
+      .getElementById("btExcluirAnexo")
+      .addEventListener("click", (e: Event) => this.excluirAnexo());
+
+    document
+      .getElementById("btnVoltar")
+      .addEventListener("click", (e: Event) => this.voltar());
+
+
+
 
 
     //var $options = $('#ddlProduto1 option:selected');
@@ -297,7 +322,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                     <RichText className="editorRichTex" value={_dadosProposta}
                       onChange={(text) => this.onTextChange(text)}
                     />
-                    </div>
+                  </div>
 
                 </div>
               </div>
@@ -318,9 +343,6 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                         <label htmlFor="txtTitulo">Segmento</label><span className="required"> *</span>
                         {this.state.itemsSegmento.map(function (item, key) {
 
-                          var checado = false;
-
-                          checado = _arrSegmento.indexOf(item) !== -1
 
                           return (
 
@@ -340,11 +362,8 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
                         {this.state.itemsSetor.map(function (item, key) {
 
-                          console.log("item",item);
-                          console.log("_arrSetor",_arrSetor);
-
                           var checado = false;
-                         // if(_arrSetor[0] == item) checado = true;
+                          if (_arrSetor == item) checado = true;
 
                           return (
 
@@ -364,10 +383,13 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
                         {this.state.itemsModalidade.map(function (item, key) {
 
+                          var checado = false;
+                          if (_arrModalidade == item) checado = true;
+
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkModalidade' type="radio" value={item} />
+                              <input className="form-check-input" name='checkModalidade' type="radio" checked={checado} value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -410,10 +432,13 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                         <label htmlFor="txtTitulo">Instalação</label><span className="required"> *</span><br></br>
                         {this.state.itemsInstalacao.map(function (item, key) {
 
+                          var checado = false;
+                          if (_instalacao == item) checado = true;
+
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkInstalacao' type="radio" value={item} />
+                              <input className="form-check-input" name='checkInstalacao' type="radio" checked={checado} value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -427,10 +452,13 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
                         {this.state.itemsGarantia.map(function (item, key) {
 
+                          var checado = false;
+                          if (_garantia == item) checado = true;
+
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkGarantia' type="radio" value={item} />
+                              <input className="form-check-input" name='checkGarantia' type="radio" checked={checado} value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -446,10 +474,13 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
                         {this.state.itemsTipoGarantia.map(function (item, key) {
 
+                          var checado = false;
+                          if (_tipoGarantia == item) checado = true;
+
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkTipoGarantia' type="radio" value={item} />
+                              <input className="form-check-input" name='checkTipoGarantia' type="radio" checked={checado} value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -469,10 +500,13 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
                         {this.state.itemsPrazoGarantia.map(function (item, key) {
 
+                          var checado = false;
+                          if (_prazoGarantia == item) checado = true;
+
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkPrazoGarantia' type="radio" value={item} />
+                              <input className="form-check-input" name='checkPrazoGarantia' type="radio" checked={checado} value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -490,7 +524,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkOutrosServicos' type="checkbox" value={item} />
+                              <input className="form-check-input" name='checkOutrosServicos' type="checkbox" checked={_arrOutrosServicos.indexOf(item) !== -1} value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -509,9 +543,14 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                                 <select multiple={true} id='ddlProduto1' className="form-control" name="ddlProduto1" style={{ "height": "194px", "width": "200px" }}>
 
                                   {this.state.itemsProdutos.map(function (item, key) {
-                                    return (
-                                      <option className="optProduto" value={item.ID}>{item.Title}</option>
-                                    );
+
+                                    if (_arrProduto.indexOf(item.ID) == -1) {
+                                      return (
+                                        <option className="optProduto" value={item.ID}>{item.Title}</option>
+                                      );
+
+                                    }
+
                                   })}
 
                                 </select>
@@ -525,6 +564,16 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                             <td>
                               <div className="col-sm-2">
                                 <select multiple={true} id="ddlProduto2" className="form-control" name="ddlProduto2" style={{ "height": "194px", "width": "200px" }}>
+                                  {this.state.itemsProdutos.map(function (item, key) {
+
+                                    if (_arrProduto.indexOf(item.ID) !== -1) {
+                                      return (
+                                        <option className="optProduto" value={item.ID}>{item.Title}</option>
+                                      );
+
+                                    }
+
+                                  })}
                                 </select>
                               </div>
                             </td>
@@ -560,9 +609,13 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                           <select multiple={true} id='ddlArea1' className="form-control" name="ddlArea1" style={{ "height": "194px", "width": "350px" }}>
 
                             {this.state.itemsAreas.map(function (item, key) {
-                              return (
-                                <option className="optArea" value={item.ID}>{item.Title}</option>
-                              );
+
+                              if (_arrAreas.indexOf(item.ID) == -1) {
+                                return (
+                                  <option className="optArea" value={item.ID}>{item.Title}</option>
+                                );
+
+                              }
 
                             })}
 
@@ -578,6 +631,17 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                       <td>
                         <div className="col-sm-6">
                           <select multiple={true} id="ddlArea2" className="form-control" name="ddlArea2" style={{ "height": "194px", "width": "350px" }}>
+
+                            {this.state.itemsAreas.map(function (item, key) {
+
+                              if (_arrAreas.indexOf(item.ID) !== -1) {
+                                return (
+                                  <option className="optArea" value={item.ID}>{item.Title}</option>
+                                );
+
+                              }
+
+                            })}
                           </select>
                         </div>
                       </td>
@@ -602,6 +666,10 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                   <p>Total máximo permitido: 15 MB</p>
                   <input className="multi" data-maxsize="1024" type="file" id="input" multiple />
 
+                  <br></br>
+                  <br></br>
+                  <div id='conteudoAnexo'></div>
+
                 </div>
               </div>
             </div>
@@ -609,7 +677,8 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
             <br></br>
 
             <div className="text-right">
-              <button id="btnIniciarAprovacao" className="btn btn-success" >Enviar para Aprovação</button>
+              <button style={{ "margin": "2px" }} type="submit" id="btnVoltar" className="btn btn-secondary">Voltar</button>
+              <button style={{ "margin": "2px" }} id="btnIniciarAprovacao" className="btn btn-success" >Enviar para Aprovação</button>
             </div>
 
 
@@ -638,6 +707,26 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
           </div>
         </div>
 
+        <div className="modal fade" id="modalConfirmarExcluirAnexo" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Confirmação</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                Deseja realmente excluir o arquivo?
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btExcluirAnexo" type="button" className="btn btn-primary">Excluir</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="modal fade" id="modalCarregando" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div>
             <div className="modal-dialog" role="document">
@@ -656,10 +745,26 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                 <h5 className="modal-title" id="exampleModalLabel">Alerta</h5>
               </div>
               <div className="modal-body">
-                Proposta cadastrada com sucesso!
+                Proposta atualizada com sucesso!
               </div>
               <div className="modal-footer">
                 <button type="button" id="btnSucesso" className="btn btn-primary">OK</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal fade" id="modalSucessoAnexoExcluido" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Alerta</h5>
+              </div>
+              <div className="modal-body">
+                Anexo excluido com sucesso!
+              </div>
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" data-dismiss="modal">OK</button>
               </div>
             </div>
           </div>
@@ -884,18 +989,20 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
     setTimeout(function () {
 
-      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Comercial"; }).prop('selected', true);
-      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Jurídico"; }).prop('selected', true);
-      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Representante"; }).prop('selected', true);
-      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Propostas"; }).prop('selected', true);
-      var $options = $('#ddlArea1 option:selected');
-      $options.appendTo("#ddlArea2");
+      // jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Comercial"; }).prop('selected', true);
+      // jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Jurídico"; }).prop('selected', true);
+      //  jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Representante"; }).prop('selected', true);
+      //  jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Propostas"; }).prop('selected', true);
+      //   var $options = $('#ddlArea1 option:selected');
+      //  $options.appendTo("#ddlArea2");
 
 
     }, 2000);
 
 
     this.getProposta();
+    this.getTarefas();
+    this.getAnexos();
 
   }
 
@@ -925,7 +1032,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     console.log("entrou no proposta");
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor&$expand=Representante,Cliente&$filter=ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID&$expand=Representante,Cliente,Produto&$filter=ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -986,14 +1093,36 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
             jQuery("#txtCondicoesPagamento").val(resultData.d.results[i].CondicoesPagamento);
             jQuery("#txtDadosProposta").val(resultData.d.results[i].DadosProposta);
 
-
             _arrSegmento = resultData.d.results[i].Segmento.results;
+            _arrSetor = resultData.d.results[i].Setor;
+            _arrModalidade = resultData.d.results[i].Modalidade;
 
-            _arrSetor = resultData.d.results[i].Setor.results;
+            console.log("_arrSetor1", _arrSetor);
 
-            console.log("_arrSetor1",_arrSetor);
+            jQuery("#txtNumeroEditalRFPRFQRFI").val(resultData.d.results[i].NumeroEditalRFPRFQRFI);
+            jQuery("#txtQuantidade").val(resultData.d.results[i].Quantidade);
 
-          
+            _instalacao = resultData.d.results[i].Instalacao;
+            _garantia = resultData.d.results[i].Garantia;
+            _tipoGarantia = resultData.d.results[i].TipoGarantia;
+            _prazoGarantia = resultData.d.results[i].PrazoGarantia;
+            _arrOutrosServicos = resultData.d.results[i].OutrosServicos.results;
+
+            var arrProduto = [];
+            arrProduto = resultData.d.results[i].Produto.results;
+
+            var tamArrProduto = resultData.d.results[i].Produto.results.length;
+
+            for (i = 0; i < tamArrProduto; i++) {
+
+              _arrProduto.push(arrProduto[i].ID);
+
+            }
+
+
+
+
+
 
           }
 
@@ -1008,6 +1137,98 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
 
     })
+
+  }
+
+
+  protected getTarefas() {
+
+    jQuery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title,GrupoSharepoint/ID&$expand=GrupoSharepoint&$filter=Proposta/ID eq ` + _idProposta,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      async: false,
+      success: async function (resultData) {
+
+        console.log("resultData Proposta", resultData);
+
+        if (resultData.d.results.length > 0) {
+
+          for (var i = 0; i < resultData.d.results.length; i++) {
+
+            //_arrSegmento = resultData.d.results[i].Title;
+
+            _arrAreas.push(resultData.d.results[i].GrupoSharepoint.ID);
+
+          }
+
+        }
+
+        console.log(_arrAreas);
+
+
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+      }
+
+
+
+    })
+
+
+  }
+
+  protected getAnexos() {
+
+    //get anexos da biblioteca
+
+    var montaAnexo = "";
+
+    var relativeURL = window.location.pathname;
+
+    var strRelativeURL = relativeURL.replace("SitePages/Propostas-SAP-Editar.aspx", "");
+
+    //var relative = "/sites/bit-hml";
+    var idItem = 0;
+
+    console.log("_bitNumero", _idProposta);
+
+    console.log("caminho", `${strRelativeURL}/AnexosSAP/${_idProposta}`);
+
+
+    _web.getFolderByServerRelativeUrl(`${strRelativeURL}/AnexosSAP/${_idProposta}`)
+      .expand("Folders, Files, ListItemAllFields").get().then(r => {
+        console.log("r", r);
+        /*
+        r.Folders.forEach(item => {
+          console.log("item-doc", item);
+          console.log("entrou em folder");
+        })
+        */
+        r.Files.forEach(item => {
+          console.log("entrou em files");
+
+          console.log("item", item);
+          idItem++;
+          $("#conteudoAnexoNaoEncontrado").hide();
+          montaAnexo = `<a id="anexo${idItem}" data-interception="off" target="_blank" title="" href="${item.ServerRelativeUrl}">${item.Name}</a>&nbsp;<a id="btnExcluirAnexo${idItem}" style="cursor:pointer" >Excluir</a> <br/>`
+
+          $("#conteudoAnexo").append(montaAnexo);
+
+          document
+            .getElementById(`btnExcluirAnexo${idItem}`)
+            .addEventListener("click", (e: Event) => this.confirmarExcluirAnexo(item.ServerRelativeUrl, item.Name, `anexo${idItem}`, `btnExcluirAnexo${idItem}`));
+
+
+        })
+
+      }).catch((error: any) => {
+        console.log("Erro Anexo da biblioteca: ", error);
+      });
+
+
+    //fim anexos da biblioteca
+
 
   }
 
@@ -1072,15 +1293,15 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
       arrOutrosServicos.push($(this).val());
     });
 
-    var arrProduto = Array.prototype.slice.call(document.querySelectorAll('#ddlProduto2 option:checked'), 0).map(function (v, i, a) {
+    var arrProduto = Array.prototype.slice.call(document.querySelectorAll('#ddlProduto2 option'), 0).map(function (v, i, a) {
       return v.value;
     });
 
-    _arrAreaId = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
+    _arrAreaId = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option'), 0).map(function (v, i, a) {
       return v.value;
     });
 
-    _arrAreaTexto = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option:checked'), 0).map(function (v, i, a) {
+    _arrAreaTexto = Array.prototype.slice.call(document.querySelectorAll('#ddlArea2 option'), 0).map(function (v, i, a) {
       return v.text;
     });
 
@@ -1226,6 +1447,54 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
   }
 
+  protected confirmarExcluirAnexo(serverRelativeUrl, nomeArquivo, elemento, elemento2) {
+
+    _serverRelativeUrl = serverRelativeUrl;
+    _nomeArquivo = nomeArquivo;
+    _elemento = elemento;
+    _elemento2 = elemento2;
+
+    console.log("_nomeArquivo", _nomeArquivo);
+    console.log("_elemento", _elemento);
+    console.log("_elemento2", _elemento2);
+
+    //return false;
+
+    jQuery("#modalConfirmarExcluirAnexo").modal({ backdrop: 'static', keyboard: false });
+
+  }
+
+
+  protected async excluirAnexo() {
+
+    console.log("_serverRelativeUrl", _serverRelativeUrl);
+    console.log("_nomeArquivo", _nomeArquivo);
+    console.log("_elemento", _elemento);
+    console.log("_elemento2", _elemento2);
+
+    const list = _web.lists.getByTitle("AnexosSAP");
+
+    var relativeURL = window.location.pathname;
+
+    var strRelativeURL = relativeURL.replace("SitePages/Propostas-SAP-Editar.aspx", "");
+
+    _web.getFolderByServerRelativePath(`${strRelativeURL}/AnexosSAP/${_idProposta}`).files.getByName(_nomeArquivo).delete()
+
+      .then(async response => {
+
+        $("#modalConfirmarExcluirAnexo").modal('hide');
+
+        jQuery(`#${_elemento}`).hide();
+        jQuery(`#${_elemento2}`).hide();
+        jQuery("#modalSucessoAnexoExcluido").modal({ backdrop: 'static', keyboard: false });
+
+      }).catch((error: any) => {
+        console.log("Erro em excluirAnexo " + error);
+
+      })
+
+  }
+
 
   protected async salvar() {
 
@@ -1344,11 +1613,10 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         return v.text;
       });
 
-      console.log("chegou aqui!!!")
 
       await _web.lists
         .getByTitle("PropostasSAP")
-        .items.add({
+        .items.getById(_idProposta).update({
           Title: sintese,
           TipoAnalise: tipoAnaliseProposta,
           IdentificacaoOportunidade: identificacaoOportunidade,
@@ -1363,7 +1631,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
           DadosProposta: _dadosProposta,
           JustificativaFinal: justificativaFinal,
           Segmento: { "results": arrSegmento },
-          Setor: arrSegmento[0],
+          Setor: arrSetor[0],
           Modalidade: arrModalidade[0],
           NumeroEditalRFPRFQRFI: numeroEditalRFPRFQRFI,
           Quantidade: quantidade,
@@ -1376,9 +1644,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         })
         .then(response => {
 
-          _idProposta = response.data.ID;
-
-          console.log(_idProposta);
+          _siteurl = this.props.siteurl;
 
           jquery.ajax({
             url: `${this.props.siteurl}/_api/web/lists/getbytitle('Representantes')/items?$filter=ID eq ` + _idProposta,
@@ -1387,65 +1653,54 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
             async: false,
             success: async function (resultData) {
 
-              console.log("resultData representantes", resultData);
-              console.log("_nroAtual", _nroAtual);
+              jquery.ajax({
+                url: `${_siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$filter=Proposta/ID eq ` + _idProposta,
+                type: "GET",
+                async: false,
+                headers: { 'Accept': 'application/json; odata=verbose;' },
+                success: async function (resultData) {
 
-              _nroAtual = resultData.d.results[0].Numero;
-              if (_nroAtual == null) _nroAtual = 0;
-              _nroNovo = _nroAtual + 1;
+                  if (resultData.d.results.length > 0) {
 
-              console.log("_nroNovo", _nroNovo);
+                    for (var i = 0; i < resultData.d.results.length; i++) {
 
-              await _web.lists
-                .getByTitle("Representantes")
-                .items.getById(_representante).update({
-                  Numero: _nroNovo,
-                })
-                .then(async response => {
+                      console.log("entrou no excluir tarefas");
 
-                  await _web.lists
-                    .getByTitle("PropostasSAP")
-                    .items.getById(_idProposta).update({
-                      Numero: _nroNovo,
-                    })
-                    .then(async response => {
+                      var idTarefa = resultData.d.results[i].ID;
+                      const list = _web.lists.getByTitle("Tarefas");
+                      await list.items.getById(idTarefa).recycle();
 
-                      for (var i = 0; i < _arrAreaId.length; i++) {
+                    }
+                  }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                }
+              });
 
-                        console.log("_arrAreaId[i]", _arrAreaId[i]);
-                        console.log("_arrAreaTexto[i]", _arrAreaTexto[i]);
+              for (var i = 0; i < _arrAreaId.length; i++) {
 
-                        _criou = true;
+                console.log("_arrAreaId[i]", _arrAreaId[i]);
+                console.log("_arrAreaTexto[i]", _arrAreaTexto[i]);
 
-                        _web.lists
-                          .getByTitle("Tarefas")
-                          .items.add({
-                            Title: _arrAreaTexto[i],
-                            PropostaId: _idProposta,
-                            DataPlanejadaTermino: formDataEntregaPropostaCliente,
-                            GrupoSharepointId: _arrAreaId[i]
-                          })
-                          .then(response => {
+                _criou = true;
 
-                            console.log("Criou a tarefa!");
+                await _web.lists
+                  .getByTitle("Tarefas")
+                  .items.add({
+                    Title: _arrAreaTexto[i],
+                    PropostaId: _idProposta,
+                    DataPlanejadaTermino: formDataEntregaPropostaCliente,
+                    GrupoSharepointId: _arrAreaId[i]
+                  })
+                  .then(response => {
 
-                          }).catch((error: any) => {
-                            console.log(error);
-                          });
+                    console.log("Criou a tarefa!");
 
-                      }
+                  }).catch((error: any) => {
+                    console.log(error);
+                  });
 
-
-                    }).catch((error: any) => {
-                      console.log(error);
-
-                    })
-
-                }).catch((error: any) => {
-                  console.log(error);
-
-                })
-
+              }
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -1475,33 +1730,27 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
     if (files.length != 0) {
 
-      _web.lists.getByTitle("AnexosSAP").rootFolder.folders.add(`${_idProposta}`).then(data => {
+      for (var i = 0; i < files.length; i++) {
 
-        for (var i = 0; i < files.length; i++) {
+        var nomeArquivo = files[i].name;
+        var rplNomeArquivo = nomeArquivo.replace(/[^0123456789.,a-zA-Z]/g, '');
 
-          var nomeArquivo = files[i].name;
-          var rplNomeArquivo = nomeArquivo.replace(/[^0123456789.,a-zA-Z]/g, '');
+        //alert(rplNomeArquivo);
+        //Upload a file to the SharePoint Library
+        _web.getFolderByServerRelativeUrl(`${_caminho}/AnexosSAP/${_idProposta}`)
+          //.files.add(files[i].name, files[i], true)
+          .files.add(rplNomeArquivo, files[i], true)
+          .then(function (data) {
+            if (i == files.length) {
 
-          //alert(rplNomeArquivo);
-          //Upload a file to the SharePoint Library
-          _web.getFolderByServerRelativeUrl(`${_caminho}/AnexosSAP/${_idProposta}`)
-            //.files.add(files[i].name, files[i], true)
-            .files.add(rplNomeArquivo, files[i], true)
-            .then(function (data) {
-              if (i == files.length) {
+              console.log("anexou:" + rplNomeArquivo);
+              $("#conteudoLoading").modal('hide');
+              jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
+              //window.location.href = `home.aspx`;
+            }
+          });
 
-                console.log("anexou:" + rplNomeArquivo);
-                $("#conteudoLoading").modal('hide');
-                jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
-                //window.location.href = `home.aspx`;
-              }
-            });
-
-        }
-
-      }).catch(err => {
-        console.log("err", err);
-      });
+      }
 
       //const folderAddResult = _web.folders.add(`${_caminho}/Anexos/${_idProposta}`);
       //console.log("foi");
@@ -1523,7 +1772,11 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
   }
 
+  protected voltar() {
 
+    history.back();
+
+  }
 
 
 

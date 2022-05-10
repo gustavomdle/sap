@@ -21,7 +21,9 @@ export default class SapDetalhesPropostaWebPart extends BaseClientSideWebPart<IS
     const element: React.ReactElement<ISapDetalhesPropostaProps> = React.createElement(
       SapDetalhesProposta,
       {
-        description: this.properties.description
+        description: this.properties.description,
+        context: this.context,
+        siteurl: this.context.pageContext.web.absoluteUrl
       }
     );
 

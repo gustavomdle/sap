@@ -130,11 +130,13 @@ const empTablecolumns = [
     headerStyle: { "backgroundColor": "#bee5eb", "width": "180px" },
     formatter: (rowContent, row) => {
       var id = row.ID;
+      var urlDetalhes = `Proposta-Detalhes.aspx?PropostasID=` + id;
       var urlEditar = `Propostas-SAP-Editar.aspx?PropostasID=` + id;
       return (
-        <><button onClick={id} className="btn btn-info">Exibir</button>&nbsp;
-        <a href={urlEditar}><button className="btn btn-danger">Editar</button></a></>
-
+        <>
+        <a href={urlDetalhes}><button className="btn btn-info">Exibir</button></a>&nbsp;
+        <a href={urlEditar}><button className="btn btn-danger">Editar</button></a>
+        </>
       )
     }
   }
