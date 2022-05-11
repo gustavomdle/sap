@@ -24,6 +24,7 @@ import "@pnp/sp/files";
 import InputMask from 'react-input-mask';
 import { deprecationHandler } from 'moment';
 import { dateToNumber } from '@pnp/spfx-controls-react';
+import { first } from 'lodash';
 
 require("../../../../node_modules/bootstrap/dist/css/bootstrap.min.css");
 require("../../../../css/estilos.css");
@@ -33,10 +34,37 @@ require("../../../../css/discussao.css");
 var _idProposta;
 var _web;
 var _mensagemDiscussao;
+var _siteURL;
+
+export interface IReactGetItemsState {
+  itemsTarefas: [
+    {
+      "ID": "",
+      "Title": "",
+      "Status": "",
+      "DataPlanejadaTermino": "",
+      "DataRealTermino": "",
+      "Justificativa": "",
+    }],
+}
+
+export default class SapDetalhesProposta extends React.Component<ISapDetalhesPropostaProps, IReactGetItemsState> {
 
 
-
-export default class SapDetalhesProposta extends React.Component<ISapDetalhesPropostaProps, {}> {
+  public constructor(props: ISapDetalhesPropostaProps, state: IReactGetItemsState) {
+    super(props);
+    this.state = {
+      itemsTarefas: [
+        {
+          "ID": "",
+          "Title": "",
+          "Status": "",
+          "DataPlanejadaTermino": "",
+          "DataRealTermino": "",
+          "Justificativa": "",
+        }],
+    };
+  }
 
 
   public componentDidMount() {
@@ -46,6 +74,8 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
     _web = new Web(this.props.context.pageContext.web.absoluteUrl);
 
+    _siteURL = this.props.siteurl;
+
     document
       .getElementById("btnResponderDiscussao")
       .addEventListener("click", (e: Event) => this.modalResponderDiscussao());
@@ -54,11 +84,27 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       .getElementById("btnCadastrarDiscussao")
       .addEventListener("click", (e: Event) => this.cadastrarDiscussao());
 
+    var reactHandlerRepresentante = this;
+
+    jquery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title,GrupoSharepoint/ID,GrupoSharepoint/Title,Status,DataPlanejadaTermino,Modified,DataRealTermino,Justificativa&$expand=GrupoSharepoint&$filter=Proposta/ID eq ` + _idProposta,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      success: function (resultData) {
+        reactHandlerRepresentante.setState({
+          itemsTarefas: resultData.d.results
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+      }
+    });
+
 
     this.getProposta();
     this.getTarefas();
     this.getAnexos();
     this.getSelecaoAreas();
+    this.getDiscussaoNova();
 
   }
 
@@ -295,10 +341,69 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                 <div className="card-body">
 
+                  <div id='conteudoDiscusssaoNova'></div>
+
                   <br></br>
                   <button id='btnResponderDiscussao' type="button" className="btn btn-info">Responder</button>
                   <br></br>
 
+
+                </div>
+
+              </div>
+            </div>
+
+            <div className="card">
+              <div className="card-header btn" id="headingTarefas" data-toggle="collapse" data-target="#collapseTarefas" aria-expanded="true" aria-controls="collapseTarefas">
+                <h5 className="mb-0 text-info" >
+                  Aprovação
+                </h5>
+              </div>
+              <div id="collapseTarefas" className="collapse show" aria-labelledby="headingOne" >
+
+                <div className="card-body">
+
+                  <table className="table table-hover" id="tbItens">
+                    <thead>
+                      <tr>
+                        <th scope="col">Título</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Data planejada</th>
+                        <th scope="col">Data real</th>
+                        <th scope="col">Justificativa</th>
+                        <th scope="col">Ação</th>
+                      </tr>
+                    </thead>
+                    <tbody id="conteudoTarefas">
+                      {this.state.itemsTarefas.map((item) => {
+
+                        var dataPlanejadaTermino = new Date(item.DataPlanejadaTermino);
+                        var dtDataPlanejadaTermino = ("0" + dataPlanejadaTermino.getDate()).slice(-2) + '/' + ("0" + (dataPlanejadaTermino.getMonth() + 1)).slice(-2) + '/' + dataPlanejadaTermino.getFullYear();
+
+                        var dataRealTermino = new Date(item.DataRealTermino);
+                        var dtDataRealTermino = ("0" + dataRealTermino.getDate()).slice(-2) + '/' + ("0" + (dataRealTermino.getMonth() + 1)).slice(-2) + '/' + dataRealTermino.getFullYear();
+                        if (dtDataRealTermino == "31/12/1969") dtDataRealTermino = "-";
+                        var vlrJustificativa;
+                        var justificativa = item.Justificativa;
+                        if (justificativa == null) vlrJustificativa = "-";
+                        else vlrJustificativa = justificativa
+
+                        return (
+
+
+                          <><tr>
+                            <td>Avaliação da Área ({item.Title})</td>
+                            <td>{item.Status}</td>
+                            <td>{dtDataPlanejadaTermino}</td>
+                            <td>{dtDataRealTermino}</td>
+                            <td>{vlrJustificativa}</td>
+                            <td><button onClick={() => this.detalhesTarefas(item.ID)} type="button" className="btn btn-success btn-sm">Detalhes</button></td>
+                          </tr></>
+                        );
+                      })}
+
+                    </tbody>
+                  </table>
 
                 </div>
 
@@ -359,6 +464,36 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
           </div>
         </div>
 
+        <div className="modal fade" id="modalAprovacao" tabIndex={-1} role="dialog" aria-labelledby="aprovacaoTitle" aria-hidden="true">
+          <div className="modal-dialog modal-dialog-scrollable" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="aprovacaoTitle">Aprovar</h5>
+                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div className="modal-body">
+                <div className="container-fluid border rounded table-responsive" id="conteudo_formulario">
+                  <div className="form-group">
+                    <label htmlFor="txtDescricao">Área</label><span className={styles.required}> *</span>
+                    fgfgfgf
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="txtDescricao">Mensagem</label><span className={styles.required}> *</span>
+                    gfgfgfd
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id='btnAprovar' className="btn btn-primary">Aprovar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </>
 
     );
@@ -368,8 +503,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
   protected getProposta() {
 
-    console.log("entrou no proposta");
-
     jQuery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Representante/Title,Cliente/ID,Cliente/Title,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,Produto/Title&$expand=Representante,Cliente,Produto&$filter=ID eq ` + _idProposta,
       type: "GET",
@@ -377,7 +510,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       async: false,
       success: async function (resultData) {
 
-        console.log("resultData Proposta", resultData);
+        //console.log("resultData Proposta", resultData);
 
         if (resultData.d.results.length > 0) {
 
@@ -467,22 +600,49 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
   protected getTarefas() {
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title,GrupoSharepoint/ID,GrupoSharepoint/Title&$expand=GrupoSharepoint&$filter=Proposta/ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title,GrupoSharepoint/ID,GrupoSharepoint/Title,Status,DataPlanejadaTermino,Modified,DataRealTermino,Justificativa&$expand=GrupoSharepoint&$filter=Proposta/ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
-      success: async function (resultData) {
+      success: async (resultData) => {
 
         var arrAreas = [];
         var montaNotificarArea = "";
-
-        console.log("resultData Proposta", resultData);
+        var montaTarefas = "";
 
         if (resultData.d.results.length > 0) {
 
           for (var i = 0; i < resultData.d.results.length; i++) {
 
             arrAreas.push(resultData.d.results[i].GrupoSharepoint.Title);
+            var id = resultData.d.results[i].ID;
+            var dataPlanejadaTermino = new Date(resultData.d.results[i].DataPlanejadaTermino);
+            var dtDataPlanejadaTermino = ("0" + dataPlanejadaTermino.getDate()).slice(-2) + '/' + ("0" + (dataPlanejadaTermino.getMonth() + 1)).slice(-2) + '/' + dataPlanejadaTermino.getFullYear();
+            var dataRealTermino = new Date(resultData.d.results[i].DataRealTermino);
+            var dtDataRealTermino = ("0" + dataRealTermino.getDate()).slice(-2) + '/' + ("0" + (dataRealTermino.getMonth() + 1)).slice(-2) + '/' + dataRealTermino.getFullYear();
+            if (dtDataRealTermino == "31/12/1969") dtDataRealTermino = "-";
+            var justificativa = resultData.d.results[i].Justificativa;
+
+            console.log("justificativa", justificativa);
+
+            if (justificativa == null) justificativa = "-";
+            /*
+                        montaTarefas = `
+                        <tr>
+                        <td>Avaliação da Área (${resultData.d.results[i].Title})</td>
+                        <td>${resultData.d.results[i].Status}</td>
+                        <td>${dtDataPlanejadaTermino}</td>
+                        <td>${dtDataRealTermino}</td>
+                        <td>${justificativa}</td>
+                        <td><button onclick="${this.detalhesTarefas(id)}" id="detalhes${resultData.d.results[i].ID}" type="button" class="btn btn-success btn-sm">Detalhes</button></td>
+                        </tr>`;
+            
+                        $("#conteudoTarefas").append(montaTarefas);
+            */
+            //document
+            //.getElementById(`detalhes${resultData.d.results[i].ID}`)
+            //.addEventListener("click", (e: Event) => this.detalhesTarefas(id));
+
 
           }
 
@@ -495,11 +655,14 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
           montaNotificarArea += `<div class="form-check">
                                     <input class="form-check-input" name="checkNotificarArea" grupo="${resultData.d.results[i].GrupoSharepoint.Title}" type="checkbox" value="${resultData.d.results[i].GrupoSharepoint.ID}">
                                     <label class="form-check-label">${resultData.d.results[i].GrupoSharepoint.Title}</label>
-                                    </div>`
+                                    </div>`;
+
+
 
         }
 
         $("#conteudoNotificarArea").append(montaNotificarArea);
+
 
 
       },
@@ -511,6 +674,12 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     })
 
 
+  }
+
+  protected detalhesTarefas(id) {
+
+    console.log("entrou no detalhesTarefas" + id);
+    var teste = id;
   }
 
   protected getAnexos() {
@@ -527,14 +696,14 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     //var relative = "/sites/bit-hml";
     var idItem = 0;
 
-    console.log("_bitNumero", _idProposta);
+    //("_bitNumero", _idProposta);
 
-    console.log("caminho", `${strRelativeURL}/AnexosSAP/${_idProposta}`);
+    //console.log("caminho", `${strRelativeURL}/AnexosSAP/${_idProposta}`);
 
 
     _web.getFolderByServerRelativeUrl(`${strRelativeURL}/AnexosSAP/${_idProposta}`)
       .expand("Folders, Files, ListItemAllFields").get().then(r => {
-        console.log("r", r);
+        //console.log("r", r);
         /*
         r.Folders.forEach(item => {
           console.log("item-doc", item);
@@ -542,9 +711,9 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
         })
         */
         r.Files.forEach(item => {
-          console.log("entrou em files");
+          //console.log("entrou em files");
 
-          console.log("item", item);
+          //console.log("item", item);
           idItem++;
           $("#conteudoAnexoNaoEncontrado").hide();
           montaAnexo = `<a id="anexo${idItem}" data-interception="off" target="_blank" title="" href="${item.ServerRelativeUrl}">${item.Name}</a>&nbsp; <br/>`
@@ -583,7 +752,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
         var montaArea = `<option value="0" selected>Selecione...</option>`;
 
-        console.log("resultData Proposta", resultData);
+        // console.log("resultData Proposta", resultData);
 
         if (resultData.d.results.length > 0) {
 
@@ -610,21 +779,133 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
   }
 
 
-  protected modalResponderDiscussao() {
 
-    jQuery("#modalDiscussao").modal({ backdrop: 'static', keyboard: false })
+  protected getDiscussaoNova() {
+
+    $("#conteudoDiscusssaoNova").empty();
+
+    console.log("this.props.siteurl", this.props.siteurl);
+
+    jQuery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('ListaDiscussao_1911')/items?$select=ID,Title,Author/Title,Area/Title,Created,NotificarArea/Title,Mensagem,txtAnexosRelacionados&$expand=Author,Area,NotificarArea`,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      async: false,
+      success: async function (resultData) {
+
+        var montaDiscussaoNova = ``;
+
+        console.log("resultData Discussao", resultData);
+
+        if (resultData.d.results.length > 0) {
+
+          console.log("resultData.d.results.length", resultData.d.results.length);
+
+          for (var i = 0; i < resultData.d.results.length; i++) {
+
+            var montaLinksAnexos = ``;
+
+            console.log("entrou discussao");
+
+            var autor = resultData.d.results[i].Author.Title;
+            var area = resultData.d.results[i].Area.Title;
+            var criado = new Date(resultData.d.results[i].Created);
+            var criado2 = new Date(criado.setHours(criado.getHours() + 3));
+            var criadoHora = criado2.getHours() + ":" + criado2.getMinutes() + ":" + criado2.getSeconds();
+            var criadoData = ("0" + criado2.getDate()).slice(-2) + '/' + ("0" + (criado2.getMonth() + 1)).slice(-2) + '/' + criado2.getFullYear();
+            var arrNotificarArea = [];
+            var notificarArea = resultData.d.results[i].NotificarArea.results;
+            var mensagem = resultData.d.results[i].Mensagem;
+
+            for (var x = 0; x < notificarArea.length; x++) {
+              arrNotificarArea.push(notificarArea[x].Title)
+            }
+
+            //var mensagem = resultData.d.results[i].Title;
+
+            //console.log("Autor", autor);
+            //console.log("Area", area);
+            //console.log("criadoHora", criadoHora);
+            //console.log("criadoData", criadoData);
+            //console.log("notificarArea", notificarArea);
+            //console.log("arrNotificarArea", arrNotificarArea.toString());
+            // console.log("mensagem", mensagem);
+
+            var anexosRelacionados = resultData.d.results[i].txtAnexosRelacionados;
+
+            if (anexosRelacionados !== null) {
+
+              var arrAnexosRelacionados = anexosRelacionados.split(',');
+
+              for (var y = 0; y < arrAnexosRelacionados.length; y++) {
+
+                montaLinksAnexos += `<a target="_blank" href="${_siteURL}/AnexosSAP/${_idProposta}/${arrAnexosRelacionados[y]}">${arrAnexosRelacionados[y]}</a><br/>`;
+
+              }
+
+            } else montaLinksAnexos = `<div class="text-secondary">Nenhum anexo encontrado.</div>`;
+
+
+            console.log("arrAnexosRelacionados", arrAnexosRelacionados);
+
+            montaDiscussaoNova += `
+            <div class="p-0 mb-0 bg-light text-dark rounded ">
+
+            <div class="p-3 mb-2 alert-danger text-dark rounded-top ">
+            <b>Comentário postado por:</b> ${autor} - Área ${area} em ${criadoData} às ${criadoHora}<br>
+            <b>Áreas notificadas:</b> ${arrNotificarArea.toString()}
+            
+            </div>
+            <br/>
+            <div class="p-3">
+            ${mensagem}
+
+            Anexos relacionados:<br/>
+            ${montaLinksAnexos}
+            </div>
+            <br/>
+            </div>
+            <br/>
+            `
+
+
+          }
+
+        }
+
+        $("#conteudoDiscusssaoNova").append(montaDiscussaoNova);
+
+
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log("Erro em getDiscussaoNova: " + textStatus);
+      }
+
+
+
+    })
+
+
 
 
   }
 
+
+  protected modalResponderDiscussao() {
+
+    jQuery("#modalDiscussao").modal({ backdrop: 'static', keyboard: false });
+
+
+  }
 
   private onTextChangeMensagemDiscussao = (newText: string) => {
     _mensagemDiscussao = newText;
     return newText;
   }
 
-
   private async cadastrarDiscussao() {
+
+    $("#btnCadastrarDiscussao").prop("disabled", true);
 
     var area = jQuery('#ddlArea option:selected').val();
     var mensagem = _mensagemDiscussao;
@@ -644,11 +925,49 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       arrNomeNotificarArea.push($(this).attr('grupo'));
     });
 
-    console.log("area", area);
-    console.log("mensagem", mensagem);
-    console.log("arrAnexosSelecionados", arrAnexosSelecionados);
-    console.log("arrNotificarArea", arrNotificarArea);
-    console.log("arrNomeNotificarArea", arrNomeNotificarArea);
+    console.log("_mensagemDiscussao", _mensagemDiscussao);
+
+
+    if (area == "0") {
+      alert("Escolha a área!");
+      $("#btnCadastrarDiscussao").prop("disabled", false);
+      return false;
+    }
+
+    if (_mensagemDiscussao == "") {
+      alert("Forneça uma mensagem!");
+      $("#btnCadastrarDiscussao").prop("disabled", false);
+      return false;
+    }
+
+    if (_mensagemDiscussao == "<p><br></p>") {
+      alert("Forneça uma mensagem!");
+      $("#btnCadastrarDiscussao").prop("disabled", false);
+      return false;
+    }
+
+    if (_mensagemDiscussao == undefined) {
+      alert("Forneça uma mensagem!");
+      $("#btnCadastrarDiscussao").prop("disabled", false);
+      return false;
+    }
+
+
+
+
+    if (arrNotificarArea.length == 0) {
+      alert("Escolha uma área a ser notificada!");
+      $("#btnCadastrarDiscussao").prop("disabled", false);
+      return false;
+    }
+
+    //console.log("area", area);
+    //console.log("mensagem", mensagem);
+    //console.log("arrAnexosSelecionados", arrAnexosSelecionados);
+    //console.log("arrNotificarArea", arrNotificarArea);
+    //console.log("arrNomeNotificarArea", arrNomeNotificarArea);
+
+
 
     await _web.lists
       .getByTitle("ListaDiscussao_1911")
@@ -665,6 +984,15 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
         //_idProposta = response.data.ID;
         console.log("gravou discussão");
+        $("#modalDiscussao").modal('hide');
+        $("#btnCadastrarDiscussao").prop("disabled", false);
+        $("#ddlArea").val('0');
+        $("input[name='checkAnexosSelecionados']").prop('checked', false);
+        $("input[name='checkNotificarArea']").prop('checked', false)
+        $(".ql-editor").empty();
+        _mensagemDiscussao = "";
+
+        this.getDiscussaoNova();
 
       }).catch((error: any) => {
         console.log(error);
