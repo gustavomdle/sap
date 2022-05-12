@@ -35,16 +35,21 @@ var _idProposta;
 var _web;
 var _mensagemDiscussao;
 var _siteURL;
+var _idTarefa;
+var _numeroProposta;
+var _grupos = [];
+var _strGrupos;
 
 export interface IReactGetItemsState {
   itemsTarefas: [
     {
       "ID": "",
       "Title": "",
-      "Status": "",
+      "Status": string,
       "DataPlanejadaTermino": "",
       "DataRealTermino": "",
       "Justificativa": "",
+      "GrupoSharepoint": { "Title": "" }
     }],
 }
 
@@ -62,12 +67,13 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
           "DataPlanejadaTermino": "",
           "DataRealTermino": "",
           "Justificativa": "",
+          "GrupoSharepoint": { "Title": "" }
         }],
     };
   }
 
 
-  public componentDidMount() {
+  public async componentDidMount() {
 
     var queryParms = new UrlQueryParameterCollection(window.location.href);
     _idProposta = parseInt(queryParms.getValue("PropostasID"));
@@ -76,6 +82,46 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
     _siteURL = this.props.siteurl;
 
+    //let groups = await _web.currentUser.groups();
+
+    await _web.currentUser.get().then(f => {
+      console.log("user", f);
+      var id = f.Id;
+
+      var grupos = [];
+
+      jQuery.ajax({
+        url: `${this.props.siteurl}/_api/web/GetUserById(${id})/Groups`,
+        type: "GET",
+        headers: { 'Accept': 'application/json; odata=verbose;' },
+        async: false,
+        success: async function (resultData) {
+
+          console.log("resultDataGrupo", resultData);
+
+          if (resultData.d.results.length > 0) {
+
+            for (var i = 0; i < resultData.d.results.length; i++) {
+
+              grupos.push(resultData.d.results[i].Title);
+
+            }
+
+          }
+
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.log(textStatus);
+        }
+
+      })
+
+      console.log("grupos", grupos);
+      _grupos = grupos;
+    })
+
+
+
     document
       .getElementById("btnResponderDiscussao")
       .addEventListener("click", (e: Event) => this.modalResponderDiscussao());
@@ -83,6 +129,12 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     document
       .getElementById("btnCadastrarDiscussao")
       .addEventListener("click", (e: Event) => this.cadastrarDiscussao());
+
+    document
+      .getElementById("btnAprovarTarefa")
+      .addEventListener("click", (e: Event) => this.aprovar());
+
+
 
     var reactHandlerRepresentante = this;
 
@@ -96,6 +148,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(textStatus);
       }
     });
 
@@ -129,68 +182,80 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                   <div className="form-group">
                     <div className="form-row">
-                      <div className="form-group col-md-8">
-                        <label htmlFor="txtTitulo">Tipo de análise</label><br></br>
+                      <div className="form-group col-md-4">
+                        <label htmlFor="txtNumeroProposta">Número da Proposta</label><br></br>
+                        <span className="text-info" id='txtNumeroProposta'></span>
+                      </div>
+                      <div className="form-group col-md-4">
+                        <label htmlFor="txtStatus">Status</label><br></br>
+                        <span className="text-info" id='txtStatus'></span>
+                      </div>
+                      <div className="form-group col-md-4">
+                        <label htmlFor="txtTipoAnalise">Tipo de análise</label><br></br>
                         <span className="text-info" id='txtTipoAnalise'></span>
                       </div>
                     </div>
-                    <div className="form-group">
-                      <div className="form-row">
-                        <div className="form-group col-md-9">
-                          <label htmlFor="txtSintese">Síntese</label><br></br>
-                          <span className="text-info" id='txtSintese'></span>
-                        </div>
-                        <div className="form-group col-md-3">
-                          <label htmlFor="txtIdentificacaoOportunidade">Identificação da Oportunidade </label><br></br>
-                          <span className="text-info" id='txtIdentificacaoOportunidade'></span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <div className="form-row">
-                        <div className="form-group col-md-4">
-                          <label htmlFor="dtDataEntregaPropostaCliente">Data da entrega da Proposta ao Cliente</label><br></br>
-                          <span className="text-info" id='txtDataEntregaPropostaCliente'></span>
-                        </div>
-                        <div className="form-group col-md-4">
-                          <label htmlFor="dtDataFinalQuestionamentos">Data final de questionamentos</label><br></br>
-                          <span className="text-info" id='txtDataFinalQuestionamentos'></span>
-                        </div>
-                        <div className="form-group col-md-4">
-                          <label htmlFor="dtDataValidadeProposta">Data de validade da Proposta</label><br></br>
-                          <span className="text-info" id='txtdataValidadeProposta'></span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <div className="form-row">
-                        <div className="form-group col-md-6">
-                          <label htmlFor="ddlRepresentante">Representante</label><br></br>
-                          <span className="text-info" id='txtRepresentante'></span>
-                        </div>
-                        <div className="form-group col-md-6">
-                          <label htmlFor="ddlCliente">Cliente </label><br></br>
-                          <span className="text-info" id='txtCliente'></span>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <div className="form-row">
-                        <div className="form-group col-md-8">
-                          <label htmlFor="txtPropostaRevisadaReferencia">Proposta revisada/referência</label><br></br>
-                          <span className="text-info" id='txtPropostaRevisadaReferencia'></span>
-                        </div>
-                        <div className="form-group col-md-4">
-                          <label htmlFor="txtCondicoesPagamento">Condições de pagamento </label><br></br>
-                          <span className="text-info" id='txtCondicoesPagamento'></span>
-                        </div>
-                      </div>
-                    </div>
-
                   </div>
+
+
+
+
+                  <div className="form-group">
+                    <div className="form-row">
+                      <div className="form-group col-md-7">
+                        <label htmlFor="txtSintese">Síntese</label><br></br>
+                        <span className="text-info" id='txtSintese'></span>
+                      </div>
+                      <div className="form-group col-md-5">
+                        <label htmlFor="txtIdentificacaoOportunidade">Identificação da Oportunidade </label><br></br>
+                        <span className="text-info" id='txtIdentificacaoOportunidade'></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <div className="form-row">
+                      <div className="form-group col-md-4">
+                        <label htmlFor="dtDataEntregaPropostaCliente">Data da entrega da Proposta ao Cliente</label><br></br>
+                        <span className="text-info" id='txtDataEntregaPropostaCliente'></span>
+                      </div>
+                      <div className="form-group col-md-4">
+                        <label htmlFor="dtDataFinalQuestionamentos">Data final de questionamentos</label><br></br>
+                        <span className="text-info" id='txtDataFinalQuestionamentos'></span>
+                      </div>
+                      <div className="form-group col-md-4">
+                        <label htmlFor="dtDataValidadeProposta">Data de validade da Proposta</label><br></br>
+                        <span className="text-info" id='txtdataValidadeProposta'></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <div className="form-row">
+                      <div className="form-group col-md-6">
+                        <label htmlFor="ddlRepresentante">Representante</label><br></br>
+                        <span className="text-info" id='txtRepresentante'></span>
+                      </div>
+                      <div className="form-group col-md-6">
+                        <label htmlFor="ddlCliente">Cliente </label><br></br>
+                        <span className="text-info" id='txtCliente'></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <div className="form-row">
+                      <div className="form-group col-md-8">
+                        <label htmlFor="txtPropostaRevisadaReferencia">Proposta revisada/referência</label><br></br>
+                        <span className="text-info" id='txtPropostaRevisadaReferencia'></span>
+                      </div>
+                      <div className="form-group col-md-4">
+                        <label htmlFor="txtCondicoesPagamento">Condições de pagamento </label><br></br>
+                        <span className="text-info" id='txtCondicoesPagamento'></span>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
 
@@ -366,7 +431,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                   <table className="table table-hover" id="tbItens">
                     <thead>
                       <tr>
-                        <th scope="col">Título</th>
+                        <th scope="col">Avaliação da Área</th>
                         <th scope="col">Status</th>
                         <th scope="col">Data planejada</th>
                         <th scope="col">Data real</th>
@@ -379,27 +444,74 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                         var dataPlanejadaTermino = new Date(item.DataPlanejadaTermino);
                         var dtDataPlanejadaTermino = ("0" + dataPlanejadaTermino.getDate()).slice(-2) + '/' + ("0" + (dataPlanejadaTermino.getMonth() + 1)).slice(-2) + '/' + dataPlanejadaTermino.getFullYear();
-
                         var dataRealTermino = new Date(item.DataRealTermino);
                         var dtDataRealTermino = ("0" + dataRealTermino.getDate()).slice(-2) + '/' + ("0" + (dataRealTermino.getMonth() + 1)).slice(-2) + '/' + dataRealTermino.getFullYear();
                         if (dtDataRealTermino == "31/12/1969") dtDataRealTermino = "-";
                         var vlrJustificativa;
                         var justificativa = item.Justificativa;
+
                         if (justificativa == null) vlrJustificativa = "-";
-                        else vlrJustificativa = justificativa
+                        else vlrJustificativa = justificativa;
 
-                        return (
+                        // var status = item.Status;
+
+                        console.log("item.Status", item.Status);
+
+                        if (item.Status == "Em análise") {
+
+                          console.log("item.Title", item.Title);
+                          console.log("_grupos.indexOf(item.Title)", _grupos.indexOf(item.Title));
+
+                          if (_grupos.indexOf(item.Title) !== -1) {
+
+                            return (
+
+                              <><tr>
+                                <td>{item.Title}</td>
+                                <td>{item.Status}</td>
+                                <td>{dtDataPlanejadaTermino}</td>
+                                <td>{dtDataRealTermino}</td>
+                                <td>{vlrJustificativa}</td>
+                                <td><button onClick={() => this.detalhesTarefas(item.ID, item.GrupoSharepoint.Title)} type="button" className="btn btn-success btn-sm">Detalhes</button></td>
+                              </tr></>
+                            );
+
+                          } else {
+
+                            return (
+
+                              <><tr>
+                                <td>{item.Title}</td>
+                                <td>{item.Status}</td>
+                                <td>{dtDataPlanejadaTermino}</td>
+                                <td>{dtDataRealTermino}</td>
+                                <td>{vlrJustificativa}</td>
+                                <td></td>
+                              </tr></>
+                            );
+
+                          }
 
 
-                          <><tr>
-                            <td>Avaliação da Área ({item.Title})</td>
-                            <td>{item.Status}</td>
-                            <td>{dtDataPlanejadaTermino}</td>
-                            <td>{dtDataRealTermino}</td>
-                            <td>{vlrJustificativa}</td>
-                            <td><button onClick={() => this.detalhesTarefas(item.ID)} type="button" className="btn btn-success btn-sm">Detalhes</button></td>
-                          </tr></>
-                        );
+                        } else {
+
+                          return (
+
+                            <><tr>
+                              <td>{item.Title}</td>
+                              <td>{item.Status}</td>
+                              <td>{dtDataPlanejadaTermino}</td>
+                              <td>{dtDataRealTermino}</td>
+                              <td>{vlrJustificativa}</td>
+                              <td></td>
+                            </tr></>
+                          );
+
+
+                        }
+
+
+
                       })}
 
                     </tbody>
@@ -476,19 +588,26 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
               <div className="modal-body">
                 <div className="container-fluid border rounded table-responsive" id="conteudo_formulario">
                   <div className="form-group">
-                    <label htmlFor="txtDescricao">Área</label><span className={styles.required}> *</span>
-                    fgfgfgf
+                    <h4>Avaliação da Área <span id='txtModalArea'></span></h4>
+                    <span className="text-info">Proposta nro: <span id='txtModalNumeroProposta'></span></span><br></br><br></br>
+                    <label htmlFor="ddlStatus">Status</label><span className={styles.required}> *</span>
+                    <select id="ddlStatus" className="form-control">
+                      <option value="0" selected>Selecione...</option>
+                      <option value="Aprovada">Aprovada</option>
+                      <option value="Reprovada">Reprovada</option>
+                      <option value="Não envolve a Área">Não envolve a Área</option>
+                    </select>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="txtDescricao">Mensagem</label><span className={styles.required}> *</span>
-                    gfgfgfd
+                    <label htmlFor="txtDescricao">Justificativa</label><span className={styles.required}> *</span>
+                    <textarea id="txtJustificativa" className="form-control" rows={4}></textarea>
                   </div>
                 </div>
               </div>
 
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" id='btnAprovar' className="btn btn-primary">Aprovar</button>
+                <button type="button" id='btnAprovarTarefa' className="btn btn-primary">Aprovar</button>
               </div>
             </div>
           </div>
@@ -504,7 +623,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
   protected getProposta() {
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Representante/Title,Cliente/ID,Cliente/Title,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,Produto/Title&$expand=Representante,Cliente,Produto&$filter=ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Representante/Title,Cliente/ID,Cliente/Title,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,Produto/Title,Numero,Status&$expand=Representante,Cliente,Produto&$filter=ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -516,6 +635,9 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
           for (var i = 0; i < resultData.d.results.length; i++) {
 
+            var numeroProposta = resultData.d.results[i].Numero;
+            _numeroProposta = numeroProposta;
+            var status = resultData.d.results[i].Status;
             var tipoAnalise = resultData.d.results[i].TipoAnalise;
             var sintese = resultData.d.results[i].Title;
             var identificacaoOportunidade = resultData.d.results[i].IdentificacaoOportunidade;
@@ -557,6 +679,8 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
             var strTituloProduto = arrTituloProduto.toString();
 
+            jQuery("#txtNumeroProposta").html(numeroProposta);
+            jQuery("#txtStatus").html(status);
             jQuery("#txtTipoAnalise").html(tipoAnalise);
             jQuery("#txtSintese").html(sintese);
             jQuery("#txtIdentificacaoOportunidade").html(identificacaoOportunidade);
@@ -580,6 +704,10 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             jQuery("#txtOutrosServicos").html(strOutrosServicos);
             jQuery("#txtProduto").html(strTituloProduto);
 
+            jQuery("#txtModalNumeroProposta").html(numeroProposta);
+
+
+
           }
 
         }
@@ -588,6 +716,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(textStatus);
       }
 
 
@@ -626,23 +755,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             console.log("justificativa", justificativa);
 
             if (justificativa == null) justificativa = "-";
-            /*
-                        montaTarefas = `
-                        <tr>
-                        <td>Avaliação da Área (${resultData.d.results[i].Title})</td>
-                        <td>${resultData.d.results[i].Status}</td>
-                        <td>${dtDataPlanejadaTermino}</td>
-                        <td>${dtDataRealTermino}</td>
-                        <td>${justificativa}</td>
-                        <td><button onclick="${this.detalhesTarefas(id)}" id="detalhes${resultData.d.results[i].ID}" type="button" class="btn btn-success btn-sm">Detalhes</button></td>
-                        </tr>`;
-            
-                        $("#conteudoTarefas").append(montaTarefas);
-            */
-            //document
-            //.getElementById(`detalhes${resultData.d.results[i].ID}`)
-            //.addEventListener("click", (e: Event) => this.detalhesTarefas(id));
-
 
           }
 
@@ -667,6 +779,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(textStatus);
       }
 
 
@@ -676,10 +789,172 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
   }
 
-  protected detalhesTarefas(id) {
+  protected detalhesTarefas(id, nomeGrupo) {
 
     console.log("entrou no detalhesTarefas" + id);
-    var teste = id;
+    _idTarefa = id;
+
+    jQuery("#txtModalArea").html(nomeGrupo);
+    jQuery("#modalAprovacao").modal({ backdrop: 'static', keyboard: false });
+
+  }
+
+  protected async aprovar() {
+
+    var status = jQuery('#ddlStatus option:selected').val();
+    var justificativa = jQuery('#txtJustificativa').val();
+
+    var DataRealTermino = "" + jQuery("#dtDataFinalQuestionamentos-label").val() + "";
+    var DataRealTerminoDia = DataRealTermino.substring(0, 2);
+    var DataRealTerminoMes = DataRealTermino.substring(3, 5);
+    var DataRealTerminoAno = DataRealTermino.substring(6, 10);
+    var formDataRealTermino = DataRealTerminoAno + "-" + DataRealTerminoMes + "-" + DataRealTerminoDia;
+
+    var today = new Date();
+    var dataRealTermino = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+
+    await _web.lists
+      .getByTitle("Tarefas")
+      .items.getById(_idTarefa).update({
+        Status: status,
+        Justificativa: justificativa,
+        DataRealTermino: dataRealTermino
+      })
+      .then(response => {
+
+
+        if (status == "Aprovada") {
+
+          jQuery.ajax({
+            url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title&$filter=(Proposta/ID eq ${_idProposta}) and (Status ne 'Aprovada' or Status ne 'Não envolve a Área')`,
+            type: "GET",
+            headers: { 'Accept': 'application/json; odata=verbose;' },
+            async: false,
+            success: async (resultData) => {
+
+              if (resultData.d.results.length > 0) {
+
+                console.log("Aprovou!!!");
+                this.recarregaTarefas();
+                $("#modalAprovacao").modal('hide');
+
+              } else {
+
+                await _web.lists
+                  .getByTitle("PropostasSAP")
+                  .items.getById(_idProposta).update({
+                    Status: "Aprovado",
+                  })
+                  .then(response => {
+
+                    console.log("Aprovou!!!");
+                    this.recarregaTarefas();
+                    $("#modalAprovacao").modal('hide');
+
+                  })
+
+              }
+
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              console.log(textStatus);
+            }
+
+          })
+          //se sim atualiza tarefas e proposta
+        }
+
+
+        else if (status == "Não envolve a Área") {
+
+          jQuery.ajax({
+            url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title&$filter=(Proposta/ID eq ${_idProposta}) and (Status ne 'Aprovada' or Status ne 'Não envolve a Área')`,
+            type: "GET",
+            headers: { 'Accept': 'application/json; odata=verbose;' },
+            async: false,
+            success: async (resultData) => {
+
+              if (resultData.d.results.length > 0) {
+
+                console.log("Aprovou!!!");
+                this.recarregaTarefas();
+                $("#modalAprovacao").modal('hide');
+
+              } else {
+
+                await _web.lists
+                  .getByTitle("PropostasSAP")
+                  .items.getById(_idProposta).update({
+                    Status: "Aprovado",
+                  })
+                  .then(response => {
+
+                    console.log("Aprovou!!!");
+                    this.recarregaTarefas();
+                    $("#modalAprovacao").modal('hide');
+
+                  })
+
+              }
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              console.log(textStatus);
+            }
+
+          })
+
+
+        }
+
+        else if (status == "Reprovada") {
+
+          jQuery.ajax({
+            url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title&$filter=Proposta/ID eq ${_idProposta}`,
+            type: "GET",
+            headers: { 'Accept': 'application/json; odata=verbose;' },
+            async: false,
+            success: async (resultData) => {
+
+              if (resultData.d.results.length > 0) {
+
+                for (var i = 0; i < resultData.d.results.length; i++) {
+
+                  var idTarefa = resultData.d.results[i].ID;
+
+                  await _web.lists
+                    .getByTitle("Tarefas")
+                    .items.getById(idTarefa).update({
+                      Status: "Reprovada",
+
+                    }).then(response => {
+
+                      console.log("Reprovou a tarefa!!!");
+
+                    })
+
+                }
+
+                console.log("Aprovou!!!");
+                this.recarregaTarefas();
+                $("#modalAprovacao").modal('hide');
+
+              }
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              console.log(textStatus);
+            }
+
+          })
+        }
+
+
+      }).catch((error: any) => {
+        console.log(error);
+      });
+
   }
 
   protected getAnexos() {
@@ -693,13 +968,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
     var strRelativeURL = relativeURL.replace("SitePages/Proposta-Detalhes.aspx", "");
 
-    //var relative = "/sites/bit-hml";
     var idItem = 0;
-
-    //("_bitNumero", _idProposta);
-
-    //console.log("caminho", `${strRelativeURL}/AnexosSAP/${_idProposta}`);
-
 
     _web.getFolderByServerRelativeUrl(`${strRelativeURL}/AnexosSAP/${_idProposta}`)
       .expand("Folders, Files, ListItemAllFields").get().then(r => {
@@ -734,12 +1003,9 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
         console.log("Erro Anexo da biblioteca: ", error);
       });
 
-
     //fim anexos da biblioteca
 
-
   }
-
 
   protected getSelecaoAreas() {
 
@@ -769,16 +1035,13 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(textStatus);
       }
-
-
 
     })
 
 
   }
-
-
 
   protected getDiscussaoNova() {
 
@@ -890,7 +1153,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
   }
 
-
   protected modalResponderDiscussao() {
 
     jQuery("#modalDiscussao").modal({ backdrop: 'static', keyboard: false });
@@ -997,6 +1259,27 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       }).catch((error: any) => {
         console.log(error);
       });
+
+  }
+
+  private recarregaTarefas() {
+
+    var reactHanthisdlerRepresentante = this;
+
+    jquery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title,GrupoSharepoint/ID,GrupoSharepoint/Title,Status,DataPlanejadaTermino,Modified,DataRealTermino,Justificativa&$expand=GrupoSharepoint&$filter=Proposta/ID eq ` + _idProposta,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      success: function (resultData) {
+        reactHanthisdlerRepresentante.setState({
+          itemsTarefas: resultData.d.results
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(textStatus);
+      }
+    });
+
 
   }
 
