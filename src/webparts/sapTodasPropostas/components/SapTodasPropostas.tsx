@@ -12,6 +12,7 @@ import { sp } from "@pnp/sp";
 import "@pnp/sp/webs";
 import "@pnp/sp/lists/web";
 import "@pnp/sp/items/list";
+import { Web } from "sp-pnp-js";
 
 import paginationFactory from 'react-bootstrap-table2-paginator';
 import filterFactory, { textFilter } from 'react-bootstrap-table2-filter';
@@ -24,6 +25,9 @@ import 'react-bootstrap-table-next/dist/react-bootstrap-table2.min.css';
 
 require("../../../../node_modules/bootstrap/dist/css/bootstrap.min.css");
 require("../../../../css/estilos.css");
+
+var _grupos;
+var _web;
 
 export interface IShowEmployeeStates {
   employeeList: any[]
@@ -130,14 +134,39 @@ const empTablecolumns = [
     headerStyle: { "backgroundColor": "#bee5eb", "width": "180px" },
     formatter: (rowContent, row) => {
       var id = row.ID;
+      var status = row.Status
       var urlDetalhes = `Proposta-Detalhes.aspx?PropostasID=` + id;
       var urlEditar = `Propostas-SAP-Editar.aspx?PropostasID=` + id;
-      return (
-        <>
-        <a href={urlDetalhes}><button className="btn btn-info">Exibir</button></a>&nbsp;
-        <a href={urlEditar}><button className="btn btn-danger">Editar</button></a>
-        </>
-      )
+
+      if (status == "Em análise") {
+
+        console.log("_grupos",_grupos);
+
+        if (_grupos.indexOf("Representante") !== -1) {
+          return (
+            <>
+              <a href={urlDetalhes}><button className="btn btn-info">Exibir</button></a>&nbsp;
+              <a href={urlEditar}><button className="btn btn-danger">Editar</button></a>
+            </>
+          )
+        } else {
+
+          return (
+            <>
+              <a href={urlDetalhes}><button className="btn btn-info">Exibir</button></a>&nbsp;
+            </>
+          )
+        }
+
+      } else {
+        return (
+          <>
+            <a href={urlDetalhes}><button className="btn btn-info">Exibir</button></a>&nbsp;
+          </>
+        )
+      }
+
+
     }
   }
 
@@ -166,7 +195,45 @@ export default class SapTodasPropostas extends React.Component<ISapTodasProposta
     }
   }
 
-  public componentDidMount() {
+  public async componentDidMount() {
+
+    _web = new Web(this.props.context.pageContext.web.absoluteUrl);
+
+    await _web.currentUser.get().then(f => {
+      console.log("user", f);
+      var id = f.Id;
+
+      var grupos = [];
+
+      jQuery.ajax({
+        url: `${this.props.siteurl}/_api/web/GetUserById(${id})/Groups`,
+        type: "GET",
+        headers: { 'Accept': 'application/json; odata=verbose;' },
+        async: false,
+        success: async function (resultData) {
+
+          console.log("resultDataGrupo", resultData);
+
+          if (resultData.d.results.length > 0) {
+
+            for (var i = 0; i < resultData.d.results.length; i++) {
+
+              grupos.push(resultData.d.results[i].Title);
+
+            }
+
+          }
+
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.log(textStatus);
+        }
+
+      })
+
+      console.log("grupos", grupos);
+      _grupos = grupos;
+    })
 
     var reactHandlerRepresentante = this;
 

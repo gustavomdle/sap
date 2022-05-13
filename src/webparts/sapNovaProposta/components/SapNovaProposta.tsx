@@ -62,6 +62,13 @@ export interface IReactGetItemsState {
       "ID": "",
       "Title": "",
     }],
+  itemsResponsavelProposta: [
+    {
+      "ID": "",
+      "Title": "",
+      "Responsavel": { "Title": "" }
+    }],
+
   itemsSegmento: [];
   itemsSetor: [];
   itemsModalidade: [];
@@ -100,6 +107,12 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         {
           "ID": "",
           "Title": "",
+        }],
+      itemsResponsavelProposta: [
+        {
+          "ID": "",
+          "Title": "",
+          "Responsavel": { "Title": "" }
         }],
       itemsSegmento: [],
       itemsSetor: [],
@@ -255,11 +268,22 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                   <div className="form-group">
                     <div className="form-row">
-                      <div className="form-group col-md-8">
+                      <div className="form-group col-md-6">
+                        <label htmlFor="ddlResponsavelProposta">Responsável da Proposta</label><span className="required"> *</span>
+                        <select id="ddlResponsavelProposta" className="form-control">
+                          <option value="0" selected>Selecione...</option>
+                          {this.state.itemsResponsavelProposta.map(function (item, key) {
+                            return (
+                              <option value={item.Responsavel.Title}>{item.Responsavel.Title}</option>
+                            );
+                          })}
+                        </select>
+                      </div>
+                      <div className="form-group col-md-3">
                         <label htmlFor="txtPropostaRevisadaReferencia">Proposta revisada/referência</label>
                         <input type="text" className="form-control" id="txtPropostaRevisadaReferencia" />
                       </div>
-                      <div className="form-group col-md-4">
+                      <div className="form-group col-md-3">
                         <label htmlFor="txtCondicoesPagamento">Condições de pagamento </label>
                         <input type="text" className="form-control" id="txtCondicoesPagamento" />
                       </div>
@@ -282,7 +306,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                   <div className="form-group">
                     <label htmlFor="txtDadosProposta">Dados da Proposta</label><span className="required"> *</span>
-                    <RichText value="" 
+                    <RichText value=""
                       onChange={(text) => this.onTextChange(text)}
                     />
                   </div>
@@ -672,6 +696,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
   protected async handler() {
 
     var reactHandlerRepresentante = this;
+    var reactHandlerResponsavelProposta = this;
     var reactHandlerClientes = this;
     var reactHandlerSegmento = this;
     var reactHandlerSetor = this;
@@ -696,6 +721,22 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       error: function (jqXHR, textStatus, errorThrown) {
       }
     });
+
+    jquery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Responsavel Proposta')/items?$top=4999&$select=ID,Responsavel/Title&$expand=Responsavel`,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      success: function (resultData) {
+        console.log("resultDataResponsavel",resultData);
+        reactHandlerResponsavelProposta.setState({
+          
+          itemsResponsavelProposta: resultData.d.results
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+      }
+    });
+
 
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('Clientes')/items?$top=4999&$orderby= Title`,
@@ -907,6 +948,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     var dataValidadeProposta = "" + jQuery("#dtDataValidadeProposta-label").val() + "";
     var representante = $("#ddlRepresentante").val();
     _representante = representante;
+    var responsavelProposta = $("#ddlResponsavelProposta").val();
     var cliente = $("#ddlCliente").val();
     var dadosProposta = $("#txtDadosProposta").val();
 
@@ -1011,7 +1053,12 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       alert("Escolha o Cliente!");
       document.getElementById('headingResumoProposta').scrollIntoView();
       return false;
+    }
 
+    if (responsavelProposta == "0") {
+      alert("Escolha o Responsável pela Proposta!");
+      document.getElementById('headingResumoProposta').scrollIntoView();
+      return false;
     }
 
     if (dadosProposta == "") {
@@ -1163,6 +1210,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       console.log("formDataValidadeProposta", formDataValidadeProposta);
 
       var representante = $("#ddlRepresentante").val();
+      var responsavelProposta = $("#ddlResponsavelProposta").val();
       var cliente = $("#ddlCliente").val();
       var propostaRevisadaReferencia = $("#txtPropostaRevisadaReferencia").val();
       var SST = $("#txtSST").val();
@@ -1237,6 +1285,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
           DataValidadeProposta: formDataValidadeProposta,
           RepresentanteId: representante,
           ClienteId: cliente,
+          ResponsavelProposta: responsavelProposta,
           PropostaRevisadaReferencia: propostaRevisadaReferencia,
           SST: SST,
           CondicoesPagamento: condicoesPagamento,

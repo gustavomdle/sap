@@ -79,11 +79,9 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     _idProposta = parseInt(queryParms.getValue("PropostasID"));
 
     _web = new Web(this.props.context.pageContext.web.absoluteUrl);
-
     _siteURL = this.props.siteurl;
 
     //let groups = await _web.currentUser.groups();
-
     await _web.currentUser.get().then(f => {
       console.log("user", f);
       var id = f.Id;
@@ -245,11 +243,15 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                   <div className="form-group">
                     <div className="form-row">
-                      <div className="form-group col-md-8">
+                    <div className="form-group col-md-3">
+                        <label htmlFor="txtPropostaRevisadaReferencia">Responsável pela Proposta</label><br></br>
+                        <span className="text-info" id='txtResponsavelPelaProposta'></span>
+                      </div>
+                      <div className="form-group col-md-3">
                         <label htmlFor="txtPropostaRevisadaReferencia">Proposta revisada/referência</label><br></br>
                         <span className="text-info" id='txtPropostaRevisadaReferencia'></span>
                       </div>
-                      <div className="form-group col-md-4">
+                      <div className="form-group col-md-3">
                         <label htmlFor="txtCondicoesPagamento">Condições de pagamento </label><br></br>
                         <span className="text-info" id='txtCondicoesPagamento'></span>
                       </div>
@@ -607,7 +609,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" id='btnAprovarTarefa' className="btn btn-primary">Aprovar</button>
+                <button type="button" id='btnAprovarTarefa' className="btn btn-primary">Salvar</button>
               </div>
             </div>
           </div>
@@ -623,7 +625,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
   protected getProposta() {
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Representante/Title,Cliente/ID,Cliente/Title,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,Produto/Title,Numero,Status&$expand=Representante,Cliente,Produto&$filter=ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Representante/Title,Cliente/ID,Cliente/Title,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,Produto/Title,Numero,Status,ResponsavelProposta&$expand=Representante,Cliente,Produto&$filter=ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -649,6 +651,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             var dtdataValidadeProposta = ("0" + dataValidadeProposta.getDate()).slice(-2) + '/' + ("0" + (dataValidadeProposta.getMonth() + 1)).slice(-2) + '/' + dataValidadeProposta.getFullYear();
             var representante = resultData.d.results[i].Representante.Title;
             var cliente = resultData.d.results[i].Cliente.Title;
+            var responsavelProposta = resultData.d.results[i].ResponsavelProposta;
             var propostaRevisadaReferencia = resultData.d.results[i].PropostaRevisadaReferencia;
             var condicoesPagamento = resultData.d.results[i].CondicoesPagamento;
             var dadosProposta = resultData.d.results[i].DadosProposta;
@@ -689,6 +692,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             jQuery("#txtdataValidadeProposta").html(dtdataValidadeProposta);
             jQuery("#txtRepresentante").html(representante);
             jQuery("#txtCliente").html(cliente);
+            jQuery("#txtResponsavelPelaProposta").html(responsavelProposta);
             jQuery("#txtPropostaRevisadaReferencia").html(propostaRevisadaReferencia);
             jQuery("#txtCondicoesPagamento").html(condicoesPagamento);
             jQuery("#txtDadosProposta").html(dadosProposta);
@@ -703,10 +707,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             jQuery("#txtPrazoGarantia").html(prazoGarantia);
             jQuery("#txtOutrosServicos").html(strOutrosServicos);
             jQuery("#txtProduto").html(strTituloProduto);
-
             jQuery("#txtModalNumeroProposta").html(numeroProposta);
-
-
 
           }
 
@@ -796,13 +797,28 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
     jQuery("#txtModalArea").html(nomeGrupo);
     jQuery("#modalAprovacao").modal({ backdrop: 'static', keyboard: false });
+    $("#btnAprovarTarefa").prop("disabled", false);
 
   }
 
   protected async aprovar() {
 
+    $("#btnAprovarTarefa").prop("disabled", true);
+
     var status = jQuery('#ddlStatus option:selected').val();
     var justificativa = jQuery('#txtJustificativa').val();
+
+    if (status == "0") {
+      alert("Escolha um Status");
+      $("#btnAprovarTarefa").prop("disabled", false);
+      return false;
+    }
+
+    if(justificativa == ""){
+      alert("Forneça uma justificativa");
+      $("#btnAprovarTarefa").prop("disabled", false);
+      return false;
+    }
 
     var DataRealTermino = "" + jQuery("#dtDataFinalQuestionamentos-label").val() + "";
     var DataRealTerminoDia = DataRealTermino.substring(0, 2);
@@ -820,13 +836,13 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
         Justificativa: justificativa,
         DataRealTermino: dataRealTermino
       })
-      .then(response => {
+      .then(async response => {
 
 
         if (status == "Aprovada") {
 
           jQuery.ajax({
-            url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title&$filter=(Proposta/ID eq ${_idProposta}) and (Status ne 'Aprovada' or Status ne 'Não envolve a Área')`,
+            url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title,Status&$filter=(Proposta/ID eq ${_idProposta}) and (Status ne 'Aprovada' and Status ne 'Não envolve a Área')`,
             type: "GET",
             headers: { 'Accept': 'application/json; odata=verbose;' },
             async: false,
@@ -834,11 +850,13 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
               if (resultData.d.results.length > 0) {
 
-                console.log("Aprovou!!!");
+                console.log("entrou 1!!!");
                 this.recarregaTarefas();
                 $("#modalAprovacao").modal('hide');
 
               } else {
+
+                console.log("entrou 2!!!");
 
                 await _web.lists
                   .getByTitle("PropostasSAP")
@@ -846,12 +864,12 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                     Status: "Aprovado",
                   })
                   .then(response => {
-
-                    console.log("Aprovou!!!");
                     this.recarregaTarefas();
                     $("#modalAprovacao").modal('hide');
-
-                  })
+                    window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
+                  }).catch((error: any) => {
+                    console.log(error);
+                  });
 
               }
 
@@ -862,14 +880,13 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             }
 
           })
-          //se sim atualiza tarefas e proposta
         }
 
 
         else if (status == "Não envolve a Área") {
 
           jQuery.ajax({
-            url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title&$filter=(Proposta/ID eq ${_idProposta}) and (Status ne 'Aprovada' or Status ne 'Não envolve a Área')`,
+            url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title,Status&$filter=(Proposta/ID eq ${_idProposta}) and (Status ne 'Aprovada' and Status ne 'Não envolve a Área')`,
             type: "GET",
             headers: { 'Accept': 'application/json; odata=verbose;' },
             async: false,
@@ -877,11 +894,13 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
               if (resultData.d.results.length > 0) {
 
-                console.log("Aprovou!!!");
+                console.log("entrou 1!!!");
                 this.recarregaTarefas();
                 $("#modalAprovacao").modal('hide');
 
               } else {
+
+                console.log("entrou 2!!!");
 
                 await _web.lists
                   .getByTitle("PropostasSAP")
@@ -889,14 +908,15 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                     Status: "Aprovado",
                   })
                   .then(response => {
-
-                    console.log("Aprovou!!!");
                     this.recarregaTarefas();
                     $("#modalAprovacao").modal('hide');
-
-                  })
+                    window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
+                  }).catch((error: any) => {
+                    console.log(error);
+                  });
 
               }
+
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -910,46 +930,57 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
         else if (status == "Reprovada") {
 
-          jQuery.ajax({
-            url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title&$filter=Proposta/ID eq ${_idProposta}`,
-            type: "GET",
-            headers: { 'Accept': 'application/json; odata=verbose;' },
-            async: false,
-            success: async (resultData) => {
+          await _web.lists
+            .getByTitle("PropostasSAP")
+            .items.getById(_idProposta).update({
+              Status: "Reprovado",
 
-              if (resultData.d.results.length > 0) {
+            }).then(response => {
 
-                for (var i = 0; i < resultData.d.results.length; i++) {
+              jQuery.ajax({
+                url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title&$filter=Proposta/ID eq ${_idProposta}`,
+                type: "GET",
+                headers: { 'Accept': 'application/json; odata=verbose;' },
+                async: false,
+                success: async (resultData) => {
 
-                  var idTarefa = resultData.d.results[i].ID;
+                  if (resultData.d.results.length > 0) {
 
-                  await _web.lists
-                    .getByTitle("Tarefas")
-                    .items.getById(idTarefa).update({
-                      Status: "Reprovada",
+                    for (var i = 0; i < resultData.d.results.length; i++) {
 
-                    }).then(response => {
+                      var idTarefa = resultData.d.results[i].ID;
 
-                      console.log("Reprovou a tarefa!!!");
+                      await _web.lists
+                        .getByTitle("Tarefas")
+                        .items.getById(idTarefa).update({
+                          Status: "Reprovada",
 
-                    })
+                        }).then(response => {
 
+                          console.log("Reprovou a tarefa!!!");
+
+                        }).catch((error: any) => {
+                          console.log(error);
+                        });
+
+                    }
+                    console.log("Reprovou!!!");
+                    this.recarregaTarefas();
+                    window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
+                  }
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  console.log(textStatus);
                 }
 
-                console.log("Aprovou!!!");
-                this.recarregaTarefas();
-                $("#modalAprovacao").modal('hide');
+              })
 
-              }
+            }).catch((error: any) => {
+              console.log(error);
+            });
 
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-              console.log(textStatus);
-            }
-
-          })
         }
-
 
       }).catch((error: any) => {
         console.log(error);
@@ -1215,8 +1246,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     }
 
 
-
-
     if (arrNotificarArea.length == 0) {
       alert("Escolha uma área a ser notificada!");
       $("#btnCadastrarDiscussao").prop("disabled", false);
@@ -1264,14 +1293,14 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
   private recarregaTarefas() {
 
-    var reactHanthisdlerRepresentante = this;
+    var reactHanthisdlerTarefas = this;
 
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title,GrupoSharepoint/ID,GrupoSharepoint/Title,Status,DataPlanejadaTermino,Modified,DataRealTermino,Justificativa&$expand=GrupoSharepoint&$filter=Proposta/ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
-        reactHanthisdlerRepresentante.setState({
+        reactHanthisdlerTarefas.setState({
           itemsTarefas: resultData.d.results
         });
       },
