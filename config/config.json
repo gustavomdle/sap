@@ -33,6 +33,22 @@
           "manifest": "./src/webparts/sapEditarProposta/SapEditarPropostaWebPart.manifest.json"
         }
       ]
+    },
+    "sap-todas-as-tarefas-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/sapTodasAsTarefas/SapTodasAsTarefasWebPart.js",
+          "manifest": "./src/webparts/sapTodasAsTarefas/SapTodasAsTarefasWebPart.manifest.json"
+        }
+      ]
+    },
+    "sap-todas-as-tarefas-adm-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/sapTodasAsTarefasAdm/SapTodasAsTarefasAdmWebPart.js",
+          "manifest": "./src/webparts/sapTodasAsTarefasAdm/SapTodasAsTarefasAdmWebPart.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
@@ -41,7 +57,8 @@
     "SapDetalhesPropostaWebPartStrings": "lib/webparts/sapDetalhesProposta/loc/{locale}.js",
     "SapTodasPropostasWebPartStrings": "lib/webparts/sapTodasPropostas/loc/{locale}.js",
     "SapEditarPropostaWebPartStrings": "lib/webparts/sapEditarProposta/loc/{locale}.js",
-    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js"
-
+    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js",
+    "SapTodasAsTarefasWebPartStrings": "lib/webparts/sapTodasAsTarefas/loc/{locale}.js",
+    "SapTodasAsTarefasAdmWebPartStrings": "lib/webparts/sapTodasAsTarefasAdm/loc/{locale}.js"
   }
 }

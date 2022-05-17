@@ -81,6 +81,10 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     _web = new Web(this.props.context.pageContext.web.absoluteUrl);
     _siteURL = this.props.siteurl;
 
+    document
+      .getElementById("btnVoltar")
+      .addEventListener("click", (e: Event) => this.voltar());
+
     //let groups = await _web.currentUser.groups();
     await _web.currentUser.get().then(f => {
       console.log("user", f);
@@ -131,6 +135,15 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     document
       .getElementById("btnAprovarTarefa")
       .addEventListener("click", (e: Event) => this.aprovar());
+
+    document
+      .getElementById("btnReabrirProposta")
+      .addEventListener("click", (e: Event) => this.modalReabrirProposta());
+
+    document
+      .getElementById("btnModalReabrirProposta")
+      .addEventListener("click", (e: Event) => this.reabrirProposta());
+
 
 
 
@@ -243,7 +256,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                   <div className="form-group">
                     <div className="form-row">
-                    <div className="form-group col-md-3">
+                      <div className="form-group col-md-3">
                         <label htmlFor="txtPropostaRevisadaReferencia">Responsável pela Proposta</label><br></br>
                         <span className="text-info" id='txtResponsavelPelaProposta'></span>
                       </div>
@@ -528,6 +541,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
             <div className="text-right">
               <button style={{ "margin": "2px" }} type="submit" id="btnVoltar" className="btn btn-secondary">Voltar</button>
+              <button style={{ "margin": "2px" }} type="submit" id="btnReabrirProposta" className="btn btn-danger">Reabrir Proposta</button>
             </div>
 
 
@@ -540,9 +554,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="discussaoTitle">Cadastrar Discussão</h5>
-                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
               </div>
               <div className="modal-body">
                 <div className="container-fluid border rounded table-responsive" id="conteudo_formulario">
@@ -571,7 +582,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
 
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id='btnCadastrarDiscussaoCancelar' className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                 <button type="button" id='btnCadastrarDiscussao' className="btn btn-primary">Cadastrar</button>
               </div>
             </div>
@@ -583,9 +594,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title" id="aprovacaoTitle">Aprovar</h5>
-                <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
               </div>
               <div className="modal-body">
                 <div className="container-fluid border rounded table-responsive" id="conteudo_formulario">
@@ -608,12 +616,60 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
               </div>
 
               <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" id='btnAprovarTarefaCancelar' className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
                 <button type="button" id='btnAprovarTarefa' className="btn btn-primary">Salvar</button>
               </div>
             </div>
           </div>
         </div>
+
+        <div className="modal fade" id="modalReabrirProposta" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Reabertura da Proposta <span id='txtModalNumeroProposta'></span></h5>
+              </div>
+              <div className="modal-body">
+                <div className="form-group">
+                  <label htmlFor="ddlStatusReabertura">Status</label><span className={styles.required}> *</span>
+                  <select id="ddlStatusReabertura" className="form-control">
+                    <option value="0" selected>Selecione...</option>
+                    <option value="Voltar para em andamento">Voltar para em andamento</option>
+                    <option value="Vencedora">Vencedora</option>
+                    <option value="Não Vencedora">Não Vencedora</option>
+                    <option value="Reprovada">Reprovada</option>
+                    <option value="Cancelada">Cancelada</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="ddlMotivoReabertura">Motivo</label><span className={styles.required}> *</span>
+                  <select id="ddlMotivoReabertura" className="form-control">
+                    <option value="0" selected>Selecione...</option>
+                    <option value="Preço">Preço</option>
+                    <option value="Solução integrada">Solução integrada</option>
+                    <option value="Reprovada pelo cliente">Reprovada pelo cliente</option>
+                    <option value="Reprovada pela Doebold">Reprovada pela Doebold</option>
+                    <option value="Proposta cancelada">Proposta cancelada</option>
+                    <option value="Nova revisão">Nova revisão</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="txtJustificativaReabertura">Justificativa</label><span className={styles.required}> *</span>
+                  <textarea id="txtJustificativaReabertura" className="form-control" rows={4}></textarea>
+                </div>
+
+              </div>
+              <div className="modal-footer">
+                <button type="button" id='btnModalReabrirPropostaCancelar' className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button id="btnModalReabrirProposta" type="button" className="btn btn-primary">Reabrir Proposta</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+
+
 
       </>
 
@@ -709,6 +765,14 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             jQuery("#txtProduto").html(strTituloProduto);
             jQuery("#txtModalNumeroProposta").html(numeroProposta);
 
+            if (status != "Em análise") {
+              jQuery("#btnResponderDiscussao").hide();
+            }
+
+            if (status != "Aprovado") {
+              jQuery("#btnReabrirProposta").hide();
+            }
+
           }
 
         }
@@ -798,12 +862,15 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     jQuery("#txtModalArea").html(nomeGrupo);
     jQuery("#modalAprovacao").modal({ backdrop: 'static', keyboard: false });
     $("#btnAprovarTarefa").prop("disabled", false);
+    $("#btnAprovarTarefaCancelar").prop("disabled", false);
 
   }
 
   protected async aprovar() {
 
     $("#btnAprovarTarefa").prop("disabled", true);
+    $("#btnAprovarTarefaCancelar").prop("disabled", true);
+
 
     var status = jQuery('#ddlStatus option:selected').val();
     var justificativa = jQuery('#txtJustificativa').val();
@@ -811,12 +878,14 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     if (status == "0") {
       alert("Escolha um Status");
       $("#btnAprovarTarefa").prop("disabled", false);
+      $("#btnAprovarTarefaCancelar").prop("disabled", false);
       return false;
     }
 
-    if(justificativa == ""){
+    if (justificativa == "") {
       alert("Forneça uma justificativa");
       $("#btnAprovarTarefa").prop("disabled", false);
+      $("#btnAprovarTarefaCancelar").prop("disabled", false);
       return false;
     }
 
@@ -1081,7 +1150,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     console.log("this.props.siteurl", this.props.siteurl);
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('ListaDiscussao_1911')/items?$select=ID,Title,Author/Title,Area/Title,Created,NotificarArea/Title,Mensagem,txtAnexosRelacionados&$expand=Author,Area,NotificarArea`,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('ListaDiscussao_1911')/items?$select=ID,Title,Author/Title,Area/Title,Created,NotificarArea/Title,Mensagem,txtAnexosRelacionados&$expand=Author,Area,NotificarArea&$filter=Proposta/ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -1199,6 +1268,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
   private async cadastrarDiscussao() {
 
     $("#btnCadastrarDiscussao").prop("disabled", true);
+    $("#btnCadastrarDiscussaoCancelar").prop("disabled", true);
 
     var area = jQuery('#ddlArea option:selected').val();
     var mensagem = _mensagemDiscussao;
@@ -1224,24 +1294,28 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     if (area == "0") {
       alert("Escolha a área!");
       $("#btnCadastrarDiscussao").prop("disabled", false);
+      $("#btnCadastrarDiscussaoCancelar").prop("disabled", false);
       return false;
     }
 
     if (_mensagemDiscussao == "") {
       alert("Forneça uma mensagem!");
       $("#btnCadastrarDiscussao").prop("disabled", false);
+      $("#btnCadastrarDiscussaoCancelar").prop("disabled", false);
       return false;
     }
 
     if (_mensagemDiscussao == "<p><br></p>") {
       alert("Forneça uma mensagem!");
       $("#btnCadastrarDiscussao").prop("disabled", false);
+      $("#btnCadastrarDiscussaoCancelar").prop("disabled", false);
       return false;
     }
 
     if (_mensagemDiscussao == undefined) {
       alert("Forneça uma mensagem!");
       $("#btnCadastrarDiscussao").prop("disabled", false);
+      $("#btnCadastrarDiscussaoCancelar").prop("disabled", false);
       return false;
     }
 
@@ -1249,6 +1323,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     if (arrNotificarArea.length == 0) {
       alert("Escolha uma área a ser notificada!");
       $("#btnCadastrarDiscussao").prop("disabled", false);
+      $("#btnCadastrarDiscussaoCancelar").prop("disabled", false);
       return false;
     }
 
@@ -1311,6 +1386,121 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
 
   }
+
+  protected modalReabrirProposta() {
+
+    jQuery("#modalReabrirProposta").modal({ backdrop: 'static', keyboard: false });
+
+  }
+
+
+  protected async reabrirProposta() {
+
+    $("#btnModalReabrirProposta").prop("disabled", true);
+    $("#btnModalReabrirPropostaCancelar").prop("disabled", true);
+
+    var novoStatus = $("#ddlStatusReabertura").val();
+    var motivo = $("#ddlMotivoReabertura").val();
+    var justificativa = $("#txtJustificativaReabertura").val();
+
+    if (novoStatus == "0"){
+      alert("Selecione o novo status da Proposta!");
+      $("#btnModalReabrirProposta").prop("disabled", false);
+      $("#btnModalReabrirPropostaCancelar").prop("disabled", false);
+      return false;
+    }
+   
+    if (motivo == "0"){
+      alert("Selecione o motivo!");
+      $("#btnModalReabrirProposta").prop("disabled", false);
+      $("#btnModalReabrirPropostaCancelar").prop("disabled", false);
+      return false;
+    }
+
+    if (justificativa == ""){
+      alert("Forneça uma justificativa!");
+      $("#btnModalReabrirProposta").prop("disabled", false);
+      $("#btnModalReabrirPropostaCancelar").prop("disabled", false);
+      return false;
+    }
+
+    console.log("novoStatus", novoStatus);
+    console.log("motivo", motivo);
+    console.log("justificativa", justificativa);
+
+    if (novoStatus != "Voltar para em andamento") {
+      var revisada = false;
+    }
+    else {
+      var revisada = true;
+      novoStatus = "Em análise";
+    }
+
+    await _web.lists
+      .getByTitle("PropostasSAP")
+      .items.getById(_idProposta).update({
+        JustificativaFinal: justificativa,
+        Status: novoStatus,
+        Motivo: motivo,
+        Revisada: revisada
+      })
+      .then(response => {
+
+        if (novoStatus == "Em análise") {
+
+          jquery.ajax({
+            url: `${_siteURL}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$filter=Proposta/ID eq ` + _idProposta,
+            type: "GET",
+            async: false,
+            headers: { 'Accept': 'application/json; odata=verbose;' },
+            success: async function (resultData) {
+
+              if (resultData.d.results.length > 0) {
+
+                for (var i = 0; i < resultData.d.results.length; i++) {
+
+                  var idTarefa = resultData.d.results[i].ID;
+
+                  await _web.lists
+                    .getByTitle("Tarefas")
+                    .items.getById(idTarefa).update({
+                      DataRealTermino: null,
+                      Justificativa: "",
+                      Status: "Em análise",
+                    }).then(response => {
+                      console.log("Atualizou a tarefa");
+                    }).catch((error: any) => {
+                      console.log(error);
+                    });
+                }
+                $("#modalReabrirProposta").modal('hide');
+                window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
+              }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+            }
+          });
+
+
+        } else {
+          $("#modalReabrirProposta").modal('hide');
+          window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
+        }
+
+
+
+      })
+
+
+  }
+
+
+  protected voltar() {
+
+    history.back();
+
+  }
+
 
 
 }

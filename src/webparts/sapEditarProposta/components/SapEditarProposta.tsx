@@ -286,15 +286,15 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                     <div className="form-row">
                       <div className="form-group col-md-4">
                         <label htmlFor="dtDataEntregaPropostaCliente">Data da entrega da Proposta ao Cliente</label><span className="required"> *</span>
-                        <DatePicker minDate={this.addDaysWRONG()} value={_dataEntregaPropostaCliente} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataEntregaPropCliente' />
+                        <DatePicker minDate={this.addDaysWRONG()} value={_dataEntregaPropostaCliente} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="datePicker" id='dtDataEntregaPropCliente' />
                       </div>
                       <div className="form-group col-md-4">
                         <label htmlFor="dtDataFinalQuestionamentos">Data final de questionamentos</label>
-                        <DatePicker minDate={new Date()} value={_datadataFinalQuestionamentos} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataFinalQuestionamentos' />
+                        <DatePicker minDate={new Date()} value={_datadataFinalQuestionamentos} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="datePicker" id='dtDataFinalQuestionamentos' />
                       </div>
                       <div className="form-group col-md-4">
                         <label htmlFor="dtDataValidadeProposta">Data de validade da Proposta</label>
-                        <DatePicker minDate={new Date()} value={_dataValidadeProposta} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataValidadeProposta' />
+                        <DatePicker minDate={new Date()} value={_dataValidadeProposta} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="datePicker" id='dtDataValidadeProposta' />
                       </div>
                     </div>
                   </div>

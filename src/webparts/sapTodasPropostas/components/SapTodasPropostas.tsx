@@ -34,13 +34,13 @@ export interface IShowEmployeeStates {
 }
 
 const selectOptions = {
-  0: 'Aprovado',
-  1: 'Em análise',
-  2: 'Encerrada pelo Sistema',
-  3: 'Não vencedora',
-  4: 'Proposta Enviada',
-  5: 'Reprovada',
-  6: 'Vencedora',
+  'Aprovado': 'Aprovado',
+  'Em análise': 'Em análise',
+  'Encerrada pelo Sistema': 'Encerrada pelo Sistema',
+  'Não vencedora': 'Não vencedora',
+  'Proposta Enviada': 'Proposta Enviada',
+  'Reprovada': 'Reprovada',
+  'Vencedora': 'Vencedora',
 };
 
 
@@ -140,7 +140,7 @@ const empTablecolumns = [
 
       if (status == "Em análise") {
 
-        console.log("_grupos",_grupos);
+        console.log("_grupos", _grupos);
 
         if (_grupos.indexOf("Representante") !== -1) {
           return (
@@ -173,15 +173,16 @@ const empTablecolumns = [
 ];
 
 const paginationOptions = {
-  sizePerPage: 5,
+  sizePerPage: 10,
   hideSizePerPage: true,
   hidePageListOnlyOnePage: true
 };
 
+/*
 const priceFilter = textFilter({
   placeholder: 'My Custom PlaceHolder',  // custom the input placeholder
 });
-
+*/
 
 
 export default class SapTodasPropostas extends React.Component<ISapTodasPropostasProps, IShowEmployeeStates> {
@@ -242,7 +243,7 @@ export default class SapTodasPropostas extends React.Component<ISapTodasProposta
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
-        // console.log("resultData.d.results", resultData.d.results)
+        jQuery('#txtCountProposta').html(resultData.d.results.length);
         reactHandlerRepresentante.setState({
           employeeList: resultData.d.results
         });
@@ -267,10 +268,10 @@ export default class SapTodasPropostas extends React.Component<ISapTodasProposta
 
     return (
 
-
+      <><p>Resultado: <span className="text-info" id="txtCountProposta"></span> proposta(s) encontrada(s)</p>
       <div className={styles.container}>
-        <BootstrapTable bootstrap4 responsive condensed hover={true} className="gridTodosItens" id="gridTodosItens" keyField='id' data={this.state.employeeList} columns={empTablecolumns} headerClasses="header-class" pagination={paginationFactory(paginationOptions)} filter={filterFactory(priceFilter)} />
-      </div>
+        <BootstrapTable bootstrap4 responsive condensed hover={true} className="gridTodosItens" id="gridTodosItens" keyField='id' data={this.state.employeeList} columns={empTablecolumns} headerClasses="header-class" pagination={paginationFactory(paginationOptions)} filter={filterFactory()} />
+      </div></>
 
 
     );

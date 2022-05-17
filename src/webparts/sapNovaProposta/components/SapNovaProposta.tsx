@@ -226,15 +226,15 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                     <div className="form-row">
                       <div className="form-group col-md-4">
                         <label htmlFor="dtDataEntregaPropostaCliente">Data da entrega da Proposta ao Cliente</label><span className="required"> *</span>
-                        <DatePicker minDate={this.addDaysWRONG()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataEntregaPropCliente' />
+                        <DatePicker minDate={this.addDaysWRONG()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="datePicker" id='dtDataEntregaPropCliente' />
                       </div>
                       <div className="form-group col-md-4">
                         <label htmlFor="dtDataFinalQuestionamentos">Data final de questionamentos</label>
-                        <DatePicker minDate={new Date()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataFinalQuestionamentos' />
+                        <DatePicker minDate={new Date()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="datePicker" id='dtDataFinalQuestionamentos' />
                       </div>
                       <div className="form-group col-md-4">
                         <label htmlFor="dtDataValidadeProposta">Data de validade da Proposta</label>
-                        <DatePicker minDate={new Date()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="form-control" id='dtDataValidadeProposta' />
+                        <DatePicker minDate={new Date()} formatDate={this.onFormatDate} isMonthPickerVisible={false} className="datePicker" id='dtDataValidadeProposta' />
                       </div>
                     </div>
                   </div>
@@ -306,7 +306,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                   <div className="form-group">
                     <label htmlFor="txtDadosProposta">Dados da Proposta</label><span className="required"> *</span>
-                    <RichText value=""
+                    <RichText className="editorRichTex" value=""
                       onChange={(text) => this.onTextChange(text)}
                     />
                   </div>
