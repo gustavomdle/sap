@@ -39,6 +39,7 @@ var _idTarefa;
 var _numeroProposta;
 var _grupos = [];
 var _strGrupos;
+var _testeGus;
 
 export interface IReactGetItemsState {
   itemsTarefas: [
@@ -81,13 +82,15 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     _web = new Web(this.props.context.pageContext.web.absoluteUrl);
     _siteURL = this.props.siteurl;
 
+    jQuery("#btnEditarProposta").hide();
+
     document
       .getElementById("btnVoltar")
       .addEventListener("click", (e: Event) => this.voltar());
 
     //let groups = await _web.currentUser.groups();
     await _web.currentUser.get().then(f => {
-      console.log("user", f);
+      // console.log("user", f);
       var id = f.Id;
 
       var grupos = [];
@@ -99,7 +102,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
         async: false,
         success: async function (resultData) {
 
-          console.log("resultDataGrupo", resultData);
+          //console.log("resultDataGrupo", resultData);
 
           if (resultData.d.results.length > 0) {
 
@@ -113,13 +116,14 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
         },
         error: function (jqXHR, textStatus, errorThrown) {
-          console.log(textStatus);
+          console.log(jqXHR.responseText);
         }
 
       })
 
-      console.log("grupos", grupos);
+      //console.log("grupos", grupos);
       _grupos = grupos;
+
     })
 
 
@@ -144,6 +148,14 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       .getElementById("btnModalReabrirProposta")
       .addEventListener("click", (e: Event) => this.reabrirProposta());
 
+    document
+      .getElementById("btnEditarProposta")
+      .addEventListener("click", (e: Event) => this.editarProposta());
+
+
+
+
+
 
 
 
@@ -159,7 +171,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(textStatus);
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -169,6 +181,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     this.getAnexos();
     this.getSelecaoAreas();
     this.getDiscussaoNova();
+    this.getDiscussaoAntiga();
 
   }
 
@@ -192,8 +205,8 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                 <div className="card-body">
 
                   <div className="form-group">
-                    <div className="form-row">
-                      <div className="form-group col-md-4">
+                    <div className="form-row border-bottom">
+                      <div className="form-group col-md-4 ">
                         <label htmlFor="txtNumeroProposta">Número da Proposta</label><br></br>
                         <span className="text-info" id='txtNumeroProposta'></span>
                       </div>
@@ -212,7 +225,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
 
                   <div className="form-group">
-                    <div className="form-row">
+                    <div className="form-row border-bottom">
                       <div className="form-group col-md-7">
                         <label htmlFor="txtSintese">Síntese</label><br></br>
                         <span className="text-info" id='txtSintese'></span>
@@ -225,7 +238,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                   </div>
 
                   <div className="form-group">
-                    <div className="form-row">
+                    <div className="form-row border-bottom">
                       <div className="form-group col-md-4">
                         <label htmlFor="dtDataEntregaPropostaCliente">Data da entrega da Proposta ao Cliente</label><br></br>
                         <span className="text-info" id='txtDataEntregaPropostaCliente'></span>
@@ -242,7 +255,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                   </div>
 
                   <div className="form-group">
-                    <div className="form-row">
+                    <div className="form-row border-bottom">
                       <div className="form-group col-md-6">
                         <label htmlFor="ddlRepresentante">Representante</label><br></br>
                         <span className="text-info" id='txtRepresentante'></span>
@@ -255,7 +268,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                   </div>
 
                   <div className="form-group">
-                    <div className="form-row">
+                    <div className="form-row border-bottom">
                       <div className="form-group col-md-3">
                         <label htmlFor="txtPropostaRevisadaReferencia">Responsável pela Proposta</label><br></br>
                         <span className="text-info" id='txtResponsavelPelaProposta'></span>
@@ -304,7 +317,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                 <div className="card-body">
 
                   <div className="form-group">
-                    <div className="form-row">
+                    <div className="form-row border-bottom">
                       <div className="form-group col-md-4">
                         <label htmlFor="txtSegmento">Segmento</label><br></br>
                         <span className="text-info" id='txtSegmento'></span>
@@ -338,7 +351,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                 <div className="card-body">
 
                   <div className="form-group">
-                    <div className="form-row">
+                    <div className="form-row border-bottom">
                       <div className="form-group col-md-3">
                         <label htmlFor="txtQuantidade">Quantidade</label><br></br>
                         <span className="text-info" id='txtQuantidade'></span>
@@ -359,7 +372,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                   </div>
 
                   <div className="form-group">
-                    <div className="form-row">
+                    <div className="form-row border-bottom">
                       <div className="form-group col-md-2">
                         <label htmlFor="txtTitulo">Prazo de garantia </label><br></br>
                         <span className="text-info" id='txtPrazoGarantia'></span>
@@ -470,12 +483,12 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                         // var status = item.Status;
 
-                        console.log("item.Status", item.Status);
+                        //console.log("item.Status", item.Status);
 
                         if (item.Status == "Em análise") {
 
-                          console.log("item.Title", item.Title);
-                          console.log("_grupos.indexOf(item.Title)", _grupos.indexOf(item.Title));
+                          //console.log("item.Title", item.Title);
+                          //console.log("_grupos.indexOf(item.Title)", _grupos.indexOf(item.Title));
 
                           if (_grupos.indexOf(item.Title) !== -1) {
 
@@ -542,6 +555,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             <div className="text-right">
               <button style={{ "margin": "2px" }} type="submit" id="btnVoltar" className="btn btn-secondary">Voltar</button>
               <button style={{ "margin": "2px" }} type="submit" id="btnReabrirProposta" className="btn btn-danger">Reabrir Proposta</button>
+              <button style={{ "margin": "2px" }} type="submit" id="btnEditarProposta" className="btn btn-primary">Editar</button>
             </div>
 
 
@@ -703,8 +717,12 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             var dtDataEntregaPropostaCliente = ("0" + dataEntregaPropostaCliente.getDate()).slice(-2) + '/' + ("0" + (dataEntregaPropostaCliente.getMonth() + 1)).slice(-2) + '/' + dataEntregaPropostaCliente.getFullYear();
             var dataFinalQuestionamentos = new Date(resultData.d.results[i].DataFinalQuestionamentos);
             var dtdataFinalQuestionamentos = ("0" + dataFinalQuestionamentos.getDate()).slice(-2) + '/' + ("0" + (dataFinalQuestionamentos.getMonth() + 1)).slice(-2) + '/' + dataFinalQuestionamentos.getFullYear();
+            if (dtdataFinalQuestionamentos == "31/12/1969") dtdataFinalQuestionamentos = "";
+
             var dataValidadeProposta = new Date(resultData.d.results[i].DataValidadeProposta);
             var dtdataValidadeProposta = ("0" + dataValidadeProposta.getDate()).slice(-2) + '/' + ("0" + (dataValidadeProposta.getMonth() + 1)).slice(-2) + '/' + dataValidadeProposta.getFullYear();
+            if (dtdataValidadeProposta == "31/12/1969") dtdataValidadeProposta = "";
+
             var representante = resultData.d.results[i].Representante.Title;
             var cliente = resultData.d.results[i].Cliente.Title;
             var responsavelProposta = resultData.d.results[i].ResponsavelProposta;
@@ -725,8 +743,13 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
             var prazoGarantia = resultData.d.results[i].PrazoGarantia;
 
-            var arrOutrosServicos = resultData.d.results[i].OutrosServicos.results;
-            var strOutrosServicos = arrOutrosServicos.toString();
+            var outrosServicos = resultData.d.results[i].OutrosServicos;
+
+            if (outrosServicos != null) {
+              var arrOutrosServicos = resultData.d.results[i].OutrosServicos.results;
+              var strOutrosServicos = arrOutrosServicos.toString();
+            }
+            else strOutrosServicos = "-"
 
 
             var arrProduto = resultData.d.results[i].Produto.results;
@@ -765,8 +788,24 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             jQuery("#txtProduto").html(strTituloProduto);
             jQuery("#txtModalNumeroProposta").html(numeroProposta);
 
+            console.log("status", status);
+
+            if (status == "Em análise") {
+
+              //console.log("_gruposzz", _grupos);
+
+              if (_grupos.indexOf("Representante") !== -1) {
+
+                jQuery("#btnEditarProposta").show();
+
+              }
+            }
+
             if (status != "Em análise") {
+
               jQuery("#btnResponderDiscussao").hide();
+
+
             }
 
             if (status != "Aprovado") {
@@ -781,7 +820,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(textStatus);
+        console.log(jqXHR.responseText);
       }
 
 
@@ -817,7 +856,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             if (dtDataRealTermino == "31/12/1969") dtDataRealTermino = "-";
             var justificativa = resultData.d.results[i].Justificativa;
 
-            console.log("justificativa", justificativa);
+            //console.log("justificativa", justificativa);
 
             if (justificativa == null) justificativa = "-";
 
@@ -844,7 +883,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(textStatus);
+        console.log(jqXHR.responseText);
       }
 
 
@@ -856,7 +895,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
   protected detalhesTarefas(id, nomeGrupo) {
 
-    console.log("entrou no detalhesTarefas" + id);
+    //console.log("entrou no detalhesTarefas" + id);
     _idTarefa = id;
 
     jQuery("#txtModalArea").html(nomeGrupo);
@@ -919,13 +958,10 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
               if (resultData.d.results.length > 0) {
 
-                console.log("entrou 1!!!");
                 this.recarregaTarefas();
                 $("#modalAprovacao").modal('hide');
 
               } else {
-
-                console.log("entrou 2!!!");
 
                 await _web.lists
                   .getByTitle("PropostasSAP")
@@ -945,7 +981,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
-              console.log(textStatus);
+              console.log(jqXHR.responseText);
             }
 
           })
@@ -963,13 +999,10 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
               if (resultData.d.results.length > 0) {
 
-                console.log("entrou 1!!!");
                 this.recarregaTarefas();
                 $("#modalAprovacao").modal('hide');
 
               } else {
-
-                console.log("entrou 2!!!");
 
                 await _web.lists
                   .getByTitle("PropostasSAP")
@@ -989,7 +1022,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
-              console.log(textStatus);
+              console.log(jqXHR.responseText);
             }
 
           })
@@ -1040,7 +1073,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
-                  console.log(textStatus);
+                  console.log(jqXHR.responseText);
                 }
 
               })
@@ -1110,7 +1143,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
   protected getSelecaoAreas() {
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('AreasDiscussao')/items?$select=ID,Title,GrupoSharepoint/ID,GrupoSharepoint/Title&$expand=GrupoSharepoint&$orderby= Title`,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Seleção da Área')/items?$select=ID,Title,GrupoSharepoint/ID,GrupoSharepoint/Title&$expand=GrupoSharepoint&$orderby= Title`,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -1124,7 +1157,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
           for (var i = 0; i < resultData.d.results.length; i++) {
 
-            montaArea += `<option value=${resultData.d.results[i].GrupoSharepoint.ID}>${resultData.d.results[i].GrupoSharepoint.Title}</option>`;
+            montaArea += `<option value=${resultData.d.results[i].ID}>${resultData.d.results[i].GrupoSharepoint.Title}</option>`;
 
           }
 
@@ -1135,7 +1168,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(textStatus);
+        console.log(jqXHR.responseText);
       }
 
     })
@@ -1147,8 +1180,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
     $("#conteudoDiscusssaoNova").empty();
 
-    console.log("this.props.siteurl", this.props.siteurl);
-
     jQuery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('ListaDiscussao_1911')/items?$select=ID,Title,Author/Title,Area/Title,Created,NotificarArea/Title,Mensagem,txtAnexosRelacionados&$expand=Author,Area,NotificarArea&$filter=Proposta/ID eq ` + _idProposta,
       type: "GET",
@@ -1158,23 +1189,20 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
         var montaDiscussaoNova = ``;
 
-        console.log("resultData Discussao", resultData);
-
         if (resultData.d.results.length > 0) {
 
-          console.log("resultData.d.results.length", resultData.d.results.length);
+          //console.log("resultData.d.results.length", resultData.d.results.length);
 
           for (var i = 0; i < resultData.d.results.length; i++) {
 
             var montaLinksAnexos = ``;
 
-            console.log("entrou discussao");
 
             var autor = resultData.d.results[i].Author.Title;
             var area = resultData.d.results[i].Area.Title;
             var criado = new Date(resultData.d.results[i].Created);
-            var criado2 = new Date(criado.setHours(criado.getHours() + 3));
-            var criadoHora = criado2.getHours() + ":" + criado2.getMinutes() + ":" + criado2.getSeconds();
+            var criado2 = new Date(criado.setHours(criado.getHours()));
+            var criadoHora = criado2.getHours() + ":" + ("0" + (criado2.getMinutes() + 1)).slice(-2) + ":" + criado2.getSeconds();
             var criadoData = ("0" + criado2.getDate()).slice(-2) + '/' + ("0" + (criado2.getMonth() + 1)).slice(-2) + '/' + criado2.getFullYear();
             var arrNotificarArea = [];
             var notificarArea = resultData.d.results[i].NotificarArea.results;
@@ -1183,16 +1211,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             for (var x = 0; x < notificarArea.length; x++) {
               arrNotificarArea.push(notificarArea[x].Title)
             }
-
-            //var mensagem = resultData.d.results[i].Title;
-
-            //console.log("Autor", autor);
-            //console.log("Area", area);
-            //console.log("criadoHora", criadoHora);
-            //console.log("criadoData", criadoData);
-            //console.log("notificarArea", notificarArea);
-            //console.log("arrNotificarArea", arrNotificarArea.toString());
-            // console.log("mensagem", mensagem);
 
             var anexosRelacionados = resultData.d.results[i].txtAnexosRelacionados;
 
@@ -1208,8 +1226,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
             } else montaLinksAnexos = `<div class="text-secondary">Nenhum anexo encontrado.</div>`;
 
-
-            console.log("arrAnexosRelacionados", arrAnexosRelacionados);
 
             montaDiscussaoNova += `
             <div class="p-0 mb-0 bg-light text-dark rounded ">
@@ -1241,7 +1257,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log("Erro em getDiscussaoNova: " + textStatus);
+        console.log(jqXHR.responseText);
       }
 
 
@@ -1252,6 +1268,290 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
 
   }
+
+  protected async getDiscussaoAntiga() {
+
+
+    const q: ICamlQuery = {
+      ViewXml: `<View>` +
+        `<Query>` +
+        `<Where><Eq><FieldRef Name="Proposal" LookupId='TRUE'/><Value Type="Number">2156</Value></Eq></Where>` +
+        `<OrderBy><FieldRef Name='ID' /></OrderBy>` +
+        `</Query><RowLimit>1</RowLimit>` +
+        `</View>`
+    };
+
+    await _web.lists
+      .getByTitle('Discussion')
+      .getItemsByCAMLQuery(q, "FieldValuesAsText")
+      .then(async (r: any[]) => {
+        {
+
+          console.log("discussão", r);
+
+          if (r.length > 0) {
+
+            for (var index = 0; index < r.length; index++) {
+
+              const x = r[index];
+              var threadDiscussao = x.FieldValuesAsText.ThreadIndex;
+              var fileLeafRef = x.FieldValuesAsText.FileLeafRef;
+
+              console.log("thread", threadDiscussao);
+              console.log("fileLeafRef", fileLeafRef);
+
+              /*    
+                   jQuery.ajax({
+                     // url: `${this.props.siteurl}/_api/web/lists/getbytitle('Discussion')/items?$select=ID,Title,ParentItemID&$filter=((ParentItemID ne null) and (ID eq 21360))`,
+                     url: `${this.props.siteurl}/_api/web/lists/getbytitle('Discussion')/items?$select=*&$expand=FieldValuesAsText&$FieldValuesAsText/ThreadIndex%20eq%20%270x01D9AA9FC281097C3944356A443EB4ACB497CB0B2D780044C252E3%27`,
+                     type: "GET",
+                     headers: { 'Accept': 'application/json; odata=verbose;' },
+                     async: false,
+                     success: async function (resultData) {
+     
+                       console.log("Mensagem", resultData);
+     
+     
+     
+                     },
+                     error: function (jqXHR, textStatus, errorThrown) {
+                       console.log(jqXHR.responseText);
+                     }
+     
+                   })
+     
+                   
+     
+                   var relativeURL = window.location.pathname;
+     
+                   var strRelativeURL = relativeURL.replace("SitePages/Proposta-Detalhes.aspx", "");
+     
+                   _web.getFolderByServerRelativeUrl(`${strRelativeURL}/Discussion`)
+                     .expand("Folders, Files, ListItemAllFields").get().then(r => {
+                       console.log("r", r);
+     
+                       r.Folders.forEach(item => {
+     
+                         console.log("entrou em folder");
+                         console.log("item-doc", item);
+                       })
+     
+                       r.Files.forEach(item2 => {
+                         console.log("entrou em files");
+                         console.log("item-doc", item2);
+     
+                       })
+     
+                     }).catch((error: any) => {
+                       console.log("Erro Anexo da biblioteca: ", error);
+                     });
+     
+     
+
+              const q1: ICamlQuery = {
+                ViewXml: `<View>` +
+                  `<Query>` +
+                  `<Where><Eq><FieldRef Name="ContentTypeId"/><Value Type="Text">0x010700710863EED7A6A24E8B30E30369A9D412</Value></Eq></Where>` +
+                  `<OrderBy><FieldRef Name='ID' /></OrderBy>` +
+                  `</Query>` +
+                  `</Query><RowLimit>4999</RowLimit>` +
+                  `</View>`
+              };
+
+       */
+
+              const q1: ICamlQuery = {
+                ViewXml: `<View>` +
+                  `<Query>` +
+                  `<Where><Eq><FieldRef Name="ID"/><Value Type="Text">21346</Value></Eq></Where>` +
+                  `<OrderBy><FieldRef Name='ID' /></OrderBy>` +
+                  `</Query>` +
+                  `</Query><RowLimit>1</RowLimit>` +
+                  `</View>`
+              };
+
+              await _web.lists
+                .getByTitle('Discussion')
+                .getItemsByCAMLQuery(q1, "FieldValuesAsText")
+                .then((r: any[]) => {
+                  {
+
+                    console.log("Mensagem 1", r);
+
+                    if (r.length > 0) {
+
+                      for (var i = 0; i < r.length; i++) {
+
+                        //var thread = r[i].FieldValuesAsText.ThreadIndex;
+
+                        //console.log(thread);
+                        //console.log(threadDiscussao);
+
+                        //console.log(thread.includes(threadDiscussao));
+
+                        //if (thread.includes(threadDiscussao)) {
+                        //console.log("Possui")
+                        //}
+
+                      }
+
+                    }
+
+                  }
+
+                })
+
+
+
+              jQuery.ajax({
+                // url: `https://dieboldnixdorf.sharepoint.com/sites/PropostasSAP-HML/_api/Web/GetFolderByServerRelativePath(decodedurl='/sites/PropostasSAP-HML/Lists/Discussion/864_.000')`,
+                url: `https://dieboldnixdorf.sharepoint.com/sites/PropostasSAP-HML/_api/Web/GetFolderByServerRelativeUrl('/sites/PropostasSAP-HML/Lists/Discussion/864_.000')/Files`,
+                type: "GET",
+                headers: { 'Accept': 'application/json; odata=verbose;' },
+                async: false,
+                success: async function (resultData) {
+
+                  console.log("Mensagem 2", resultData);
+
+                  if (resultData.d.ItemCount > 0) {
+
+                    for (var i = 0; i < resultData.d.results.length; i++) {
+
+                      console.log(resultData.d.results[i].Folders);
+
+                    }
+
+                  }
+
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  console.log(jqXHR.responseText);
+                }
+
+              })
+
+
+            }
+
+          }
+
+        }
+      })
+      .catch(console.error);
+
+
+    /////
+
+
+    var camlQuery = {
+      'query': {
+        '__metadata': { 'type': 'SP.CamlQuery' },
+        'ViewXml': '<View><Query/></View>',
+        'FolderServerRelativeUrl': '/sites/PropostasSAP-HML/Lists/Discussion/864_.000'
+      }
+    };
+
+
+    const q1: ICamlQuery = {
+      ViewXml: `<View>` +
+        `<Query>` +
+        `<Where><Eq><FieldRef Name="ID"/><Value Type="Text">21346</Value></Eq></Where>` +
+        `<OrderBy><FieldRef Name='ID' /></OrderBy>` +
+        `</Query>` +
+        `</Query><RowLimit>1</RowLimit>` +
+        `</View>`
+    };
+
+    await _web.lists
+      .getByTitle('Discussion')
+      .getItemsByCAMLQuery(camlQuery, "FieldValuesAsText")
+      .then((r: any[]) => {
+        {
+
+          console.log("Mensagem 3", r);
+
+          if (r.length > 0) {
+
+            for (var i = 0; i < r.length; i++) {
+
+              //var thread = r[i].FieldValuesAsText.ThreadIndex;
+
+              //console.log(thread);
+              //console.log(threadDiscussao);
+
+              //console.log(thread.includes(threadDiscussao));
+
+              //if (thread.includes(threadDiscussao)) {
+              //console.log("Possui")
+              //}
+
+            }
+
+          }
+
+        }
+
+      })
+
+
+
+
+
+    var camlQuery = {
+      'query': {
+        '__metadata': { 'type': 'SP.CamlQuery' },
+        'ViewXml': '<View><Query/></View>',
+        'FolderServerRelativeUrl': '/sites/PropostasSAP-HML/Lists/Discussion/864_.000'
+      }
+    };
+
+    var url = "https://dieboldnixdorf.sharepoint.com/sites/PropostasSAP-HML/_api/SP.AppContextSite(@target)/web/lists/getByTitle('Discussion')/getitems?$select=ID,Title&@target=https://dieboldnixdorf.sharepoint.com/sites/PropostasSAP-HML'";
+
+    jQuery.ajax({
+      // url: `${this.props.siteurl}/_api/web/lists/getbytitle('Discussion')/items?$select=ID,Title,ParentItemID&$filter=((ParentItemID ne null) and (ID eq 21360))`,
+      url: url,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      async: false,
+      data: JSON.stringify(camlQuery),
+      success: async function (resultData) {
+
+        console.log("Mensagem 5", resultData);
+
+
+
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
+      }
+
+    })
+    /*     
+         jQuery.ajax({
+             async: false,
+             url: url,
+             type: "POST",
+             headers: {
+                 "accept": "application/json;odata=verbose",
+                 "content-type": "application/json;odata=verbose",
+                 "X-RequestDigest": $("#__REQUESTDIGEST").val()
+             },
+             data: JSON.stringify(camlQuery),
+             success: function (data) {             
+                 var result = "success";
+             },
+             error: function (data, msg) {
+                 var result = "Fail";
+             }
+         });
+     
+     
+ */
+
+
+  }
+
 
   protected modalResponderDiscussao() {
 
@@ -1288,9 +1588,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       arrNomeNotificarArea.push($(this).attr('grupo'));
     });
 
-    console.log("_mensagemDiscussao", _mensagemDiscussao);
-
-
     if (area == "0") {
       alert("Escolha a área!");
       $("#btnCadastrarDiscussao").prop("disabled", false);
@@ -1326,14 +1623,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       $("#btnCadastrarDiscussaoCancelar").prop("disabled", false);
       return false;
     }
-
-    //console.log("area", area);
-    //console.log("mensagem", mensagem);
-    //console.log("arrAnexosSelecionados", arrAnexosSelecionados);
-    //console.log("arrNotificarArea", arrNotificarArea);
-    //console.log("arrNomeNotificarArea", arrNomeNotificarArea);
-
-
 
     await _web.lists
       .getByTitle("ListaDiscussao_1911")
@@ -1380,7 +1669,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
-        console.log(textStatus);
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -1403,21 +1692,21 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     var motivo = $("#ddlMotivoReabertura").val();
     var justificativa = $("#txtJustificativaReabertura").val();
 
-    if (novoStatus == "0"){
+    if (novoStatus == "0") {
       alert("Selecione o novo status da Proposta!");
       $("#btnModalReabrirProposta").prop("disabled", false);
       $("#btnModalReabrirPropostaCancelar").prop("disabled", false);
       return false;
     }
-   
-    if (motivo == "0"){
+
+    if (motivo == "0") {
       alert("Selecione o motivo!");
       $("#btnModalReabrirProposta").prop("disabled", false);
       $("#btnModalReabrirPropostaCancelar").prop("disabled", false);
       return false;
     }
 
-    if (justificativa == ""){
+    if (justificativa == "") {
       alert("Forneça uma justificativa!");
       $("#btnModalReabrirProposta").prop("disabled", false);
       $("#btnModalReabrirPropostaCancelar").prop("disabled", false);
@@ -1478,6 +1767,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
               }
             },
             error: function (jqXHR, textStatus, errorThrown) {
+              console.log(jqXHR.responseText);
             }
           });
 
@@ -1494,6 +1784,12 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
   }
 
+
+  protected editarProposta() {
+
+    window.location.href = `Propostas-SAP-Editar.aspx?PropostasID=${_idProposta}`;
+
+  }
 
   protected voltar() {
 

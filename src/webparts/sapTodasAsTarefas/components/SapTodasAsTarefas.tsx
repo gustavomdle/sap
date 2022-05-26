@@ -201,6 +201,7 @@ export default class SapTodasAsTarefas extends React.Component<ISapTodasAsTarefa
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 

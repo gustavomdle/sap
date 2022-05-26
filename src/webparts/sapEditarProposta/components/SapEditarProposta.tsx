@@ -62,7 +62,7 @@ var _nomeArquivo;
 var _elemento;
 var _elemento2;
 var _siteurl;
-var _responsavelProposta;
+var _arrAreasAntiga = [];
 
 
 export interface IReactGetItemsState {
@@ -107,7 +107,8 @@ export interface IReactGetItemsState {
   itemsDataEntregaPropostaCliente: any;
   valorItemsRepresentante: "",
   valorItemsCliente: "",
-  valorItemsResponsavelProposta: ""
+  valorItemsResponsavelProposta: any;
+  valorCheckedSegmento;
 
 
 
@@ -159,8 +160,9 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
       itemsDataEntregaPropostaCliente: "",
       valorItemsRepresentante: "",
       valorItemsCliente: "",
-      valorItemsResponsavelProposta: ""
-   
+      valorItemsResponsavelProposta: "",
+      valorCheckedSegmento: "any"
+
 
     };
 
@@ -303,7 +305,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                     <div className="form-row">
                       <div className="form-group col-md-6">
                         <label htmlFor="ddlRepresentante">Representante</label><span className="required"> *</span>
-                        <select id="ddlRepresentante" className="form-control" value={this.state.valorItemsRepresentante} onChange={e => this.changeRepresentante(e.target.value)} >
+                        <select id="ddlRepresentante" className="form-control" value={this.state.valorItemsRepresentante} disabled  >
                           <option value="0" selected>Selecione...</option>
                           {this.state.itemsRepresentante.map(function (item, key) {
                             return (
@@ -314,7 +316,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                       </div>
                       <div className="form-group col-md-6">
                         <label htmlFor="ddlCliente">Cliente </label><span className="required"> *</span>
-                        <select id="ddlCliente" className="form-control" value={this.state.valorItemsCliente} onChange={e => this.changeCliente(e.target.value)}>
+                        <select id="ddlCliente" className="form-control" value={this.state.valorItemsCliente} onChange={(e) => this.onChangeCliente(e.target.value)} >
                           <option value="0" selected>Selecione...</option>
                           {this.state.itemsClientes.map(function (item, key) {
                             return (
@@ -330,7 +332,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                     <div className="form-row">
                       <div className="form-group col-md-6">
                         <label htmlFor="ddlResponsavelProposta">Responsável da Proposta</label><span className="required"> *</span>
-                        <select id="ddlResponsavelProposta" className="form-control" value={this.state.valorItemsResponsavelProposta} onChange={e => this.changeResponsavelArea(e.target.value)}> 
+                        <select id="ddlResponsavelProposta" className="form-control" value={this.state.valorItemsResponsavelProposta} onChange={(e) => this.onChangeResponsavelProposta(e.target.value)}>
                           <option value="0" selected>Selecione...</option>
                           {this.state.itemsResponsavelProposta.map(function (item, key) {
                             return (
@@ -388,13 +390,12 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                     <div className="form-row">
                       <div className="form-group col-md-4">
                         <label htmlFor="txtTitulo">Segmento</label><span className="required"> *</span>
-                        {this.state.itemsSegmento.map(function (item, key) {
-
+                        {this.state.itemsSegmento.map((item) => {
 
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkSegmento' checked={_arrSegmento.indexOf(item) !== -1} type="checkbox" value={item} />
+                              <input className="form-check-input" name='checkSegmento' defaultChecked={_arrSegmento.indexOf(item) !== -1} type="checkbox" value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -415,7 +416,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" type="radio" checked={checado} name="checkSetor" value={item} />
+                              <input className="form-check-input" type="radio" defaultChecked={checado} name="checkSetor" value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -436,7 +437,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkModalidade' type="radio" checked={checado} value={item} />
+                              <input className="form-check-input" name='checkModalidade' type="radio" defaultChecked={checado} value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -485,7 +486,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkInstalacao' type="radio" checked={checado} value={item} />
+                              <input className="form-check-input" name='checkInstalacao' type="radio" defaultChecked={checado} value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -505,7 +506,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkGarantia' type="radio" checked={checado} value={item} />
+                              <input className="form-check-input" name='checkGarantia' type="radio" defaultChecked={checado} value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -527,7 +528,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkTipoGarantia' type="radio" checked={checado} value={item} />
+                              <input className="form-check-input" name='checkTipoGarantia' type="radio" defaultChecked={checado} value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -545,22 +546,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                       <div className="form-group col-md-2">
                         <label htmlFor="txtTitulo">Prazo de garantia </label><span className="required"> *</span>
 
-                        {this.state.itemsPrazoGarantia.map(function (item, key) {
-
-                          var checado = false;
-                          if (_prazoGarantia == item) checado = true;
-
-                          return (
-
-                            <div className="form-check">
-                              <input className="form-check-input" name='checkPrazoGarantia' type="radio" checked={checado} value={item} />
-                              <label className="form-check-label">
-                                {item}
-                              </label>
-                            </div>
-
-                          );
-                        })}
+                        <input type="number" style={{ "width": "120px" }} className="form-control" id="txtPrazoGarantia" />
 
                       </div>
                       <div className="form-group col-md-2">
@@ -571,7 +557,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                           return (
 
                             <div className="form-check">
-                              <input className="form-check-input" name='checkOutrosServicos' type="checkbox" checked={_arrOutrosServicos.indexOf(item) !== -1} value={item} />
+                              <input className="form-check-input" name='checkOutrosServicos' type="checkbox" defaultChecked={_arrOutrosServicos.indexOf(item) !== -1} value={item} />
                               <label className="form-check-label">
                                 {item}
                               </label>
@@ -681,7 +667,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
                             {this.state.itemsAreas.map(function (item, key) {
 
-                              if (_arrAreas.indexOf(item.ID) !== -1) {
+                              if (_arrAreas.indexOf(item.ID) != -1) {
                                 return (
                                   <option className="optArea" value={item.ID}>{item.Title}</option>
                                 );
@@ -694,6 +680,8 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                       </td>
                     </tr>
                   </table>
+                  <br></br>
+                  <p className="text-info">&nbsp;&nbsp;&nbsp; As seguintes áreas já são adicionadas a Proposta automaticamente: Comercial, Jurídico, Representante, Propostas </p>
                 </div>
               </div>
             </div>
@@ -725,7 +713,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
             <div className="text-right">
               <button style={{ "margin": "2px" }} type="submit" id="btnVoltar" className="btn btn-secondary">Voltar</button>
-              <button style={{ "margin": "2px" }} id="btnIniciarAprovacao" className="btn btn-success" >Enviar para Aprovação</button>
+              <button style={{ "margin": "2px" }} id="btnIniciarAprovacao" className="btn btn-success" >Salvar</button>
             </div>
 
 
@@ -744,11 +732,11 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                 </button>
               </div>
               <div className="modal-body">
-                Deseja realmente iniciar o fluxo?
+                Deseja realmente salvar as alterações?
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button id="btIniciarFluxo" type="button" className="btn btn-primary">Iniciar fluxo</button>
+                <button id="btIniciarFluxo" type="button" className="btn btn-primary">Salvar</button>
               </div>
             </div>
           </div>
@@ -823,38 +811,46 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     );
   }
 
-  protected changeRepresentante = (val) => {
+
+  protected changeSegmento = (val) => {
 
     this.setState({
-      valorItemsRepresentante: val
+      valorCheckedSegmento: true
     });
 
-  }
+    return {
+      value: 'select'
+    }
 
-  protected changeCliente = (val) => {
+    //console.log("elem",elem);
 
     this.setState({
-      valorItemsCliente: val
+      // itemsSegmento: val
     });
 
-  }
-
-  protected changeResponsavelArea = (val) => {
-
-    this.setState({
-      valorItemsResponsavelProposta: val
-    });
 
   }
-
-
-
-
 
   private onTextChange = (newText: string) => {
     _dadosProposta = newText;
     return newText;
   }
+
+  private onChangeCliente = (val) => {
+    this.setState({
+      valorItemsCliente: val,
+    });
+  }
+
+  private onChangeResponsavelProposta = (val) => {
+    this.setState({
+      valorItemsResponsavelProposta: val,
+    });
+  }
+
+
+
+
 
 
   private onFormatDate = (date: Date): string => {
@@ -899,6 +895,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -914,12 +911,13 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
 
     jquery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Clientes')/items?$top=4999&$orderby= Title`,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Clientes')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
@@ -928,6 +926,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -941,6 +940,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -954,6 +954,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -967,6 +968,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -980,6 +982,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -993,6 +996,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -1006,6 +1010,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -1019,9 +1024,11 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
+    /*
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/GetByTitle('PropostasSAP')/fields?$filter=EntityPropertyName eq 'PrazoGarantia'`,
       type: "GET",
@@ -1032,9 +1039,10 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
-
+    */
 
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/GetByTitle('PropostasSAP')/fields?$filter=EntityPropertyName eq 'OutrosServicos'`,
@@ -1046,6 +1054,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -1060,12 +1069,13 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
 
     jquery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$top=4999&$filter=((Ativo eq 1) and (Title ne 'Comercial') and (Title ne 'Jurídico') and (Title ne 'Representante') and (Title ne 'Propostas'))&$orderby= Title`,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
@@ -1074,6 +1084,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -1176,17 +1187,31 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
             jQuery("#txtSintese").val(resultData.d.results[i].Title);
             jQuery("#txtIdentificacaoOportunidade").val(resultData.d.results[i].IdentificacaoOportunidade);
 
-            this.setState({
-              valorItemsRepresentante: resultData.d.results[i].Representante.ID
-            });
+            console.log("resultData.d.results[i].Cliente.ID", resultData.d.results[i].Cliente.ID)
 
             this.setState({
-              valorItemsCliente: resultData.d.results[i].Cliente.ID
+              valorItemsRepresentante: resultData.d.results[i].Representante.ID,
+              valorItemsCliente: resultData.d.results[i].Cliente.ID,
             });
 
-            this.setState({
-              valorItemsResponsavelProposta: resultData.d.results[i].ResponsavelProposta
-            });
+            var itemsResponsavelProposta = resultData.d.results[i].ResponsavelProposta;
+
+            if (itemsResponsavelProposta == null) {
+
+              this.setState({
+                valorItemsResponsavelProposta: 0
+              });
+
+            } else {
+
+              this.setState({
+                valorItemsResponsavelProposta: resultData.d.results[i].ResponsavelProposta
+              });
+
+
+            }
+
+
 
             //_representante = resultData.d.results[i].Representante.ID;
             //_cliente = resultData.d.results[i].Cliente.ID;
@@ -1211,7 +1236,16 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
             _garantia = resultData.d.results[i].Garantia;
             _tipoGarantia = resultData.d.results[i].TipoGarantia;
             _prazoGarantia = resultData.d.results[i].PrazoGarantia;
-            _arrOutrosServicos = resultData.d.results[i].OutrosServicos.results;
+
+            jQuery("#txtPrazoGarantia").val(_prazoGarantia);
+
+            var outrosServicos = resultData.d.results[i].OutrosServicos;
+
+            if (outrosServicos != null) {
+
+              _arrOutrosServicos = resultData.d.results[i].OutrosServicos.results;
+
+            }
 
             var arrProduto = [];
             arrProduto = resultData.d.results[i].Produto.results;
@@ -1233,10 +1267,11 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
         }
 
-
+        //console.log("_arrProdutoZ", _arrProduto);
 
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
 
 
@@ -1264,16 +1299,19 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
             //_arrSegmento = resultData.d.results[i].Title;
 
             _arrAreas.push(resultData.d.results[i].GrupoSharepoint.ID);
+            _arrAreasAntiga.push(resultData.d.results[i].Title);
 
           }
 
         }
 
-        console.log(_arrAreas);
+        //console.log("_arrAreas", _arrAreas);
+        console.log("_arrAreasAntiga", _arrAreasAntiga);
 
 
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
 
 
@@ -1356,6 +1394,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     _representante = representante;
     var cliente = $("#ddlCliente").val();
     var dadosProposta = $("#txtDadosProposta").val();
+    var prazoGarantia = $("#txtPrazoGarantia").val();
 
     var arrSegmento = [];
     $.each($("input[name='checkSegmento']:checked"), function () {
@@ -1382,16 +1421,6 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     var arrGarantia = [];
     $.each($("input[name='checkGarantia']:checked"), function () {
       arrGarantia.push($(this).val());
-    });
-
-    var arrTipoGarantia = [];
-    $.each($("input[name='checkTipoGarantia']:checked"), function () {
-      arrTipoGarantia.push($(this).val());
-    });
-
-    var arrPrazoGarantia = [];
-    $.each($("input[name='checkPrazoGarantia']:checked"), function () {
-      arrPrazoGarantia.push($(this).val());
     });
 
     var arrOutrosServicos = [];
@@ -1431,18 +1460,6 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
     if (dataEntregaPropostaCliente == "") {
       alert("Forneça a Data de Entrega da Proposta!");
-      document.getElementById('headingResumoProposta').scrollIntoView();
-      return false;
-    }
-
-    if (dataFinalQuestionamentos == "") {
-      alert("Forneça a data Final dos Questionamentos!");
-      document.getElementById('headingResumoProposta').scrollIntoView();
-      return false;
-    }
-
-    if (dataValidadeProposta == "") {
-      alert("Forneça a Data de Validade da Proposta!");
       document.getElementById('headingResumoProposta').scrollIntoView();
       return false;
     }
@@ -1510,7 +1527,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
       return false;
     }
 
-    if (arrPrazoGarantia.length == 0) {
+    if (prazoGarantia == "") {
       alert("Escolha a o Prazo de Garantia!");
       document.getElementById('headingProduto').scrollIntoView();
       return false;
@@ -1623,12 +1640,16 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
       var tipoAnaliseProposta = "";
 
+      /*
+
       jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Comercial"; }).prop('selected', true);
       jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Jurídico"; }).prop('selected', true);
       jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Representante"; }).prop('selected', true);
       jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Propostas"; }).prop('selected', true);
       var $options = $('#ddlArea1 option:selected');
       $options.appendTo("#ddlArea2");
+
+      */
 
 
       if ($('#checkTipoAnaliseProposta').is(':checked')) { tipoAnaliseProposta = "Proposta" };
@@ -1644,16 +1665,24 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
       var formDataEntregaPropostaCliente = dataEntregaPropostaClienteAno + "-" + dataEntregaPropostaClienteMes + "-" + dataEntregaPropostaClienteDia;
 
       var dataFinalQuestionamentos = "" + jQuery("#dtDataFinalQuestionamentos-label").val() + "";
-      var dataFinalQuestionamentosDia = dataFinalQuestionamentos.substring(0, 2);
-      var dataFinalQuestionamentosMes = dataFinalQuestionamentos.substring(3, 5);
-      var dataFinalQuestionamentosAno = dataFinalQuestionamentos.substring(6, 10);
-      var formDataFinalQuestionamentos = dataFinalQuestionamentosAno + "-" + dataFinalQuestionamentosMes + "-" + dataFinalQuestionamentosDia;
+
+      if (dataFinalQuestionamentos != "") {
+        var dataFinalQuestionamentosDia = dataFinalQuestionamentos.substring(0, 2);
+        var dataFinalQuestionamentosMes = dataFinalQuestionamentos.substring(3, 5);
+        var dataFinalQuestionamentosAno = dataFinalQuestionamentos.substring(6, 10);
+        var formDataFinalQuestionamentos = dataFinalQuestionamentosAno + "-" + dataFinalQuestionamentosMes + "-" + dataFinalQuestionamentosDia;
+      }
+      else formDataFinalQuestionamentos = null;
 
       var dataValidadeProposta = "" + jQuery("#dtDataValidadeProposta-label").val() + "";
-      var dataValidadePropostaDia = dataValidadeProposta.substring(0, 2);
-      var dataValidadePropostaMes = dataValidadeProposta.substring(3, 5);
-      var dataValidadePropostaAno = dataValidadeProposta.substring(6, 10);
-      var formDataValidadeProposta = dataValidadePropostaAno + "-" + dataValidadePropostaMes + "-" + dataValidadePropostaDia;
+
+      if (dataValidadeProposta != "") {
+        var dataValidadePropostaDia = dataValidadeProposta.substring(0, 2);
+        var dataValidadePropostaMes = dataValidadeProposta.substring(3, 5);
+        var dataValidadePropostaAno = dataValidadeProposta.substring(6, 10);
+        var formDataValidadeProposta = dataValidadePropostaAno + "-" + dataValidadePropostaMes + "-" + dataValidadePropostaDia;
+      }
+      else formDataValidadeProposta = null;
 
       console.log("sintese", sintese);
       console.log("tipoAnaliseProposta", tipoAnaliseProposta);
@@ -1669,6 +1698,8 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
       var SST = $("#txtSST").val();
       var condicoesPagamento = $("#txtCondicoesPagamento").val();
       var justificativaFinal = $("#txtJustificativa").val();
+      var prazoGarantia = $("#txtPrazoGarantia").val();
+
 
       var arrSegmento = [];
       $.each($("input[name='checkSegmento']:checked"), function () {
@@ -1703,11 +1734,6 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         arrTipoGarantia.push($(this).val());
       });
 
-      var arrPrazoGarantia = [];
-      $.each($("input[name='checkPrazoGarantia']:checked"), function () {
-        arrPrazoGarantia.push($(this).val());
-      });
-
       var arrOutrosServicos = [];
       $.each($("input[name='checkOutrosServicos']:checked"), function () {
         arrOutrosServicos.push($(this).val());
@@ -1725,6 +1751,27 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         return v.text;
       });
 
+      /*
+            jquery.ajax({
+      
+              url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$select=ID,Title&$filter=(Title eq 'Comercial') or (Title eq 'Jurídico') or (Title eq 'Representante') or (Title eq 'Propostas')`,
+              type: "GET",
+              async: false,
+              headers: { 'Accept': 'application/json; odata=verbose;' },
+              success: function (resultData) {
+                if (resultData.d.results.length > 0) {
+                  for (var i = 0; i < resultData.d.results.length; i++) {
+                    _arrAreaId.push(resultData.d.results[i].ID);
+                    _arrAreaTexto.push(resultData.d.results[i].Title);
+                  }
+                }
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                console.log(textStatus);
+              }
+            });
+      
+      */
 
       await _web.lists
         .getByTitle("PropostasSAP")
@@ -1735,7 +1782,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
           DataEntregaPropostaCliente: formDataEntregaPropostaCliente,
           DataFinalQuestionamentos: formDataFinalQuestionamentos,
           DataValidadeProposta: formDataValidadeProposta,
-          RepresentanteId: representante,
+          //RepresentanteId: representante,
           ClienteId: cliente,
           ResponsavelProposta: responsavelProposta,
           PropostaRevisadaReferencia: propostaRevisadaReferencia,
@@ -1751,80 +1798,51 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
           Instalacao: arrInstalacao[0],
           Garantia: arrGarantia[0],
           TipoGarantia: arrTipoGarantia[0],
-          PrazoGarantia: arrPrazoGarantia[0],
+          PrazoGarantia: prazoGarantia,
           OutrosServicos: { "results": arrOutrosServicos },
           ProdutoId: { "results": arrProduto }
         })
-        .then(response => {
+        .then(async response => {
 
-          _siteurl = this.props.siteurl;
+          if (_arrAreaId.length != 0) {
 
-          jquery.ajax({
-            url: `${this.props.siteurl}/_api/web/lists/getbytitle('Representantes')/items?$filter=ID eq ` + _idProposta,
-            type: "GET",
-            headers: { 'Accept': 'application/json; odata=verbose;' },
-            async: false,
-            success: async function (resultData) {
+            for (var x = 0; x < _arrAreaId.length; x++) {
 
-              jquery.ajax({
-                url: `${_siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$filter=Proposta/ID eq ` + _idProposta,
-                type: "GET",
-                async: false,
-                headers: { 'Accept': 'application/json; odata=verbose;' },
-                success: async function (resultData) {
+              console.log("_arrAreaId[x]", _arrAreaId[x]);
+              console.log("_arrAreaTexto[x]", _arrAreaTexto[x]);
 
-                  if (resultData.d.results.length > 0) {
+              _criou = true;
 
-                    for (var i = 0; i < resultData.d.results.length; i++) {
-
-                      console.log("entrou no excluir tarefas");
-
-                      var idTarefa = resultData.d.results[i].ID;
-                      const list = _web.lists.getByTitle("Tarefas");
-                      await list.items.getById(idTarefa).recycle();
-
-                    }
-                  }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                }
-              });
-
-              for (var i = 0; i < _arrAreaId.length; i++) {
-
-                console.log("_arrAreaId[i]", _arrAreaId[i]);
-                console.log("_arrAreaTexto[i]", _arrAreaTexto[i]);
-
-                _criou = true;
+              if (_arrAreasAntiga.indexOf(_arrAreaTexto[x]) == -1) {
 
                 await _web.lists
                   .getByTitle("Tarefas")
                   .items.add({
-                    Title: _arrAreaTexto[i],
+                    Title: _arrAreaTexto[x],
                     PropostaId: _idProposta,
                     DataPlanejadaTermino: formDataEntregaPropostaCliente,
-                    GrupoSharepointId: _arrAreaId[i]
+                    GrupoSharepointId: _arrAreaId[x]
                   })
                   .then(response => {
 
-                    console.log("Criou a tarefa!");
+                    var last = (_arrAreaId.length) - 1;
+                    console.log("last", last);
+                    console.log("x", x);
+                    if (x == last) this.upload();
 
                   }).catch((error: any) => {
                     console.log(error);
                   });
 
+              } else {
+                this.upload();
               }
 
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
             }
-          });
 
-
+          }
 
         })
-
-      this.upload();
 
     }
 

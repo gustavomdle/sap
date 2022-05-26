@@ -41,20 +41,66 @@ const customFilter = textFilter({
 
 const empTablecolumns = [
   {
-    dataField: "Proposta.Title",
-    text: "Proposta",
+    dataField: "Proposta.Numero",
+    text: "Número",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    //filter: customFilter
+    filter: customFilter
   },
   {
-    dataField: "Proposta.Numero",
-    text: "Número da Proposta",
+    dataField: "Proposta.IdentificacaoOportunidade",
+    text: "Oportunidade",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    //filter: customFilter
+    filter: customFilter
   },
-
+  {
+    dataField: "Proposta.Title",
+    text: "Síntese",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter
+  },
+  {
+    dataField: "Created",
+    text: "Data de criação",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter,
+    formatter: (rowContent, row) => {
+      var dataCriacao = new Date(row.Created);
+      var dtdataCriacao = ("0" + dataCriacao.getDate()).slice(-2) + '/' + ("0" + (dataCriacao.getMonth() + 1)).slice(-2) + '/' + dataCriacao.getFullYear();
+      return dtdataCriacao;
+    }
+  },
+  {
+    dataField: "Proposta.DataEntregaPropostaCliente",
+    text: "Data de entrega",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter,
+    formatter: (rowContent, row) => {
+      var dataEntregaPropostaCliente = new Date(row.Proposta.DataEntregaPropostaCliente);
+      var dtDataEntregaPropostaCliente = ("0" + dataEntregaPropostaCliente.getDate()).slice(-2) + '/' + ("0" + (dataEntregaPropostaCliente.getMonth() + 1)).slice(-2) + '/' + dataEntregaPropostaCliente.getFullYear();
+      console.log("dtDataEntregaPropostaCliente", dtDataEntregaPropostaCliente);
+      return dtDataEntregaPropostaCliente;
+    }
+  },
+  {
+    dataField: "Proposta.ResponsavelProposta",
+    text: "Responsável",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter
+  },
+  {
+    dataField: "Author.Title",
+    text: "Criado por",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter
+  },
+  /*
   {
     dataField: "GrupoSharepoint.Title",
     text: "Atribuido a",
@@ -89,6 +135,7 @@ const empTablecolumns = [
     sort: true,
     //filter: customFilter
   },
+  */
   {
     dataField: "",
     text: "",
@@ -140,7 +187,7 @@ export default class SapTodasAsTarefasAdm extends React.Component<ISapTodasAsTar
 
     var reactHandlerRepresentante = this;
 
-    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/Title,Proposta/Numero,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso&$expand=Proposta,GrupoSharepoint&$filter=(Status eq 'Em análise')`;
+    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/Title,Proposta/Numero,Proposta/IdentificacaoOportunidade,Proposta/DataEntregaPropostaCliente,Proposta/ResponsavelProposta,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso,Created,Author/Title&$expand=Proposta,GrupoSharepoint,Author&$filter=(Status eq 'Em análise')`;
     console.log("url", url);
 
     jQuery.ajax({
@@ -156,6 +203,7 @@ export default class SapTodasAsTarefasAdm extends React.Component<ISapTodasAsTar
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 

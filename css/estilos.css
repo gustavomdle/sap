@@ -10,50 +10,9 @@
     margin-bottom: 5px;
 }
 
-.fieldGroup-146 {
-    border: 0px;
-    background-color: transparent;
-    height: 25px;
-    font-family: inherit;
-
-}
-
-.field-147 {
-    color: #495057;
-    font-size: 1rem;
-}
-
-.fieldGroup-148 {
-    border: 0px;
-    background-color: transparent;
-    /*height: 25px;*/
-    font-family: inherit;
-
-}
-
-.field-148 {
-    color: #495057;
-    font-size: 1rem;
-}
-
-.icon-156 {
-    padding: 4px 5px 5px;
-}
-
 .carregando{
     text-align: center;
 }
-
-/*
-.my-hovertable > tbody > tr.mytable-hover-row:hover {
-    background-color: rgba(212, 24, 24, 0.822) !important;
-}
-*/
-/*
-#gridTodosItens{
-    width: 1280px;
-}
-*/
 
 .editorRichTex{
         border: 1px solid #ced4da;
@@ -68,4 +27,38 @@
     height: 39px;
     font-size: 14px;
 }
+
+
+.ms-TextField-fieldGroup{
+    border: 0px;
+}
+
+/*
+.fieldGroup-234{
+    border: 0px;
+}
+
+.field-147 {
+    color: #495057;
+    font-size: 1rem;
+}
+
+.field-148 {
+    color: #495057;
+    font-size: 1rem;
+}
+
+.icon-156 {
+    padding: 4px 5px 5px;
+}
+
+.my-hovertable > tbody > tr.mytable-hover-row:hover {
+    background-color: rgba(212, 24, 24, 0.822) !important;
+}
+*/
+/*
+#gridTodosItens{
+    width: 1280px;
+}
+*/
 

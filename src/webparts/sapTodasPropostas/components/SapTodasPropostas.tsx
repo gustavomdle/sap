@@ -44,27 +44,7 @@ const selectOptions = {
 };
 
 
-const customFilterID = textFilter({
-  placeholder: ' ',  // custom the input placeholder
-});
-
-const customFilterNumero = textFilter({
-  placeholder: ' ',  // custom the input placeholder
-});
-
-const customFilterIDOportunidade = textFilter({
-  placeholder: ' ',  // custom the input placeholder
-});
-
-const customFilterIDSintese = textFilter({
-  placeholder: ' ',  // custom the input placeholder
-});
-
-const customFilterCliente = textFilter({
-  placeholder: ' ',  // custom the input placeholder
-});
-
-const customFilterRepresentante = textFilter({
+const customFilter = textFilter({
   placeholder: ' ',  // custom the input placeholder
 });
 
@@ -72,52 +52,73 @@ const customFilterStatus = selectFilter({
   placeholder: 'Selecione',  // custom the input placeholder
 });
 
-
-
-
-
 const empTablecolumns = [
-  {
-    dataField: "ID",
-    text: "ID",
-    headerStyle: { backgroundColor: '#bee5eb' },
-    sort: true,
-    filter: customFilterID
-  },
   {
     dataField: "Numero",
     text: "Número",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    filter: customFilterNumero
+    filter: customFilter
   },
   {
     dataField: "IdentificacaoOportunidade",
     text: "ID Oportunidade",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    filter: customFilterIDOportunidade
+    filter: customFilter
   },
   {
     dataField: "Title",
     text: "Síntese",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    filter: customFilterIDSintese
+    filter: customFilter
   },
   {
     dataField: "Cliente.Title",
     text: "Cliente",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    filter: customFilterCliente
+    filter: customFilter
   },
   {
     dataField: "Representante.Title",
     text: "Representante",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    filter: customFilterRepresentante
+    filter: customFilter
+  },
+  {
+    dataField: "ResponsavelProposta",
+    text: "Responsável",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter
+  },
+  {
+    dataField: "Created",
+    text: "Data de criação",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter,
+    formatter: (rowContent, row) => {
+      var dataCriacao = new Date(row.Created);
+      var dtdataCriacao = ("0" + dataCriacao.getDate()).slice(-2) + '/' + ("0" + (dataCriacao.getMonth() + 1)).slice(-2) + '/' + dataCriacao.getFullYear();
+      return dtdataCriacao;
+    }
+  },
+  {
+    dataField: "DataEntregaPropostaCliente",
+    text: "Data de entrega",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter,
+    formatter: (rowContent, row) => {
+      var dataEntregaPropostaCliente = new Date(row.DataEntregaPropostaCliente);
+      var dtDataEntregaPropostaCliente = ("0" + dataEntregaPropostaCliente.getDate()).slice(-2) + '/' + ("0" + (dataEntregaPropostaCliente.getMonth() + 1)).slice(-2) + '/' + dataEntregaPropostaCliente.getFullYear();
+      console.log("dtDataEntregaPropostaCliente", dtDataEntregaPropostaCliente);
+      return dtDataEntregaPropostaCliente;
+    }
   },
   {
     dataField: "Status",
@@ -239,7 +240,7 @@ export default class SapTodasPropostas extends React.Component<ISapTodasProposta
     var reactHandlerRepresentante = this;
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$top=4999&$orderby= ID desc&$select=ID,Title,Numero,IdentificacaoOportunidade,Title,Cliente/Title,Representante/Title,Status&$expand=Cliente,Representante`,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$top=4999&$orderby= ID desc&$select=ID,Title,Numero,IdentificacaoOportunidade,Title,Cliente/Title,Representante/Title,Status,ResponsavelProposta,Created,DataEntregaPropostaCliente&$expand=Cliente,Representante`,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
@@ -249,6 +250,7 @@ export default class SapTodasPropostas extends React.Component<ISapTodasProposta
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -269,9 +271,9 @@ export default class SapTodasPropostas extends React.Component<ISapTodasProposta
     return (
 
       <><p>Resultado: <span className="text-info" id="txtCountProposta"></span> proposta(s) encontrada(s)</p>
-      <div className={styles.container}>
-        <BootstrapTable bootstrap4 responsive condensed hover={true} className="gridTodosItens" id="gridTodosItens" keyField='id' data={this.state.employeeList} columns={empTablecolumns} headerClasses="header-class" pagination={paginationFactory(paginationOptions)} filter={filterFactory()} />
-      </div></>
+        <div className={styles.container}>
+          <BootstrapTable bootstrap4 responsive condensed hover={true} className="gridTodosItens" id="gridTodosItens" keyField='id' data={this.state.employeeList} columns={empTablecolumns} headerClasses="header-class" pagination={paginationFactory(paginationOptions)} filter={filterFactory()} />
+        </div></>
 
 
     );

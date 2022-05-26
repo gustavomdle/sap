@@ -62,12 +62,6 @@ export interface IReactGetItemsState {
       "ID": "",
       "Title": "",
     }],
-  itemsResponsavelProposta: [
-    {
-      "ID": "",
-      "Title": "",
-      "Responsavel": { "Title": "" }
-    }],
 
   itemsSegmento: [];
   itemsSetor: [];
@@ -75,7 +69,6 @@ export interface IReactGetItemsState {
   itemsInstalacao: [];
   itemsGarantia: [];
   itemsTipoGarantia: [];
-  itemsPrazoGarantia: [];
   itemsOutrosServicos: [];
   startDate: any;
   endDate: any;
@@ -108,19 +101,12 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
           "ID": "",
           "Title": "",
         }],
-      itemsResponsavelProposta: [
-        {
-          "ID": "",
-          "Title": "",
-          "Responsavel": { "Title": "" }
-        }],
       itemsSegmento: [],
       itemsSetor: [],
       itemsModalidade: [],
       itemsInstalacao: [],
       itemsGarantia: [],
       itemsTipoGarantia: [],
-      itemsPrazoGarantia: [],
       itemsOutrosServicos: [],
       startDate: "",
       endDate: "",
@@ -268,22 +254,11 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                   <div className="form-group">
                     <div className="form-row">
-                      <div className="form-group col-md-6">
-                        <label htmlFor="ddlResponsavelProposta">Responsável da Proposta</label><span className="required"> *</span>
-                        <select id="ddlResponsavelProposta" className="form-control">
-                          <option value="0" selected>Selecione...</option>
-                          {this.state.itemsResponsavelProposta.map(function (item, key) {
-                            return (
-                              <option value={item.Responsavel.Title}>{item.Responsavel.Title}</option>
-                            );
-                          })}
-                        </select>
-                      </div>
-                      <div className="form-group col-md-3">
+                      <div className="form-group col-md-8">
                         <label htmlFor="txtPropostaRevisadaReferencia">Proposta revisada/referência</label>
                         <input type="text" className="form-control" id="txtPropostaRevisadaReferencia" />
                       </div>
-                      <div className="form-group col-md-3">
+                      <div className="form-group col-md-4">
                         <label htmlFor="txtCondicoesPagamento">Condições de pagamento </label>
                         <input type="text" className="form-control" id="txtCondicoesPagamento" />
                       </div>
@@ -469,19 +444,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                       <div className="form-group col-md-2">
                         <label htmlFor="txtTitulo">Prazo de garantia </label><span className="required"> *</span>
 
-                        {this.state.itemsPrazoGarantia.map(function (item, key) {
-
-                          return (
-
-                            <div className="form-check">
-                              <input className="form-check-input" name='checkPrazoGarantia' type="radio" value={item} />
-                              <label className="form-check-label">
-                                {item}
-                              </label>
-                            </div>
-
-                          );
-                        })}
+                        <input type="number" style={{ "width": "120px" }} className="form-control" id="txtPrazoGarantia" />
 
                       </div>
                       <div className="form-group col-md-2">
@@ -585,6 +548,9 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                       </td>
                     </tr>
                   </table>
+                  <br></br>
+                  <p className="text-info">&nbsp;&nbsp;&nbsp; As seguintes áreas já são adicionadas a Proposta automaticamente: Comercial, Jurídico, Representante, Propostas </p>
+
                 </div>
               </div>
             </div>
@@ -592,15 +558,16 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
             <div className="card">
               <div className="card-header btn" id="headingAnexos" data-toggle="collapse" data-target="#collapseAnexos" aria-expanded="true" aria-controls="collapseAnexos">
-                <h5 className="mb-0 text-info" >
+                <h6 className="mb-0 text-info" >
                   Anexos
-                </h5>
+                </h6>
               </div>
               <div id="collapseAnexos" className="collapse show" aria-labelledby="headingOne" >
 
                 <div className="card-body">
 
-                  <label htmlFor="ddlProduto">Anexo</label><span className="required"> *</span><br />
+                  <label htmlFor="ddlProduto">Anexo</label>
+                  <br />
                   <p>Total máximo permitido: 15 MB</p>
                   <input className="multi" data-maxsize="1024" type="file" id="input" multiple />
 
@@ -693,6 +660,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
   }
 
 
+
   protected async handler() {
 
     var reactHandlerRepresentante = this;
@@ -704,7 +672,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     var reactHandlerInstalacao = this;
     var reactHandlerGarantia = this;
     var reactHandlerTipoGarantia = this;
-    var reactHandlerPrazoGarantia = this;
     var reactHandlerOutrosServicos = this;
     var reactHandlerProdutos = this;
     var reactHandlerAreas = this;
@@ -719,27 +686,12 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
     jquery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Responsavel Proposta')/items?$top=4999&$select=ID,Responsavel/Title&$expand=Responsavel`,
-      type: "GET",
-      headers: { 'Accept': 'application/json; odata=verbose;' },
-      success: function (resultData) {
-        console.log("resultDataResponsavel",resultData);
-        reactHandlerResponsavelProposta.setState({
-          
-          itemsResponsavelProposta: resultData.d.results
-        });
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-      }
-    });
-
-
-    jquery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Clientes')/items?$top=4999&$orderby= Title`,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Clientes')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
@@ -748,6 +700,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -761,6 +714,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -774,6 +728,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -787,6 +742,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -800,6 +756,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -813,6 +770,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -826,6 +784,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -839,22 +798,9 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
-
-    jquery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/GetByTitle('PropostasSAP')/fields?$filter=EntityPropertyName eq 'PrazoGarantia'`,
-      type: "GET",
-      headers: { 'Accept': 'application/json; odata=verbose;' },
-      success: function (resultData) {
-        reactHandlerPrazoGarantia.setState({
-          itemsPrazoGarantia: resultData.d.results[0].Choices.results
-        });
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-      }
-    });
-
 
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/GetByTitle('PropostasSAP')/fields?$filter=EntityPropertyName eq 'OutrosServicos'`,
@@ -866,6 +812,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
@@ -880,12 +827,13 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
 
     jquery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$top=4999&$filter=((Ativo eq 1) and (Title ne 'Comercial') and (Title ne 'Jurídico') and (Title ne 'Representante') and (Title ne 'Propostas'))&$orderby= Title`,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
@@ -894,22 +842,24 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         });
       },
       error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
       }
     });
 
-
-    setTimeout(function () {
-
-      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Comercial"; }).prop('selected', true);
-      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Jurídico"; }).prop('selected', true);
-      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Representante"; }).prop('selected', true);
-      jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Propostas"; }).prop('selected', true);
-      var $options = $('#ddlArea1 option:selected');
-      $options.appendTo("#ddlArea2");
-
-
-    }, 2000);
-
+    /*
+        setTimeout(function () {
+    
+          jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Comercial"; }).prop('selected', true);
+          jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Jurídico"; }).prop('selected', true);
+          jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Representante"; }).prop('selected', true);
+          jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Propostas"; }).prop('selected', true);
+          var $options = $('#ddlArea1 option:selected');
+          $options.appendTo("#ddlArea2");
+    
+    
+        }, 2000);
+    
+        */
   }
 
   protected addButtonProduto = () => {
@@ -948,9 +898,9 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     var dataValidadeProposta = "" + jQuery("#dtDataValidadeProposta-label").val() + "";
     var representante = $("#ddlRepresentante").val();
     _representante = representante;
-    var responsavelProposta = $("#ddlResponsavelProposta").val();
     var cliente = $("#ddlCliente").val();
     var dadosProposta = $("#txtDadosProposta").val();
+    var prazoGarantia = $("#txtPrazoGarantia").val();
 
     var arrSegmento = [];
     $.each($("input[name='checkSegmento']:checked"), function () {
@@ -982,11 +932,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     var arrTipoGarantia = [];
     $.each($("input[name='checkTipoGarantia']:checked"), function () {
       arrTipoGarantia.push($(this).val());
-    });
-
-    var arrPrazoGarantia = [];
-    $.each($("input[name='checkPrazoGarantia']:checked"), function () {
-      arrPrazoGarantia.push($(this).val());
     });
 
     var arrOutrosServicos = [];
@@ -1030,18 +975,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       return false;
     }
 
-    if (dataFinalQuestionamentos == "") {
-      alert("Forneça a data Final dos Questionamentos!");
-      document.getElementById('headingResumoProposta').scrollIntoView();
-      return false;
-    }
-
-    if (dataValidadeProposta == "") {
-      alert("Forneça a Data de Validade da Proposta!");
-      document.getElementById('headingResumoProposta').scrollIntoView();
-      return false;
-    }
-
     if (representante == "0") {
       alert("Escolha o Representante!");
       document.getElementById('headingResumoProposta').scrollIntoView();
@@ -1051,12 +984,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
     if (cliente == "0") {
       alert("Escolha o Cliente!");
-      document.getElementById('headingResumoProposta').scrollIntoView();
-      return false;
-    }
-
-    if (responsavelProposta == "0") {
-      alert("Escolha o Responsável pela Proposta!");
       document.getElementById('headingResumoProposta').scrollIntoView();
       return false;
     }
@@ -1103,7 +1030,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       return false;
     }
 
-    if (arrPrazoGarantia.length == 0) {
+    if (prazoGarantia == "") {
       alert("Escolha a o Prazo de Garantia!");
       document.getElementById('headingProduto').scrollIntoView();
       return false;
@@ -1158,6 +1085,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
     $("#btnSalvar").prop("disabled", true);
     $("#btnIniciarAprovacao").prop("disabled", true);
+    $("#btIniciarFluxo").prop("disabled", true);
 
     if (!_criou) {
 
@@ -1170,12 +1098,14 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
       var tipoAnaliseProposta = "";
 
+      /*
       jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Comercial"; }).prop('selected', true);
       jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Jurídico"; }).prop('selected', true);
       jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Representante"; }).prop('selected', true);
       jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Propostas"; }).prop('selected', true);
       var $options = $('#ddlArea1 option:selected');
       $options.appendTo("#ddlArea2");
+      */
 
 
       if ($('#checkTipoAnaliseProposta').is(':checked')) { tipoAnaliseProposta = "Proposta" };
@@ -1191,16 +1121,24 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       var formDataEntregaPropostaCliente = dataEntregaPropostaClienteAno + "-" + dataEntregaPropostaClienteMes + "-" + dataEntregaPropostaClienteDia;
 
       var dataFinalQuestionamentos = "" + jQuery("#dtDataFinalQuestionamentos-label").val() + "";
-      var dataFinalQuestionamentosDia = dataFinalQuestionamentos.substring(0, 2);
-      var dataFinalQuestionamentosMes = dataFinalQuestionamentos.substring(3, 5);
-      var dataFinalQuestionamentosAno = dataFinalQuestionamentos.substring(6, 10);
-      var formDataFinalQuestionamentos = dataFinalQuestionamentosAno + "-" + dataFinalQuestionamentosMes + "-" + dataFinalQuestionamentosDia;
+
+      if (dataFinalQuestionamentos != "") {
+        var dataFinalQuestionamentosDia = dataFinalQuestionamentos.substring(0, 2);
+        var dataFinalQuestionamentosMes = dataFinalQuestionamentos.substring(3, 5);
+        var dataFinalQuestionamentosAno = dataFinalQuestionamentos.substring(6, 10);
+        var formDataFinalQuestionamentos = dataFinalQuestionamentosAno + "-" + dataFinalQuestionamentosMes + "-" + dataFinalQuestionamentosDia;
+      }
+      else formDataFinalQuestionamentos = null;
 
       var dataValidadeProposta = "" + jQuery("#dtDataValidadeProposta-label").val() + "";
-      var dataValidadePropostaDia = dataValidadeProposta.substring(0, 2);
-      var dataValidadePropostaMes = dataValidadeProposta.substring(3, 5);
-      var dataValidadePropostaAno = dataValidadeProposta.substring(6, 10);
-      var formDataValidadeProposta = dataValidadePropostaAno + "-" + dataValidadePropostaMes + "-" + dataValidadePropostaDia;
+
+      if (dataValidadeProposta != "") {
+        var dataValidadePropostaDia = dataValidadeProposta.substring(0, 2);
+        var dataValidadePropostaMes = dataValidadeProposta.substring(3, 5);
+        var dataValidadePropostaAno = dataValidadeProposta.substring(6, 10);
+        var formDataValidadeProposta = dataValidadePropostaAno + "-" + dataValidadePropostaMes + "-" + dataValidadePropostaDia;
+      }
+      else formDataValidadeProposta = null;
 
       console.log("sintese", sintese);
       console.log("tipoAnaliseProposta", tipoAnaliseProposta);
@@ -1210,12 +1148,12 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       console.log("formDataValidadeProposta", formDataValidadeProposta);
 
       var representante = $("#ddlRepresentante").val();
-      var responsavelProposta = $("#ddlResponsavelProposta").val();
       var cliente = $("#ddlCliente").val();
       var propostaRevisadaReferencia = $("#txtPropostaRevisadaReferencia").val();
       var SST = $("#txtSST").val();
       var condicoesPagamento = $("#txtCondicoesPagamento").val();
       var justificativaFinal = $("#txtJustificativa").val();
+      var prazoGarantia = $("#txtPrazoGarantia").val();
 
       var arrSegmento = [];
       $.each($("input[name='checkSegmento']:checked"), function () {
@@ -1250,11 +1188,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         arrTipoGarantia.push($(this).val());
       });
 
-      var arrPrazoGarantia = [];
-      $.each($("input[name='checkPrazoGarantia']:checked"), function () {
-        arrPrazoGarantia.push($(this).val());
-      });
-
       var arrOutrosServicos = [];
       $.each($("input[name='checkOutrosServicos']:checked"), function () {
         arrOutrosServicos.push($(this).val());
@@ -1272,7 +1205,26 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
         return v.text;
       });
 
-      console.log("chegou aqui!!!")
+
+      jquery.ajax({
+
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$select=ID,Title&$filter=(Title eq 'Comercial') or (Title eq 'Jurídico') or (Title eq 'Representante') or (Title eq 'Propostas')`,
+        type: "GET",
+        async: false,
+        headers: { 'Accept': 'application/json; odata=verbose;' },
+        success: function (resultData) {
+          if (resultData.d.results.length > 0) {
+            for (var i = 0; i < resultData.d.results.length; i++) {
+              _arrAreaId.push(resultData.d.results[i].ID);
+              _arrAreaTexto.push(resultData.d.results[i].Title);
+            }
+          }
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.log(textStatus);
+        }
+      });
+
 
       await _web.lists
         .getByTitle("PropostasSAP")
@@ -1285,7 +1237,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
           DataValidadeProposta: formDataValidadeProposta,
           RepresentanteId: representante,
           ClienteId: cliente,
-          ResponsavelProposta: responsavelProposta,
           PropostaRevisadaReferencia: propostaRevisadaReferencia,
           SST: SST,
           CondicoesPagamento: condicoesPagamento,
@@ -1299,7 +1250,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
           Instalacao: arrInstalacao[0],
           Garantia: arrGarantia[0],
           TipoGarantia: arrTipoGarantia[0],
-          PrazoGarantia: arrPrazoGarantia[0],
+          PrazoGarantia: prazoGarantia,
           OutrosServicos: { "results": arrOutrosServicos },
           ProdutoId: { "results": arrProduto }
         })
@@ -1309,12 +1260,14 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
           console.log(_idProposta);
 
+          if ((_idProposta == null) || (_idProposta == "")) alert("Id da Proposta vazio");
+
           jquery.ajax({
             url: `${this.props.siteurl}/_api/web/lists/getbytitle('Representantes')/items?$filter=ID eq ` + representante,
             type: "GET",
             headers: { 'Accept': 'application/json; odata=verbose;' },
             async: false,
-            success: async function (resultData) {
+            success: async (resultData) => {
 
               console.log("resultData representantes", resultData);
               console.log("_nroAtual", _nroAtual);
@@ -1346,7 +1299,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                         _criou = true;
 
-                        _web.lists
+                        await _web.lists
                           .getByTitle("Tarefas")
                           .items.add({
                             Title: _arrAreaTexto[i],
@@ -1356,13 +1309,18 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                           })
                           .then(response => {
 
-                            console.log("Criou a tarefa!");
+                            var last = (_arrAreaId.length) - 1;
+                            console.log("last", last);
+                            console.log("i", i);
+                            if (i == last) this.upload();
 
                           }).catch((error: any) => {
                             console.log(error);
                           });
 
                       }
+
+
 
                     }).catch((error: any) => {
                       console.log(error);
@@ -1378,6 +1336,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
             },
             error: function (jqXHR, textStatus, errorThrown) {
+              console.log(jqXHR.responseText);
             }
           });
 
@@ -1385,7 +1344,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
         })
 
-      this.upload();
+
 
     }
 
