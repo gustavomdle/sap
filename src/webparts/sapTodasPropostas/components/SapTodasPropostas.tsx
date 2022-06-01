@@ -39,7 +39,7 @@ const selectOptions = {
   'Encerrada pelo Sistema': 'Encerrada pelo Sistema',
   'Não vencedora': 'Não vencedora',
   'Proposta Enviada': 'Proposta Enviada',
-  'Reprovada': 'Reprovada',
+  'Reprovado': 'Reprovado',
   'Vencedora': 'Vencedora',
 };
 
@@ -62,7 +62,14 @@ const empTablecolumns = [
   },
   {
     dataField: "IdentificacaoOportunidade",
-    text: "ID Oportunidade",
+    text: "ID",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter
+  },
+  {
+    dataField: "Cliente.Title",
+    text: "Cliente",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilter
@@ -75,11 +82,26 @@ const empTablecolumns = [
     filter: customFilter
   },
   {
-    dataField: "Cliente.Title",
-    text: "Cliente",
+    dataField: "DataEntregaPropostaCliente",
+    text: "Data de entrega",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    filter: customFilter
+    filter: customFilter,
+    formatter: (rowContent, row) => {
+      var dataEntregaPropostaCliente = new Date(row.DataEntregaPropostaCliente);
+      var dtDataEntregaPropostaCliente = ("0" + dataEntregaPropostaCliente.getDate()).slice(-2) + '/' + ("0" + (dataEntregaPropostaCliente.getMonth() + 1)).slice(-2) + '/' + dataEntregaPropostaCliente.getFullYear();
+      console.log("dtDataEntregaPropostaCliente", dtDataEntregaPropostaCliente);
+      return dtDataEntregaPropostaCliente;
+    }
+  },
+  {
+    dataField: "Status",
+    text: "Status",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: selectFilter({
+      options: selectOptions
+    })
   },
   {
     dataField: "Representante.Title",
@@ -108,28 +130,6 @@ const empTablecolumns = [
     }
   },
   {
-    dataField: "DataEntregaPropostaCliente",
-    text: "Data de entrega",
-    headerStyle: { backgroundColor: '#bee5eb' },
-    sort: true,
-    filter: customFilter,
-    formatter: (rowContent, row) => {
-      var dataEntregaPropostaCliente = new Date(row.DataEntregaPropostaCliente);
-      var dtDataEntregaPropostaCliente = ("0" + dataEntregaPropostaCliente.getDate()).slice(-2) + '/' + ("0" + (dataEntregaPropostaCliente.getMonth() + 1)).slice(-2) + '/' + dataEntregaPropostaCliente.getFullYear();
-      console.log("dtDataEntregaPropostaCliente", dtDataEntregaPropostaCliente);
-      return dtDataEntregaPropostaCliente;
-    }
-  },
-  {
-    dataField: "Status",
-    text: "Status",
-    headerStyle: { backgroundColor: '#bee5eb' },
-    sort: true,
-    filter: selectFilter({
-      options: selectOptions
-    })
-  },
-  {
     dataField: "",
     text: "",
     headerStyle: { "backgroundColor": "#bee5eb", "width": "180px" },
@@ -143,18 +143,18 @@ const empTablecolumns = [
 
         console.log("_grupos", _grupos);
 
-        if (_grupos.indexOf("Representante") !== -1) {
+        if ((_grupos.indexOf("Representante") !== -1) || (_grupos.indexOf("Comercial") !== -1)) {
           return (
             <>
-              <a href={urlDetalhes}><button className="btn btn-info">Exibir</button></a>&nbsp;
-              <a href={urlEditar}><button className="btn btn-danger">Editar</button></a>
+              <a href={urlDetalhes}><button className="btn btn-info btnCustom">Exibir</button></a>&nbsp;
+              <a href={urlEditar}><button className="btn btn-danger btnCustom">Editar</button></a>
             </>
           )
         } else {
 
           return (
             <>
-              <a href={urlDetalhes}><button className="btn btn-info">Exibir</button></a>&nbsp;
+              <a href={urlDetalhes}><button className="btn btn-info btnCustom">Exibir</button></a>&nbsp;
             </>
           )
         }
@@ -162,7 +162,7 @@ const empTablecolumns = [
       } else {
         return (
           <>
-            <a href={urlDetalhes}><button className="btn btn-info">Exibir</button></a>&nbsp;
+            <a href={urlDetalhes}><button className="btn btn-info btnCustom">Exibir</button></a>&nbsp;
           </>
         )
       }
@@ -174,7 +174,7 @@ const empTablecolumns = [
 ];
 
 const paginationOptions = {
-  sizePerPage: 10,
+  sizePerPage: 20,
   hideSizePerPage: true,
   hidePageListOnlyOnePage: true
 };

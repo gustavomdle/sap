@@ -94,7 +94,9 @@ const empTablecolumns = [
     text: "",
     headerStyle: { "backgroundColor": "#bee5eb", "width": "180px" },
     formatter: (rowContent, row) => {
-      var id = row.ID;
+
+      console.log("row",row);
+      var id = row.Proposta.ID;
       var urlDetalhes = `Proposta-Detalhes.aspx?PropostasID=` + id;
 
       return (
@@ -113,7 +115,7 @@ const empTablecolumns = [
 ]
 
 const paginationOptions = {
-  sizePerPage: 10,
+  sizePerPage: 20,
   hideSizePerPage: true,
   hidePageListOnlyOnePage: true
 };
@@ -187,7 +189,7 @@ export default class SapTodasAsTarefas extends React.Component<ISapTodasAsTarefa
 
     var reactHandlerRepresentante = this;
 
-    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/Title,Proposta/Numero,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso&$expand=Proposta,GrupoSharepoint&$filter=(Status eq 'Em análise') and (${_filter})`;
+    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/ID,Proposta/Title,Proposta/Numero,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso&$expand=Proposta,GrupoSharepoint&$filter=(Status eq 'Em análise') and (${_filter})`;
     console.log("url", url)
 
     jQuery.ajax({

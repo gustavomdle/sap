@@ -63,6 +63,7 @@ var _elemento;
 var _elemento2;
 var _siteurl;
 var _arrAreasAntiga = [];
+var _txtCliente;
 
 
 export interface IReactGetItemsState {
@@ -1135,7 +1136,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     console.log("entrou no proposta");
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,ResponsavelProposta&$expand=Representante,Cliente,Produto&$filter=ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,Status,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,ResponsavelProposta&$expand=Representante,Cliente,Produto&$filter=ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -1154,6 +1155,16 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
             var dataEntregaPropostaCliente = resultData.d.results[i].DataEntregaPropostaCliente;
             var dataFinalQuestionamentos = resultData.d.results[i].DataFinalQuestionamentos;
             var dataValidadeProposta = resultData.d.results[i].DataValidadeProposta;
+
+            var status = resultData.d.results[i].Status;
+
+            console.log("status",status);
+
+            if(status != "Em análise"){
+
+              $("#btnIniciarAprovacao").prop("disabled", true);
+
+            }
 
             if (dataEntregaPropostaCliente != null) {
 
@@ -1691,9 +1702,9 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
       console.log("formDataFinalQuestionamentos", formDataFinalQuestionamentos);
       console.log("formDataValidadeProposta", formDataValidadeProposta);
 
-      var representante = $("#ddlRepresentante").val();
       var responsavelProposta = $("#ddlResponsavelProposta").val();
       var cliente = $("#ddlCliente").val();
+      _txtCliente = $('#ddlCliente :selected').text();
       var propostaRevisadaReferencia = $("#txtPropostaRevisadaReferencia").val();
       var SST = $("#txtSST").val();
       var condicoesPagamento = $("#txtCondicoesPagamento").val();
@@ -1804,7 +1815,10 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         })
         .then(async response => {
 
+          
+
           if (_arrAreaId.length != 0) {
+
 
             for (var x = 0; x < _arrAreaId.length; x++) {
 
@@ -1812,6 +1826,9 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
               console.log("_arrAreaTexto[x]", _arrAreaTexto[x]);
 
               _criou = true;
+
+              console.log("_arrAreasAntiga.indexOf(_arrAreaTexto[x])",_arrAreasAntiga.indexOf(_arrAreaTexto[x]));
+
 
               if (_arrAreasAntiga.indexOf(_arrAreaTexto[x]) == -1) {
 
@@ -1821,7 +1838,8 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                     Title: _arrAreaTexto[x],
                     PropostaId: _idProposta,
                     DataPlanejadaTermino: formDataEntregaPropostaCliente,
-                    GrupoSharepointId: _arrAreaId[x]
+                    GrupoSharepointId: _arrAreaId[x],
+                    Cliente: _txtCliente
                   })
                   .then(response => {
 
@@ -1834,12 +1852,19 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                     console.log(error);
                   });
 
-              } else {
-                this.upload();
+              }else{
+
+                var last = (_arrAreaId.length) - 1;
+                console.log("last", last);
+                console.log("x", x);
+                if (x == last) this.upload();
+
               }
 
             }
 
+          }else {
+            this.upload();
           }
 
         })
@@ -1855,7 +1880,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     var files = (document.querySelector("#input") as HTMLInputElement).files;
     var file = files[0];
 
-    //console.log("files.length", files.length);
+    console.log("files.length", files.length);
 
     if (files.length != 0) {
 

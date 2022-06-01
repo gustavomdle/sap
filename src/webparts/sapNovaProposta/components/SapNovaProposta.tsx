@@ -40,6 +40,8 @@ var _nroAtual: number = 0;
 var _nroNovo: number = 0;
 var _representante;
 var _dadosProposta;
+var _txtCliente;
+var _txtRepresentante;
 
 export interface IReactGetItemsState {
   itemsRepresentante: [
@@ -1148,7 +1150,9 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       console.log("formDataValidadeProposta", formDataValidadeProposta);
 
       var representante = $("#ddlRepresentante").val();
+      _txtRepresentante = $('#ddlRepresentante :selected').text();
       var cliente = $("#ddlCliente").val();
+      _txtCliente = $('#ddlCliente :selected').text();
       var propostaRevisadaReferencia = $("#txtPropostaRevisadaReferencia").val();
       var SST = $("#txtSST").val();
       var condicoesPagamento = $("#txtCondicoesPagamento").val();
@@ -1305,7 +1309,9 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                             Title: _arrAreaTexto[i],
                             PropostaId: _idProposta,
                             DataPlanejadaTermino: formDataEntregaPropostaCliente,
-                            GrupoSharepointId: _arrAreaId[i]
+                            GrupoSharepointId: _arrAreaId[i],
+                            Cliente: _txtCliente,
+                            Representante: _txtRepresentante
                           })
                           .then(response => {
 
@@ -1396,9 +1402,15 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
     } else {
 
-      console.log("Gravou!!");
-      $("#conteudoLoading").modal('hide');
-      jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false });
+      _web.lists.getByTitle("AnexosSAP").rootFolder.folders.add(`${_idProposta}`).then(data => {
+
+        console.log("Gravou!!");
+        $("#conteudoLoading").modal('hide');
+        jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false });
+
+      }).catch(err => {
+        console.log("err", err);
+      });
 
     }
 

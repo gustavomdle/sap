@@ -40,6 +40,7 @@ var _numeroProposta;
 var _grupos = [];
 var _strGrupos;
 var _testeGus;
+var _threadDiscussao;
 
 export interface IReactGetItemsState {
   itemsTarefas: [
@@ -154,11 +155,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
 
 
-
-
-
-
-
     var reactHandlerRepresentante = this;
 
     jquery.ajax({
@@ -181,7 +177,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     this.getAnexos();
     this.getSelecaoAreas();
     this.getDiscussaoNova();
-    this.getDiscussaoAntiga();
 
   }
 
@@ -205,16 +200,16 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                 <div className="card-body">
 
                   <div className="form-group">
-                    <div className="form-row border-bottom">
-                      <div className="form-group col-md-4 ">
+                    <div className="form-row ">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtNumeroProposta">Número da Proposta</label><br></br>
                         <span className="text-info" id='txtNumeroProposta'></span>
                       </div>
-                      <div className="form-group col-md-4">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtStatus">Status</label><br></br>
                         <span className="text-info" id='txtStatus'></span>
                       </div>
-                      <div className="form-group col-md-4">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtTipoAnalise">Tipo de análise</label><br></br>
                         <span className="text-info" id='txtTipoAnalise'></span>
                       </div>
@@ -225,12 +220,12 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
 
                   <div className="form-group">
-                    <div className="form-row border-bottom">
-                      <div className="form-group col-md-7">
+                    <div className="form-row ">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtSintese">Síntese</label><br></br>
                         <span className="text-info" id='txtSintese'></span>
                       </div>
-                      <div className="form-group col-md-5">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtIdentificacaoOportunidade">Identificação da Oportunidade </label><br></br>
                         <span className="text-info" id='txtIdentificacaoOportunidade'></span>
                       </div>
@@ -238,16 +233,16 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                   </div>
 
                   <div className="form-group">
-                    <div className="form-row border-bottom">
-                      <div className="form-group col-md-4">
+                    <div className="form-row ">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="dtDataEntregaPropostaCliente">Data da entrega da Proposta ao Cliente</label><br></br>
                         <span className="text-info" id='txtDataEntregaPropostaCliente'></span>
                       </div>
-                      <div className="form-group col-md-4">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="dtDataFinalQuestionamentos">Data final de questionamentos</label><br></br>
                         <span className="text-info" id='txtDataFinalQuestionamentos'></span>
                       </div>
-                      <div className="form-group col-md-4">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="dtDataValidadeProposta">Data de validade da Proposta</label><br></br>
                         <span className="text-info" id='txtdataValidadeProposta'></span>
                       </div>
@@ -255,12 +250,12 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                   </div>
 
                   <div className="form-group">
-                    <div className="form-row border-bottom">
-                      <div className="form-group col-md-6">
+                    <div className="form-row ">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="ddlRepresentante">Representante</label><br></br>
                         <span className="text-info" id='txtRepresentante'></span>
                       </div>
-                      <div className="form-group col-md-6">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="ddlCliente">Cliente </label><br></br>
                         <span className="text-info" id='txtCliente'></span>
                       </div>
@@ -268,16 +263,16 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                   </div>
 
                   <div className="form-group">
-                    <div className="form-row border-bottom">
-                      <div className="form-group col-md-3">
+                    <div className="form-row ">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtPropostaRevisadaReferencia">Responsável pela Proposta</label><br></br>
                         <span className="text-info" id='txtResponsavelPelaProposta'></span>
                       </div>
-                      <div className="form-group col-md-3">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtPropostaRevisadaReferencia">Proposta revisada/referência</label><br></br>
                         <span className="text-info" id='txtPropostaRevisadaReferencia'></span>
                       </div>
-                      <div className="form-group col-md-3">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtCondicoesPagamento">Condições de pagamento </label><br></br>
                         <span className="text-info" id='txtCondicoesPagamento'></span>
                       </div>
@@ -299,8 +294,12 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                 <div className="card-body">
 
                   <div className="form-group">
-                    <label htmlFor="txtDadosProposta">Dados da Proposta</label><span className="required"> *</span>
-                    <span id='txtDadosProposta'></span>
+                    <div className="form-row ">
+                      <div className="form-group col-md border m-1">
+                        <label htmlFor="txtDadosProposta">Dados da Proposta</label><span className="required"> *</span>
+                        <span id='txtDadosProposta'></span>
+                      </div>
+                    </div>
                   </div>
 
                 </div>
@@ -317,24 +316,28 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                 <div className="card-body">
 
                   <div className="form-group">
-                    <div className="form-row border-bottom">
-                      <div className="form-group col-md-4">
+                    <div className="form-row">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtSegmento">Segmento</label><br></br>
                         <span className="text-info" id='txtSegmento'></span>
                       </div>
-                      <div className="form-group col-md-4">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtSetor">Setor</label><br></br>
                         <span className="text-info" id='txtSetor'></span>
                       </div>
-                      <div className="form-group col-md-4">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtModalidade">Modalidade </label><br></br>
                         <span className="text-info" id='txtModalidade'></span>
                       </div>
                     </div>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="txtNumeroEditalRFPRFQRFI">Número do Edital, RFP, RFQ ou RFI </label><br></br>
-                    <span className="text-info" id='txtNumeroEditalRFPRFQRFI'></span>
+                    <div className="form-row">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
+                        <label htmlFor="txtNumeroEditalRFPRFQRFI">Número do Edital, RFP, RFQ ou RFI </label><br></br>
+                        <span className="text-info" id='txtNumeroEditalRFPRFQRFI'></span>
+                      </div>
+                    </div>
                   </div>
 
                 </div>
@@ -351,20 +354,20 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                 <div className="card-body">
 
                   <div className="form-group">
-                    <div className="form-row border-bottom">
-                      <div className="form-group col-md-3">
+                    <div className="form-row">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtQuantidade">Quantidade</label><br></br>
                         <span className="text-info" id='txtQuantidade'></span>
                       </div>
-                      <div className="form-group col-md-3">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtInstalacao">Instalação</label><br></br>
                         <span className="text-info" id='txtInstalacao'></span>
                       </div>
-                      <div className="form-group col-md-3">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtGarantia">Garantia</label><br></br>
                         <span className="text-info" id='txtGarantia'></span>
                       </div>
-                      <div className="form-group col-md-3">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtTitulo">Tipo de garantia </label><br></br>
                         <span className="text-info" id='txtTipoGarantia'></span>
                       </div>
@@ -372,16 +375,16 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                   </div>
 
                   <div className="form-group">
-                    <div className="form-row border-bottom">
-                      <div className="form-group col-md-2">
+                    <div className="form-row">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtTitulo">Prazo de garantia </label><br></br>
                         <span className="text-info" id='txtPrazoGarantia'></span>
                       </div>
-                      <div className="form-group col-md-2">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="txtOutrosServicos">Outros serviços</label><br></br>
                         <span className="text-info" id='txtOutrosServicos'></span>
                       </div>
-                      <div className="form-group col-md-8">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
                         <label htmlFor="ddlProduto">Produto</label><br></br>
                         <span className="text-info" id='txtProduto'></span>
                       </div>
@@ -402,8 +405,15 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                 <div className="card-body">
 
-                  <label htmlFor="txtAreas">Áreas</label><br></br>
-                  <span className="text-info" id='txtAreas'></span>
+                  <div className="form-group">
+                    <div className="form-row ">
+                      <div className="form-group col-md border m-1" style={{ "height": "53px" }}>
+                        <label htmlFor="txtAreas">Áreas</label><br></br>
+                        <span className="text-info" id='txtAreas'></span>
+                      </div>
+                    </div>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -556,6 +566,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
               <button style={{ "margin": "2px" }} type="submit" id="btnVoltar" className="btn btn-secondary">Voltar</button>
               <button style={{ "margin": "2px" }} type="submit" id="btnReabrirProposta" className="btn btn-danger">Reabrir Proposta</button>
               <button style={{ "margin": "2px" }} type="submit" id="btnEditarProposta" className="btn btn-primary">Editar</button>
+
             </div>
 
 
@@ -792,19 +803,23 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
             if (status == "Em análise") {
 
-              //console.log("_gruposzz", _grupos);
-
               if (_grupos.indexOf("Representante") !== -1) {
 
                 jQuery("#btnEditarProposta").show();
 
               }
+
+              if (_grupos.indexOf("Comercial") !== -1) {
+
+                jQuery("#btnEditarProposta").show();
+
+              }
+
             }
 
             if (status != "Em análise") {
 
               jQuery("#btnResponderDiscussao").hide();
-
 
             }
 
@@ -1272,282 +1287,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
   protected async getDiscussaoAntiga() {
 
 
-    const q: ICamlQuery = {
-      ViewXml: `<View>` +
-        `<Query>` +
-        `<Where><Eq><FieldRef Name="Proposal" LookupId='TRUE'/><Value Type="Number">2156</Value></Eq></Where>` +
-        `<OrderBy><FieldRef Name='ID' /></OrderBy>` +
-        `</Query><RowLimit>1</RowLimit>` +
-        `</View>`
-    };
-
-    await _web.lists
-      .getByTitle('Discussion')
-      .getItemsByCAMLQuery(q, "FieldValuesAsText")
-      .then(async (r: any[]) => {
-        {
-
-          console.log("discussão", r);
-
-          if (r.length > 0) {
-
-            for (var index = 0; index < r.length; index++) {
-
-              const x = r[index];
-              var threadDiscussao = x.FieldValuesAsText.ThreadIndex;
-              var fileLeafRef = x.FieldValuesAsText.FileLeafRef;
-
-              console.log("thread", threadDiscussao);
-              console.log("fileLeafRef", fileLeafRef);
-
-              /*    
-                   jQuery.ajax({
-                     // url: `${this.props.siteurl}/_api/web/lists/getbytitle('Discussion')/items?$select=ID,Title,ParentItemID&$filter=((ParentItemID ne null) and (ID eq 21360))`,
-                     url: `${this.props.siteurl}/_api/web/lists/getbytitle('Discussion')/items?$select=*&$expand=FieldValuesAsText&$FieldValuesAsText/ThreadIndex%20eq%20%270x01D9AA9FC281097C3944356A443EB4ACB497CB0B2D780044C252E3%27`,
-                     type: "GET",
-                     headers: { 'Accept': 'application/json; odata=verbose;' },
-                     async: false,
-                     success: async function (resultData) {
-     
-                       console.log("Mensagem", resultData);
-     
-     
-     
-                     },
-                     error: function (jqXHR, textStatus, errorThrown) {
-                       console.log(jqXHR.responseText);
-                     }
-     
-                   })
-     
-                   
-     
-                   var relativeURL = window.location.pathname;
-     
-                   var strRelativeURL = relativeURL.replace("SitePages/Proposta-Detalhes.aspx", "");
-     
-                   _web.getFolderByServerRelativeUrl(`${strRelativeURL}/Discussion`)
-                     .expand("Folders, Files, ListItemAllFields").get().then(r => {
-                       console.log("r", r);
-     
-                       r.Folders.forEach(item => {
-     
-                         console.log("entrou em folder");
-                         console.log("item-doc", item);
-                       })
-     
-                       r.Files.forEach(item2 => {
-                         console.log("entrou em files");
-                         console.log("item-doc", item2);
-     
-                       })
-     
-                     }).catch((error: any) => {
-                       console.log("Erro Anexo da biblioteca: ", error);
-                     });
-     
-     
-
-              const q1: ICamlQuery = {
-                ViewXml: `<View>` +
-                  `<Query>` +
-                  `<Where><Eq><FieldRef Name="ContentTypeId"/><Value Type="Text">0x010700710863EED7A6A24E8B30E30369A9D412</Value></Eq></Where>` +
-                  `<OrderBy><FieldRef Name='ID' /></OrderBy>` +
-                  `</Query>` +
-                  `</Query><RowLimit>4999</RowLimit>` +
-                  `</View>`
-              };
-
-       */
-
-              const q1: ICamlQuery = {
-                ViewXml: `<View>` +
-                  `<Query>` +
-                  `<Where><Eq><FieldRef Name="ID"/><Value Type="Text">21346</Value></Eq></Where>` +
-                  `<OrderBy><FieldRef Name='ID' /></OrderBy>` +
-                  `</Query>` +
-                  `</Query><RowLimit>1</RowLimit>` +
-                  `</View>`
-              };
-
-              await _web.lists
-                .getByTitle('Discussion')
-                .getItemsByCAMLQuery(q1, "FieldValuesAsText")
-                .then((r: any[]) => {
-                  {
-
-                    console.log("Mensagem 1", r);
-
-                    if (r.length > 0) {
-
-                      for (var i = 0; i < r.length; i++) {
-
-                        //var thread = r[i].FieldValuesAsText.ThreadIndex;
-
-                        //console.log(thread);
-                        //console.log(threadDiscussao);
-
-                        //console.log(thread.includes(threadDiscussao));
-
-                        //if (thread.includes(threadDiscussao)) {
-                        //console.log("Possui")
-                        //}
-
-                      }
-
-                    }
-
-                  }
-
-                })
-
-
-
-              jQuery.ajax({
-                // url: `https://dieboldnixdorf.sharepoint.com/sites/PropostasSAP-HML/_api/Web/GetFolderByServerRelativePath(decodedurl='/sites/PropostasSAP-HML/Lists/Discussion/864_.000')`,
-                url: `https://dieboldnixdorf.sharepoint.com/sites/PropostasSAP-HML/_api/Web/GetFolderByServerRelativeUrl('/sites/PropostasSAP-HML/Lists/Discussion/864_.000')/Files`,
-                type: "GET",
-                headers: { 'Accept': 'application/json; odata=verbose;' },
-                async: false,
-                success: async function (resultData) {
-
-                  console.log("Mensagem 2", resultData);
-
-                  if (resultData.d.ItemCount > 0) {
-
-                    for (var i = 0; i < resultData.d.results.length; i++) {
-
-                      console.log(resultData.d.results[i].Folders);
-
-                    }
-
-                  }
-
-
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                  console.log(jqXHR.responseText);
-                }
-
-              })
-
-
-            }
-
-          }
-
-        }
-      })
-      .catch(console.error);
-
-
-    /////
-
-
-    var camlQuery = {
-      'query': {
-        '__metadata': { 'type': 'SP.CamlQuery' },
-        'ViewXml': '<View><Query/></View>',
-        'FolderServerRelativeUrl': '/sites/PropostasSAP-HML/Lists/Discussion/864_.000'
-      }
-    };
-
-
-    const q1: ICamlQuery = {
-      ViewXml: `<View>` +
-        `<Query>` +
-        `<Where><Eq><FieldRef Name="ID"/><Value Type="Text">21346</Value></Eq></Where>` +
-        `<OrderBy><FieldRef Name='ID' /></OrderBy>` +
-        `</Query>` +
-        `</Query><RowLimit>1</RowLimit>` +
-        `</View>`
-    };
-
-    await _web.lists
-      .getByTitle('Discussion')
-      .getItemsByCAMLQuery(camlQuery, "FieldValuesAsText")
-      .then((r: any[]) => {
-        {
-
-          console.log("Mensagem 3", r);
-
-          if (r.length > 0) {
-
-            for (var i = 0; i < r.length; i++) {
-
-              //var thread = r[i].FieldValuesAsText.ThreadIndex;
-
-              //console.log(thread);
-              //console.log(threadDiscussao);
-
-              //console.log(thread.includes(threadDiscussao));
-
-              //if (thread.includes(threadDiscussao)) {
-              //console.log("Possui")
-              //}
-
-            }
-
-          }
-
-        }
-
-      })
-
-
-
-
-
-    var camlQuery = {
-      'query': {
-        '__metadata': { 'type': 'SP.CamlQuery' },
-        'ViewXml': '<View><Query/></View>',
-        'FolderServerRelativeUrl': '/sites/PropostasSAP-HML/Lists/Discussion/864_.000'
-      }
-    };
-
-    var url = "https://dieboldnixdorf.sharepoint.com/sites/PropostasSAP-HML/_api/SP.AppContextSite(@target)/web/lists/getByTitle('Discussion')/getitems?$select=ID,Title&@target=https://dieboldnixdorf.sharepoint.com/sites/PropostasSAP-HML'";
-
-    jQuery.ajax({
-      // url: `${this.props.siteurl}/_api/web/lists/getbytitle('Discussion')/items?$select=ID,Title,ParentItemID&$filter=((ParentItemID ne null) and (ID eq 21360))`,
-      url: url,
-      type: "GET",
-      headers: { 'Accept': 'application/json; odata=verbose;' },
-      async: false,
-      data: JSON.stringify(camlQuery),
-      success: async function (resultData) {
-
-        console.log("Mensagem 5", resultData);
-
-
-
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR.responseText);
-      }
-
-    })
-    /*     
-         jQuery.ajax({
-             async: false,
-             url: url,
-             type: "POST",
-             headers: {
-                 "accept": "application/json;odata=verbose",
-                 "content-type": "application/json;odata=verbose",
-                 "X-RequestDigest": $("#__REQUESTDIGEST").val()
-             },
-             data: JSON.stringify(camlQuery),
-             success: function (data) {             
-                 var result = "success";
-             },
-             error: function (data, msg) {
-                 var result = "Fail";
-             }
-         });
-     
-     
- */
 
 
   }

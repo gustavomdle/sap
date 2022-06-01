@@ -30,6 +30,8 @@ require("../../../../css/estilos.css");
 var _grupos;
 var _web;
 var _filter = "";
+var _siteurl = "";
+var _representante;
 
 export interface IShowEmployeeStates {
   employeeList: any[]
@@ -55,13 +57,6 @@ const empTablecolumns = [
     filter: customFilter
   },
   {
-    dataField: "Proposta.Title",
-    text: "Síntese",
-    headerStyle: { backgroundColor: '#bee5eb' },
-    sort: true,
-    filter: customFilter
-  },
-  {
     dataField: "Created",
     text: "Data de criação",
     headerStyle: { backgroundColor: '#bee5eb' },
@@ -74,6 +69,20 @@ const empTablecolumns = [
     }
   },
   {
+    dataField: "Cliente",
+    text: "Cliente",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter
+  },
+  {
+    dataField: "Proposta.Title",
+    text: "Síntese",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter
+  },
+  {
     dataField: "Proposta.DataEntregaPropostaCliente",
     text: "Data de entrega",
     headerStyle: { backgroundColor: '#bee5eb' },
@@ -82,32 +91,26 @@ const empTablecolumns = [
     formatter: (rowContent, row) => {
       var dataEntregaPropostaCliente = new Date(row.Proposta.DataEntregaPropostaCliente);
       var dtDataEntregaPropostaCliente = ("0" + dataEntregaPropostaCliente.getDate()).slice(-2) + '/' + ("0" + (dataEntregaPropostaCliente.getMonth() + 1)).slice(-2) + '/' + dataEntregaPropostaCliente.getFullYear();
-      console.log("dtDataEntregaPropostaCliente", dtDataEntregaPropostaCliente);
+      //console.log("dtDataEntregaPropostaCliente", dtDataEntregaPropostaCliente);
       return dtDataEntregaPropostaCliente;
     }
   },
-  {
-    dataField: "Proposta.ResponsavelProposta",
-    text: "Responsável",
-    headerStyle: { backgroundColor: '#bee5eb' },
-    sort: true,
-    filter: customFilter
-  },
-  {
-    dataField: "Author.Title",
-    text: "Criado por",
-    headerStyle: { backgroundColor: '#bee5eb' },
-    sort: true,
-    filter: customFilter
-  },
-  /*
   {
     dataField: "GrupoSharepoint.Title",
     text: "Atribuido a",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    //filter: customFilter
+    filter: customFilter,
   },
+  {
+    dataField: "Representante",
+    text: "Representante",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter,
+
+  },
+  /*
   {
     dataField: "DataPlanejadaTermino",
     text: "Data Planejada de Termino",
@@ -141,7 +144,7 @@ const empTablecolumns = [
     text: "",
     headerStyle: { "backgroundColor": "#bee5eb", "width": "180px" },
     formatter: (rowContent, row) => {
-      var id = row.ID;
+      var id = row.Proposta.ID;
       var urlDetalhes = `Proposta-Detalhes.aspx?PropostasID=` + id;
 
       return (
@@ -160,7 +163,7 @@ const empTablecolumns = [
 ]
 
 const paginationOptions = {
-  sizePerPage: 10,
+  sizePerPage: 20,
   hideSizePerPage: true,
   hidePageListOnlyOnePage: true
 };
@@ -185,10 +188,12 @@ export default class SapTodasAsTarefasAdm extends React.Component<ISapTodasAsTar
 
     _web = new Web(this.props.context.pageContext.web.absoluteUrl);
 
-    var reactHandlerRepresentante = this;
+    _siteurl = this.props.siteurl;
 
-    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/Title,Proposta/Numero,Proposta/IdentificacaoOportunidade,Proposta/DataEntregaPropostaCliente,Proposta/ResponsavelProposta,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso,Created,Author/Title&$expand=Proposta,GrupoSharepoint,Author&$filter=(Status eq 'Em análise')`;
-    console.log("url", url);
+    var reactHandler = this;
+
+    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/ID,Proposta/Title,Proposta/Numero,Proposta/IdentificacaoOportunidade,Proposta/DataEntregaPropostaCliente,Proposta/ResponsavelProposta,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso,Created,Author/Title,Cliente,Representante&$expand=Proposta,GrupoSharepoint,Author&$filter=(Status eq 'Em análise')`;
+    //console.log("url", url);
 
     jQuery.ajax({
       url: url,
@@ -198,7 +203,7 @@ export default class SapTodasAsTarefasAdm extends React.Component<ISapTodasAsTar
 
         jQuery('#txtCountProposta').html(resultData.d.results.length);
 
-        reactHandlerRepresentante.setState({
+        reactHandler.setState({
           employeeList: resultData.d.results
         });
       },
