@@ -45,14 +45,14 @@ const empTablecolumns = [
     text: "Proposta",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    //filter: customFilter
+    filter: customFilter
   },
   {
     dataField: "Proposta.Numero",
     text: "Número da Proposta",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    //filter: customFilter
+    filter: customFilter
   },
 
   {
@@ -60,14 +60,29 @@ const empTablecolumns = [
     text: "Atribuido a",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    //filter: customFilter
+    filter: customFilter
+  },
+  {
+    dataField: "Cliente",
+    text: "Cliente",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter
+  },
+  {
+    dataField: "Representante",
+    text: "Representante",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter,
+
   },
   {
     dataField: "DataPlanejadaTermino",
     text: "Data Planejada de Termino",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    //filter: customFilter,
+    filter: customFilter,
     formatter: (rowContent, row) => {
 
       var dataPlanejadaTermino = new Date(row.DataPlanejadaTermino);
@@ -87,7 +102,7 @@ const empTablecolumns = [
     text: "Atraso",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    //filter: customFilter
+    filter: customFilter
   },
   {
     dataField: "",
@@ -189,7 +204,7 @@ export default class SapTodasAsTarefas extends React.Component<ISapTodasAsTarefa
 
     var reactHandlerRepresentante = this;
 
-    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/ID,Proposta/Title,Proposta/Numero,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso&$expand=Proposta,GrupoSharepoint&$filter=(Status eq 'Em análise') and (${_filter})`;
+    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/ID,Proposta/Title,Proposta/Numero,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso,Cliente,Representante&$expand=Proposta,GrupoSharepoint&$filter=(Status eq 'Em análise') and (${_filter})`;
     console.log("url", url)
 
     jQuery.ajax({

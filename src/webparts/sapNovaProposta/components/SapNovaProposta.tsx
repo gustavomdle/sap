@@ -580,7 +580,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
             <br></br>
 
             <div className="text-right">
-              <button id="btnIniciarAprovacao" className="btn btn-success" >Enviar para Aprovação</button>
+              <button id="btnIniciarAprovacao" className="btn btn-success" >Criar Proposta</button>
             </div>
 
 
