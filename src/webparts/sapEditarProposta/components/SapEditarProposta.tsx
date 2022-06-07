@@ -712,6 +712,12 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
             <br></br>
 
+            <span className='text-info'>Criador por: <span id='txtCriadoPor'></span> no dia <span id='txtCriadoData'></span> às <span id='txtCriadoHora'>11:30</span></span><br></br>
+            <span className='text-info'>Modificado por: <span id='txtModificadoPor'></span> no dia <span id='txtModificadoData'></span> às <span id='txtModificadoHora'>11:30</span></span>
+
+
+            <br></br>
+
             <div className="text-right">
               <button style={{ "margin": "2px" }} type="submit" id="btnVoltar" className="btn btn-secondary">Voltar</button>
               <button style={{ "margin": "2px" }} id="btnIniciarAprovacao" className="btn btn-success" >Salvar</button>
@@ -1136,7 +1142,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     console.log("entrou no proposta");
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,Status,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,ResponsavelProposta&$expand=Representante,Cliente,Produto&$filter=ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,Status,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,ResponsavelProposta,Created,Author/Title,Modified,Editor/Title&$expand=Representante,Cliente,Produto,Author,Editor&$filter=ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -1150,7 +1156,25 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
             var tipoAnalise = resultData.d.results[i].TipoAnalise;
 
-            console.log("resultData.d.results[i].DataEntregaPropostaCliente", resultData.d.results[i].DataEntregaPropostaCliente)
+            console.log("resultData.d.results[i].DataEntregaPropostaCliente", resultData.d.results[i].DataEntregaPropostaCliente);
+
+            var criadoPor = resultData.d.results[i].Author.Title;
+            var modificadoPor = resultData.d.results[i].Editor.Title;
+
+            var criado = new Date(resultData.d.results[i].Created);
+            var criadoData = ("0" + criado.getDate()).slice(-2) + '/' + ("0" + (criado.getMonth() + 1)).slice(-2) + '/' + criado.getFullYear();
+            var criadoHora = criado.getHours() + ":" + ("0" + (criado.getMinutes() + 1)).slice(-2) + ":" + criado.getSeconds();
+
+            var modificado = new Date(resultData.d.results[i].Modified);
+            var modificadoData = ("0" + modificado.getDate()).slice(-2) + '/' + ("0" + (modificado.getMonth() + 1)).slice(-2) + '/' + modificado.getFullYear();;
+            var modificadoHora = modificado.getHours() + ":" + ("0" + (modificado.getMinutes() + 1)).slice(-2) + ":" + modificado.getSeconds();
+
+            jQuery("#txtCriadoPor").html(criadoPor);
+            jQuery("#txtCriadoData").html(criadoData);
+            jQuery("#txtCriadoHora").html(criadoHora);
+            jQuery("#txtModificadoPor").html(modificadoPor);
+            jQuery("#txtModificadoData").html(modificadoData);
+            jQuery("#txtModificadoHora").html(modificadoHora);
 
             var dataEntregaPropostaCliente = resultData.d.results[i].DataEntregaPropostaCliente;
             var dataFinalQuestionamentos = resultData.d.results[i].DataFinalQuestionamentos;

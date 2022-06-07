@@ -41,6 +41,7 @@ var _grupos = [];
 var _strGrupos;
 var _testeGus;
 var _threadDiscussao;
+var _caminho;
 
 export interface IReactGetItemsState {
   itemsTarefas: [
@@ -83,7 +84,10 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     _web = new Web(this.props.context.pageContext.web.absoluteUrl);
     _siteURL = this.props.siteurl;
 
+    _caminho = this.props.context.pageContext.web.serverRelativeUrl;
+
     jQuery("#btnEditarProposta").hide();
+    jQuery("#conteudoUpload").hide();
 
     document
       .getElementById("btnVoltar")
@@ -153,6 +157,14 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       .getElementById("btnEditarProposta")
       .addEventListener("click", (e: Event) => this.editarProposta());
 
+    document
+      .getElementById("btnSucesso")
+      .addEventListener("click", (e: Event) => this.fecharSucesso());
+
+    document
+      .getElementById("btnAnexar")
+      .addEventListener("click", (e: Event) => this.upload());
+
 
 
     var reactHandlerRepresentante = this;
@@ -171,6 +183,11 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       }
     });
 
+    $("#conteudoLoading").html(`<br/><br/><img style="height: 80px; width: 80px" src='${_caminho}/Images1/loading.gif'/>
+    <br/>Aguarde....<br/><br/>
+    Dependendo do tamanho do anexo e a velocidade<br>
+     da Internet essa ação pode demorar um pouco. <br>
+     Não fechar a janela!<br/><br/>`);
 
     this.getProposta();
     this.getTarefas();
@@ -430,6 +447,15 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                   <div id='conteudoAnexo'></div>
 
+                  <br></br>
+                  <div id='conteudoUpload'>
+                    <label htmlFor="ddlProduto">Anexo</label>
+                    <br />
+                    <p>Total máximo permitido: 15 MB</p>
+                    <input className="multi" data-maxsize="1024" type="file" id="input" multiple />
+                    <button id='btnAnexar' type="button" className="btn btn-secondary btn-sm">Anexar</button>
+                  </div>
+
                 </div>
               </div>
             </div>
@@ -502,6 +528,8 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                           if (_grupos.indexOf(item.Title) !== -1) {
 
+                            jQuery("#conteudoUpload").show();
+
                             return (
 
                               <><tr>
@@ -562,6 +590,14 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
             <br></br>
 
+            <span className='text-info'>Criador por: <span id='txtCriadoPor'></span> no dia <span id='txtCriadoData'></span> às <span id='txtCriadoHora'>11:30</span></span><br></br>
+            <span className='text-info'>Modificado por: <span id='txtModificadoPor'></span> no dia <span id='txtModificadoData'></span> às <span id='txtModificadoHora'>11:30</span></span>
+
+
+            <br></br>
+
+
+
             <div className="text-right">
               <button style={{ "margin": "2px" }} type="submit" id="btnVoltar" className="btn btn-secondary">Voltar</button>
               <button style={{ "margin": "2px" }} type="submit" id="btnReabrirProposta" className="btn btn-danger">Reabrir Proposta</button>
@@ -572,6 +608,16 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
           </div>
 
+        </div>
+
+        <div className="modal fade" id="modalCarregando" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div>
+            <div className="modal-dialog" role="document">
+              <div className="modal-content">
+                <div id='conteudoLoading' className='carregando'></div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="modal fade" id="modalDiscussao" tabIndex={-1} role="dialog" aria-labelledby="discussaoTitle" aria-hidden="true">
@@ -692,6 +738,22 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
           </div>
         </div>
 
+        <div className="modal fade" id="modalSucesso" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Alerta</h5>
+              </div>
+              <div className="modal-body">
+                Arquivo anexado com sucesso!
+              </div>
+              <div className="modal-footer">
+                <button type="button" id="btnSucesso" className="btn btn-primary">OK</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
 
 
 
@@ -706,7 +768,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
   protected getProposta() {
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Representante/Title,Cliente/ID,Cliente/Title,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,Produto/Title,Numero,Status,ResponsavelProposta&$expand=Representante,Cliente,Produto&$filter=ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Representante/Title,Cliente/ID,Cliente/Title,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,Produto/Title,Numero,Status,ResponsavelProposta,Created,Author/Title,Modified,Editor/Title&$expand=Representante,Cliente,Produto,Author,Editor&$filter=ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -766,11 +828,29 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             var arrProduto = resultData.d.results[i].Produto.results;
             var arrTituloProduto = [];
 
-            for (i = 0; i < arrProduto.length; i++) {
-              arrTituloProduto.push(arrProduto[i].Title);
+            for (var x = 0; x < arrProduto.length; x++) {
+              arrTituloProduto.push(arrProduto[x].Title);
             }
 
             var strTituloProduto = arrTituloProduto.toString();
+
+            var criadoPor = resultData.d.results[i].Author.Title;
+            var modificadoPor = resultData.d.results[i].Editor.Title;
+
+            var criado = new Date(resultData.d.results[i].Created);
+            var criadoData = ("0" + criado.getDate()).slice(-2) + '/' + ("0" + (criado.getMonth() + 1)).slice(-2) + '/' + criado.getFullYear();
+            var criadoHora = criado.getHours() + ":" + ("0" + (criado.getMinutes() + 1)).slice(-2) + ":" + criado.getSeconds();
+
+            var modificado = new Date(resultData.d.results[i].Modified);
+            var modificadoData = ("0" + modificado.getDate()).slice(-2) + '/' + ("0" + (modificado.getMonth() + 1)).slice(-2) + '/' + modificado.getFullYear();;
+            var modificadoHora = modificado.getHours() + ":" + ("0" + (modificado.getMinutes() + 1)).slice(-2) + ":" + modificado.getSeconds();
+
+            jQuery("#txtCriadoPor").html(criadoPor);
+            jQuery("#txtCriadoData").html(criadoData);
+            jQuery("#txtCriadoHora").html(criadoHora);
+            jQuery("#txtModificadoPor").html(modificadoPor);
+            jQuery("#txtModificadoData").html(modificadoData);
+            jQuery("#txtModificadoHora").html(modificadoHora);
 
             jQuery("#txtNumeroProposta").html(numeroProposta);
             jQuery("#txtStatus").html(status);
@@ -1132,17 +1212,17 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
           //console.log("item", item);
           idItem++;
-          $("#conteudoAnexoNaoEncontrado").hide();
+          jQuery("#conteudoAnexoNaoEncontrado").hide();
           montaAnexo = `<a id="anexo${idItem}" data-interception="off" target="_blank" title="" href="${item.ServerRelativeUrl}">${item.Name}</a>&nbsp; <br/>`
 
-          $("#conteudoAnexo").append(montaAnexo);
+          jQuery("#conteudoAnexo").append(montaAnexo);
 
           montaAnexosRelacionados = `<div class="form-check">
                                     <input class="form-check-input" name="checkAnexosSelecionados" type="checkbox" value="${item.Name}">
                                     <label class="form-check-label">${item.Name}</label>
                                     </div>`
 
-          $("#conteudoAnexosRelacionados").append(montaAnexosRelacionados);
+          jQuery("#conteudoAnexosRelacionados").append(montaAnexosRelacionados);
 
 
         })
@@ -1533,6 +1613,62 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
   protected voltar() {
 
     history.back();
+
+  }
+
+
+  protected upload() {
+
+    var files = (document.querySelector("#input") as HTMLInputElement).files;
+    //var file = files[0];
+
+    //console.log("files.length", files.length);
+
+    if (files.length != 0) {
+
+      jQuery("#modalCarregando").modal({ backdrop: 'static', keyboard: false });
+
+      for (var i = 0; i < files.length; i++) {
+
+        var nomeArquivo = files[i].name;
+        var rplNomeArquivo = nomeArquivo.replace(/[^0123456789.,a-zA-Z]/g, '');
+
+        //alert(rplNomeArquivo);
+        //Upload a file to the SharePoint Library
+        _web.getFolderByServerRelativeUrl(`${_caminho}/AnexosSAP/${_idProposta}`)
+          //.files.add(files[i].name, files[i], true)
+          .files.add(rplNomeArquivo, files[i], true)
+          .then(function (data) {
+            if (i == files.length) {
+
+              console.log("anexou:" + rplNomeArquivo);
+              $("#conteudoLoading").modal('hide');
+              jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
+              //window.location.href = `home.aspx`;
+            }
+          }).catch(err => {
+            console.log("err", err);
+          });
+
+      }
+
+      //const folderAddResult = _web.folders.add(`${_caminho}/Anexos/${_idProposta}`);
+      //console.log("foi");
+
+    } else {
+      alert("Nenhum anexo encontrado!")
+      return false;
+    }
+
+  }
+
+
+  protected fecharSucesso() {
+
+    $("#conteudoAnexo").empty();
+    this.getAnexos();
+    jQuery("#modalCarregando").modal('hide');
+    jQuery("#modalSucesso").modal('hide');
 
   }
 
