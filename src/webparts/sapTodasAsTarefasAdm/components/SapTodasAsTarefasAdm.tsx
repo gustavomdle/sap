@@ -47,14 +47,38 @@ const empTablecolumns = [
     text: "Número",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    filter: customFilter
+    filter: customFilter,
+    classes: 'text-center',
+    formatter: (rowContent, row) => {
+      var tarefaAntiga = row.TarefaAntiga;
+      var val;
+      if(tarefaAntiga == "Sim"){
+        val = row.AntigoPropostaNumero;
+        val = val.replace(".000000000","");
+      }else{
+        val = row.Proposta.Numero;
+      }
+      return val;
+    }
   },
   {
     dataField: "Proposta.IdentificacaoOportunidade",
     text: "Oportunidade",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    filter: customFilter
+    classes: 'text-center',
+    filter: customFilter,
+    formatter: (rowContent, row) => {
+      var tarefaAntiga = row.TarefaAntiga;
+      var val;
+      if(tarefaAntiga == "Sim"){
+        val = row.AntigoPropostaOportunidade;
+      }else{
+        val = row.Proposta.IdentificacaoOportunidade;
+      }
+      return val;
+    }
+
   },
   {
     dataField: "Created",
@@ -62,6 +86,7 @@ const empTablecolumns = [
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilter,
+    classes: 'text-center',
     formatter: (rowContent, row) => {
       var dataCriacao = new Date(row.Created);
       var dtdataCriacao = ("0" + dataCriacao.getDate()).slice(-2) + '/' + ("0" + (dataCriacao.getMonth() + 1)).slice(-2) + '/' + dataCriacao.getFullYear();
@@ -80,7 +105,18 @@ const empTablecolumns = [
     text: "Síntese",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    filter: customFilter
+    filter: customFilter,
+    formatter: (rowContent, row) => {
+      var tarefaAntiga = row.TarefaAntiga;
+      var val;
+      if(tarefaAntiga == "Sim"){
+        val = row.Title;
+      }else{
+        val = row.Proposta.Title;
+      }
+      return val;
+    }
+
   },
   {
     dataField: "Proposta.DataEntregaPropostaCliente",
@@ -186,13 +222,18 @@ export default class SapTodasAsTarefasAdm extends React.Component<ISapTodasAsTar
 
   public async componentDidMount() {
 
+
+
     _web = new Web(this.props.context.pageContext.web.absoluteUrl);
+
+
+
 
     _siteurl = this.props.siteurl;
 
     var reactHandler = this;
 
-    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/ID,Proposta/Title,Proposta/Numero,Proposta/IdentificacaoOportunidade,Proposta/DataEntregaPropostaCliente,Proposta/ResponsavelProposta,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso,Created,Author/Title,Cliente,Representante&$expand=Proposta,GrupoSharepoint,Author&$filter=(Status eq 'Em análise')`;
+    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/ID,Proposta/Title,Proposta/Numero,Proposta/IdentificacaoOportunidade,Proposta/DataEntregaPropostaCliente,Proposta/ResponsavelProposta,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso,Created,Author/Title,Cliente,Representante,TarefaAntiga,AntigoPropostaNumero,AntigoPropostaOportunidade&$expand=Proposta,GrupoSharepoint,Author&$filter=(Status eq 'Em análise')`;
     //console.log("url", url);
 
     jQuery.ajax({
@@ -200,6 +241,8 @@ export default class SapTodasAsTarefasAdm extends React.Component<ISapTodasAsTar
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
+
+        console.log("resultData",resultData);
 
         jQuery('#txtCountProposta').html(resultData.d.results.length);
 
@@ -219,7 +262,7 @@ export default class SapTodasAsTarefasAdm extends React.Component<ISapTodasAsTar
   public render(): React.ReactElement<ISapTodasAsTarefasAdmProps> {
     return (
 
-      <><p>Resultado: <span className="text-info" id="txtCountProposta"></span> proposta(s) encontrada(s)</p>
+      <><p>Aprovações encontradas: <span className="text-info" id="txtCountProposta"></span></p>
         <div className={styles.container}>
           <BootstrapTable bootstrap4 responsive condensed hover={true} className="gridTodosItens" id="gridTodosItens" keyField='id' data={this.state.employeeList} columns={empTablecolumns} headerClasses="header-class" pagination={paginationFactory(paginationOptions)} filter={filterFactory()} />
         </div></>

@@ -63,6 +63,10 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
+.break-word{
+    word-break: break-word
+}
+
 /*
 .fieldGroup-234{
     border: 0px;

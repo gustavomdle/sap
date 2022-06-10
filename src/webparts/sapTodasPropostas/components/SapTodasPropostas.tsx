@@ -58,6 +58,7 @@ const empTablecolumns = [
     text: "Número",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
+    classes: 'text-center',
     filter: customFilter
   },
   {
@@ -65,6 +66,7 @@ const empTablecolumns = [
     text: "ID",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
+    classes: 'text-center',
     filter: customFilter
   },
   {
@@ -87,6 +89,7 @@ const empTablecolumns = [
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilter,
+    classes: 'text-center',
     formatter: (rowContent, row) => {
       var dataEntregaPropostaCliente = new Date(row.DataEntregaPropostaCliente);
       var dtDataEntregaPropostaCliente = ("0" + dataEntregaPropostaCliente.getDate()).slice(-2) + '/' + ("0" + (dataEntregaPropostaCliente.getMonth() + 1)).slice(-2) + '/' + dataEntregaPropostaCliente.getFullYear();
@@ -123,6 +126,7 @@ const empTablecolumns = [
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilter,
+    classes: 'text-center',
     formatter: (rowContent, row) => {
       var dataCriacao = new Date(row.Created);
       var dtdataCriacao = ("0" + dataCriacao.getDate()).slice(-2) + '/' + ("0" + (dataCriacao.getMonth() + 1)).slice(-2) + '/' + dataCriacao.getFullYear();

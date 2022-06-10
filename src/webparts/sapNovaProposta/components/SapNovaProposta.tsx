@@ -42,6 +42,7 @@ var _representante;
 var _dadosProposta;
 var _txtCliente;
 var _txtRepresentante;
+var _areaAnexo;
 
 export interface IReactGetItemsState {
   itemsRepresentante: [
@@ -64,6 +65,12 @@ export interface IReactGetItemsState {
       "ID": "",
       "Title": "",
     }],
+  itemsAreasAnexo: [
+    {
+      "ID": "",
+      "Title": "",
+    }],
+
 
   itemsSegmento: [];
   itemsSetor: [];
@@ -103,6 +110,11 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
           "ID": "",
           "Title": "",
         }],
+      itemsAreasAnexo: [
+        {
+          "ID": "",
+          "Title": "",
+        }],
       itemsSegmento: [],
       itemsSetor: [],
       itemsModalidade: [],
@@ -122,6 +134,8 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     _web = new Web(this.props.context.pageContext.web.absoluteUrl);
 
     _caminho = this.props.context.pageContext.web.serverRelativeUrl;
+
+    $('[aria-describedby="image-richtextbutton"]').hide();
 
     console.log("_caminho", _caminho);
 
@@ -568,11 +582,32 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
                 <div className="card-body">
 
-                  <label htmlFor="ddlProduto">Anexo</label>
-                  <br />
-                  <p>Total máximo permitido: 15 MB</p>
-                  <input className="multi" data-maxsize="1024" type="file" id="input" multiple />
+                  <div className="form-group">
+                    <div className="form-row ">
+                      <div className="form-group col-md" >
+                        <label htmlFor="txtTitulo">Anexo </label><span className="required"> *</span>
+                        <input className="multi" data-maxsize="1024" type="file" id="input" multiple />
+                      </div>
+                      <div className="form-group col-md" >
+                        <label htmlFor="txtTitulo">Área </label><span className="required"> *</span>
+                        <select id="ddlAreaAnexo" className="form-control" style={{ "width": "300px" }}>
+                          <option value="0" selected>Selecione...</option>
+                          {this.state.itemsAreasAnexo.map(function (item, key) {
+                            return (
+                              <option value={item.ID}>{item.Title}</option>
+                            );
+                          })}
+                        </select>
+                      </div>
+                      <div className="form-group col-md" >
 
+                      </div>
+
+                    </div>
+                    <br />
+                    <p className='text-info'>Total máximo permitido: 15 MB</p>
+
+                  </div>
                 </div>
               </div>
             </div>
@@ -599,11 +634,11 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                 </button>
               </div>
               <div className="modal-body">
-                Deseja realmente iniciar o fluxo?
+                Deseja realmente criar a Proposta?
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button id="btIniciarFluxo" type="button" className="btn btn-primary">Iniciar fluxo</button>
+                <button id="btIniciarFluxo" type="button" className="btn btn-primary">Criar Proposta</button>
               </div>
             </div>
           </div>
@@ -655,10 +690,27 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
   private addDaysWRONG() {
 
+
+    var days = 6;
+
     var date = new Date();
+    var day = date.getDay();
     var result = new Date();
-    result.setDate(date.getDate() + 5);
+    //result.setDate(date.getDate() + 4);
+    result.setDate(date.getDate() + days + (day === 6 ? 2 : +!day) + (Math.floor((days - 1 + (day % 6 || 1)) / 5) * 2));
     return result;
+    /*
+        var count = 0;
+        var date = new Date();
+        var result = new Date();
+        while (count < 7) {
+          result.setDate(date.getDate() + 1);
+            if (date.getDay() != 0 && date.getDay() != 6) // Skip weekends
+                count++;
+        }
+        console.log("date",date);
+        return date;
+    */
   }
 
 
@@ -677,6 +729,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     var reactHandlerOutrosServicos = this;
     var reactHandlerProdutos = this;
     var reactHandlerAreas = this;
+    var reactHandlerAreasAnexo = this;
 
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('Representantes')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
@@ -848,6 +901,21 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
       }
     });
 
+    jquery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      success: function (resultData) {
+        reactHandlerAreasAnexo.setState({
+          itemsAreasAnexo: resultData.d.results
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
+      }
+    });
+
+
     /*
         setTimeout(function () {
     
@@ -885,8 +953,6 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
   }
 
   protected validar() {
-
-    console.log("Entrou na validação");
 
     var tipoAnaliseProposta = "";
 
@@ -1055,6 +1121,13 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     var files = (document.querySelector("#input") as HTMLInputElement).files;
 
     if (files.length > 0) {
+
+      _areaAnexo = $("#ddlAreaAnexo option:selected").text();
+
+      if (_areaAnexo == "Selecione...") {
+        alert("Escolha a Área do anexo");
+        return false;
+      }
 
       console.log("files.length", files.length);
 
@@ -1256,7 +1329,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
           TipoGarantia: arrTipoGarantia[0],
           PrazoGarantia: prazoGarantia,
           OutrosServicos: { "results": arrOutrosServicos },
-          ProdutoId: { "results": arrProduto }
+          ProdutoId: { "results": arrProduto },
         })
         .then(response => {
 
@@ -1293,6 +1366,7 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
                     .getByTitle("PropostasSAP")
                     .items.getById(_idProposta).update({
                       Numero: _nroNovo,
+                      PastaCriada: "Sim"
                     })
                     .then(async response => {
 
@@ -1381,16 +1455,28 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
           _web.getFolderByServerRelativeUrl(`${_caminho}/AnexosSAP/${_idProposta}`)
             //.files.add(files[i].name, files[i], true)
             .files.add(rplNomeArquivo, files[i], true)
-            .then(function (data) {
-              if (i == files.length) {
+            .then(async data => {
 
-                console.log("anexou:" + rplNomeArquivo);
-                $("#conteudoLoading").modal('hide');
-                jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
-                //window.location.href = `home.aspx`;
-              }
+              data.file.getItem().then(async item => {
+                var idAnexo = item.ID;
+
+                await _web.lists
+                  .getByTitle("AnexosSAP")
+                  .items.getById(idAnexo).update({
+                    Area: _areaAnexo,
+                  })
+                  .then(async response => {
+
+                    if (i == files.length) {
+                      console.log("anexou:" + rplNomeArquivo);
+                      $("#conteudoLoading").modal('hide');
+                      jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
+                    }
+                  }).catch(err => {
+                    console.log("err", err);
+                  });
+              })
             });
-
         }
 
       }).catch(err => {

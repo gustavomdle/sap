@@ -41,26 +41,30 @@ const customFilter = textFilter({
 
 const empTablecolumns = [
   {
-    dataField: "Proposta.Title",
-    text: "Proposta",
-    headerStyle: { backgroundColor: '#bee5eb' },
-    sort: true,
-    filter: customFilter
-  },
-  {
     dataField: "Proposta.Numero",
-    text: "Número da Proposta",
+    text: "Número",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilter
   },
-
   {
-    dataField: "GrupoSharepoint.Title",
-    text: "Atribuido a",
+    dataField: "Proposta.IdentificacaoOportunidade",
+    text: "Oportunidade",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     filter: customFilter
+  },
+  {
+    dataField: "Created",
+    text: "Data de criação",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter,
+    formatter: (rowContent, row) => {
+      var dataCriacao = new Date(row.Created);
+      var dtdataCriacao = ("0" + dataCriacao.getDate()).slice(-2) + '/' + ("0" + (dataCriacao.getMonth() + 1)).slice(-2) + '/' + dataCriacao.getFullYear();
+      return dtdataCriacao;
+    }
   },
   {
     dataField: "Cliente",
@@ -70,6 +74,32 @@ const empTablecolumns = [
     filter: customFilter
   },
   {
+    dataField: "Proposta.Title",
+    text: "Síntese",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter
+  },
+  {
+    dataField: "Proposta.DataEntregaPropostaCliente",
+    text: "Data de entrega",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter,
+    formatter: (rowContent, row) => {
+      var dataEntregaPropostaCliente = new Date(row.Proposta.DataEntregaPropostaCliente);
+      var dtDataEntregaPropostaCliente = ("0" + dataEntregaPropostaCliente.getDate()).slice(-2) + '/' + ("0" + (dataEntregaPropostaCliente.getMonth() + 1)).slice(-2) + '/' + dataEntregaPropostaCliente.getFullYear();
+      return dtDataEntregaPropostaCliente;
+    }
+  },
+  {
+    dataField: "GrupoSharepoint.Title",
+    text: "Atribuido a",
+    headerStyle: { backgroundColor: '#bee5eb' },
+    sort: true,
+    filter: customFilter,
+  },
+  {
     dataField: "Representante",
     text: "Representante",
     headerStyle: { backgroundColor: '#bee5eb' },
@@ -77,12 +107,13 @@ const empTablecolumns = [
     filter: customFilter,
 
   },
+  /*
   {
     dataField: "DataPlanejadaTermino",
     text: "Data Planejada de Termino",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    filter: customFilter,
+    //filter: customFilter,
     formatter: (rowContent, row) => {
 
       var dataPlanejadaTermino = new Date(row.DataPlanejadaTermino);
@@ -102,15 +133,14 @@ const empTablecolumns = [
     text: "Atraso",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
-    filter: customFilter
+    //filter: customFilter
   },
+  */
   {
     dataField: "",
     text: "",
     headerStyle: { "backgroundColor": "#bee5eb", "width": "180px" },
     formatter: (rowContent, row) => {
-
-      console.log("row",row);
       var id = row.Proposta.ID;
       var urlDetalhes = `Proposta-Detalhes.aspx?PropostasID=` + id;
 
@@ -199,12 +229,12 @@ export default class SapTodasAsTarefas extends React.Component<ISapTodasAsTarefa
       })
 
       console.log("grupos", grupos);
-      //_grupos = grupos;
     })
+
 
     var reactHandlerRepresentante = this;
 
-    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/ID,Proposta/Title,Proposta/Numero,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso,Cliente,Representante&$expand=Proposta,GrupoSharepoint&$filter=(Status eq 'Em análise') and (${_filter})`;
+    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/ID,Proposta/Title,Proposta/Numero,Proposta/IdentificacaoOportunidade,Proposta/DataEntregaPropostaCliente,Proposta/ResponsavelProposta,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso,Created,Author/Title,Cliente,Representante&$expand=Proposta,GrupoSharepoint,Author&$filter=((Status eq 'Em análise') and ${_filter})`;
     console.log("url", url)
 
     jQuery.ajax({
@@ -223,21 +253,26 @@ export default class SapTodasAsTarefas extends React.Component<ISapTodasAsTarefa
     });
 
 
+
+
   }
 
 
 
 
   public render(): React.ReactElement<ISapTodasAsTarefasProps> {
+
+
     return (
 
-
-        <><p>Resultado: <span className="text-info" id="txtCountProposta"></span> proposta(s) encontrada(s)</p>
-          <div className={styles.container}>
-            <BootstrapTable wrapperClasses="table-responsive" bootstrap4 responsive condensed hover={true} className="gridTodosItens" id="gridTodosItens" keyField='id' data={this.state.employeeList} columns={empTablecolumns} headerClasses="header-class" pagination={paginationFactory(paginationOptions)} filter={filterFactory()} />
-          </div></>
+      <><p>Aprovações encontradas: <span className="text-info" id="txtCountProposta"></span></p>
+        <div className={styles.container}>
+          <BootstrapTable wrapperClasses="table-responsive" bootstrap4 responsive condensed hover={true} className="gridTodosItens" id="gridTodosItens" keyField='id' data={this.state.employeeList} columns={empTablecolumns} headerClasses="header-class" pagination={paginationFactory(paginationOptions)} filter={filterFactory()} />
+        </div></>
 
 
     );
+
+
   }
 }

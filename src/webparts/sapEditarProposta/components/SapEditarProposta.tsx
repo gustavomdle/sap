@@ -64,6 +64,10 @@ var _elemento2;
 var _siteurl;
 var _arrAreasAntiga = [];
 var _txtCliente;
+var _areaAnexo;
+var _pastaCriada;
+var _siteAntigo;
+var _idAntigo;
 
 
 export interface IReactGetItemsState {
@@ -87,12 +91,18 @@ export interface IReactGetItemsState {
       "ID": "",
       "Title": "",
     }],
+  itemsAreasAnexos: [
+    {
+      "ID": "",
+      "Title": "",
+    }],
   itemsResponsavelProposta: [
     {
       "ID": "",
       "Title": "",
       "Responsavel": { "Title": "" }
     }],
+
 
   itemsSegmento: [];
   itemsSetor: [];
@@ -136,6 +146,11 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
           "Title": "",
         }],
       itemsAreas: [
+        {
+          "ID": "",
+          "Title": "",
+        }],
+      itemsAreasAnexos: [
         {
           "ID": "",
           "Title": "",
@@ -204,13 +219,6 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     document
       .getElementById("btnVoltar")
       .addEventListener("click", (e: Event) => this.voltar());
-
-
-
-
-
-    //var $options = $('#ddlProduto1 option:selected');
-    //$options.appendTo("#ddlProduto2");
 
 
     $("#conteudoLoading").html(`<br/><br/><img style="height: 80px; width: 80px" src='${_caminho}/Images1/loading.gif'/>
@@ -694,19 +702,64 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                   Anexos
                 </h5>
               </div>
+
               <div id="collapseAnexos" className="collapse show" aria-labelledby="headingOne" >
 
                 <div className="card-body">
 
-                  <label htmlFor="ddlProduto">Anexo</label><span className="required"> *</span><br />
-                  <p>Total máximo permitido: 15 MB</p>
-                  <input className="multi" data-maxsize="1024" type="file" id="input" multiple />
+                  <div className="table-responsive">
+
+                    <table className="table table-hover" id="tbItens">
+                      <thead>
+                        <tr>
+                          <th scope="col">Nome</th>
+                          <th scope="col">Área</th>
+                          <th scope="col">Criado</th>
+                          <th scope="col">Criado por</th>
+                          <th scope="col">Ação</th>
+                        </tr>
+                      </thead>
+                      <tbody id="conteudoAnexo">
+                      </tbody>
+                    </table>
+
+                  </div>
+
 
                   <br></br>
-                  <br></br>
-                  <div id='conteudoAnexo'></div>
+                  <div id='conteudoUpload' className='form-group col-md border m-1'>
+
+                    <br></br>
+
+                    <div className="form-group">
+                      <div className="form-row ">
+                        <div className="form-group col-md" >
+                          <label htmlFor="input">Anexo </label><span className="required"> *</span>
+                          <input className="multi" data-maxsize="1024" type="file" id="input" multiple />
+                        </div>
+                        <div className="form-group col-md" >
+                          <label htmlFor="ddlAreaAnexo">Área </label><span className="required"> *</span>
+                          <select id="ddlAreaAnexo" className="form-control" style={{ "width": "300px" }}>
+                            <option value="0" selected>Selecione...</option>
+                            {this.state.itemsAreasAnexos.map(function (item, key) {
+                              return (
+                                <option value={item.ID}>{item.Title}</option>
+                              );
+                            })}
+                          </select>
+                        </div>
+                        <div className="form-group col-md" >
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className='text-info'>Total máximo permitido: 15 MB</p>
+
+
+                  </div>
 
                 </div>
+
               </div>
             </div>
 
@@ -1096,19 +1149,6 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     });
 
 
-    setTimeout(function () {
-
-      // jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Comercial"; }).prop('selected', true);
-      // jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Jurídico"; }).prop('selected', true);
-      //  jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Representante"; }).prop('selected', true);
-      //  jQuery('#ddlArea1 option').filter(function () { return $(this).html() == "Propostas"; }).prop('selected', true);
-      //   var $options = $('#ddlArea1 option:selected');
-      //  $options.appendTo("#ddlArea2");
-
-
-    }, 2000);
-
-
     this.getProposta();
     this.getTarefas();
     this.getAnexos();
@@ -1142,7 +1182,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     console.log("entrou no proposta");
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,Status,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,ResponsavelProposta,Created,Author/Title,Modified,Editor/Title&$expand=Representante,Cliente,Produto,Author,Editor&$filter=ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,Status,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,ResponsavelProposta,Created,Author/Title,Modified,Editor/Title,IDAntigo,SiteAntigo,PastaCriada&$expand=Representante,Cliente,Produto,Author,Editor&$filter=ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -1153,6 +1193,10 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         if (resultData.d.results.length > 0) {
 
           for (var i = 0; i < resultData.d.results.length; i++) {
+
+            _siteAntigo = resultData.d.results[i].SiteAntigo;
+            _pastaCriada = resultData.d.results[i].PastaCriada;
+            _idAntigo = resultData.d.results[i].IDAntigo;
 
             var tipoAnalise = resultData.d.results[i].TipoAnalise;
 
@@ -1182,9 +1226,9 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
             var status = resultData.d.results[i].Status;
 
-            console.log("status",status);
+            console.log("status", status);
 
-            if(status != "Em análise"){
+            if (status != "Em análise") {
 
               $("#btnIniciarAprovacao").prop("disabled", true);
 
@@ -1319,13 +1363,19 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
   protected getTarefas() {
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title,GrupoSharepoint/ID&$expand=GrupoSharepoint&$filter=Proposta/ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title,GrupoSharepoint/ID&$expand=GrupoSharepoint&$orderby=Title&$filter=Proposta/ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
-      success: async function (resultData) {
+      success: async (resultData) => {
 
         console.log("resultData Proposta", resultData);
+
+        var reactHandlerAreaAnexo = this;
+
+        reactHandlerAreaAnexo.setState({
+          itemsAreasAnexos: resultData.d.results
+        });
 
         if (resultData.d.results.length > 0) {
 
@@ -1356,7 +1406,8 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
   }
 
-  protected getAnexos() {
+  /*
+  protected getAnexosOld() {
 
     //get anexos da biblioteca
 
@@ -1377,12 +1428,10 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     _web.getFolderByServerRelativeUrl(`${strRelativeURL}/AnexosSAP/${_idProposta}`)
       .expand("Folders, Files, ListItemAllFields").get().then(r => {
         console.log("r", r);
-        /*
         r.Folders.forEach(item => {
           console.log("item-doc", item);
           console.log("entrou em folder");
         })
-        */
         r.Files.forEach(item => {
           console.log("entrou em files");
 
@@ -1393,11 +1442,6 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
           $("#conteudoAnexo").append(montaAnexo);
 
-          document
-            .getElementById(`btnExcluirAnexo${idItem}`)
-            .addEventListener("click", (e: Event) => this.confirmarExcluirAnexo(item.ServerRelativeUrl, item.Name, `anexo${idItem}`, `btnExcluirAnexo${idItem}`));
-
-
         })
 
       }).catch((error: any) => {
@@ -1406,6 +1450,104 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
 
     //fim anexos da biblioteca
+
+
+  }
+
+  */
+
+  protected getAnexos() {
+
+    var montaAnexo = "";
+    var montaAnexo2 = "";
+    var relativeURL = window.location.pathname;
+    var strRelativeURL = relativeURL.replace("SitePages/Propostas-SAP-Editar.aspx", "");
+    var idItem = 0;
+
+    if (_siteAntigo == "Sim") {
+
+      jquery.ajax({
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Anexos')/items?$select=Title,AreaSelecionada,Created,Author/Title,File/ServerRelativeUrl&$expand=Author,File&$filter=Proposta/ID eq ` + _idAntigo,
+        type: "GET",
+        async: false,
+        headers: { 'Accept': 'application/json; odata=verbose;' },
+        success: function (resultData) {
+
+          console.log("resultData anexos antigos", resultData);
+
+          if (resultData.d.results.length > 0) {
+
+            for (var i = 0; i < resultData.d.results.length; i++) {
+
+              var criado = new Date(resultData.d.results[i].Created);
+              var criadoData = ("0" + criado.getDate()).slice(-2) + '/' + ("0" + (criado.getMonth() + 1)).slice(-2) + '/' + criado.getFullYear();
+              var criadoHora = criado.getHours() + ":" + ("0" + (criado.getMinutes() + 1)).slice(-2) + ":" + criado.getSeconds();
+
+              montaAnexo2 += `<tr> 
+              <td style="word-break: break-word;"><a id="anexo${idItem}" data-interception="off" target="_blank" title="" href="${resultData.d.results[i].File.ServerRelativeUrl}">${resultData.d.results[i].Title}</a></td>
+              <td style="word-break: break-word;">${resultData.d.results[i].AreaSelecionada}</td>
+              <td style="word-break: break-word;">${criadoData} ${criadoHora}</td>
+              <td style="word-break: break-word;">${resultData.d.results[i].Author.Title}</td>
+              </tr>
+              `
+
+            }
+
+            //console.log("montaAnexo2",montaAnexo2);
+            jQuery("#conteudoAnexo").append(montaAnexo2);
+
+          }
+
+
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR.responseText);
+        }
+      });
+
+    }
+
+    _web.getFolderByServerRelativeUrl(`${strRelativeURL}/AnexosSAP/${_idProposta}`).files
+      .expand('ListItemAllFields', 'Author').get().then(r => {
+
+        console.log("r1", r);
+
+        if (r.length != 0) {
+
+          r.forEach(item => {
+
+            idItem++;
+
+            var criado = new Date(item.TimeCreated);
+            var criadoData = ("0" + criado.getDate()).slice(-2) + '/' + ("0" + (criado.getMonth() + 1)).slice(-2) + '/' + criado.getFullYear();
+            var criadoHora = criado.getHours() + ":" + ("0" + (criado.getMinutes() + 1)).slice(-2) + ":" + criado.getSeconds();
+
+            montaAnexo = `<tr id="anexo${idItem}"> 
+          <td style="word-break: break-word;"><a id="anexo${idItem}" data-interception="off" target="_blank" title="" href="${item.ServerRelativeUrl}">${item.Name}</a></td>
+          <td style="word-break: break-word;">${item.ListItemAllFields.Area}</td>
+          <td style="word-break: break-word;">${criadoData} ${criadoHora}</td>
+          <td style="word-break: break-word;">${item.Author.Title}</td>
+          <td style="word-break: break-word; width: 100px;"><button id="btnExcluirAnexo${idItem}" type="button" class="btn btn-secondary btn-sm">Excluir</button></td>
+          </tr> 
+          `
+
+            jQuery("#conteudoAnexo").append(montaAnexo);
+
+            document
+              .getElementById(`btnExcluirAnexo${idItem}`)
+              .addEventListener("click", (e: Event) => this.confirmarExcluirAnexo(item.ServerRelativeUrl, item.Name, `anexo${idItem}`, `btnExcluirAnexo${idItem}`));
+
+          });
+
+
+
+        }
+
+      }).catch((error: any) => {
+        console.log("Erro onChangeCliente: ", error);
+      });
+
+
 
 
   }
@@ -1585,6 +1727,14 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     var files = (document.querySelector("#input") as HTMLInputElement).files;
 
     if (files.length > 0) {
+
+      _areaAnexo = $("#ddlAreaAnexo option:selected").text();
+
+      if (_areaAnexo == "Selecione...") {
+        alert("Escolha a Área do anexo");
+        return false;
+      }
+
 
       console.log("files.length", files.length);
 
@@ -1839,7 +1989,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
         })
         .then(async response => {
 
-          
+
 
           if (_arrAreaId.length != 0) {
 
@@ -1851,7 +2001,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
               _criou = true;
 
-              console.log("_arrAreasAntiga.indexOf(_arrAreaTexto[x])",_arrAreasAntiga.indexOf(_arrAreaTexto[x]));
+              console.log("_arrAreasAntiga.indexOf(_arrAreaTexto[x])", _arrAreasAntiga.indexOf(_arrAreaTexto[x]));
 
 
               if (_arrAreasAntiga.indexOf(_arrAreaTexto[x]) == -1) {
@@ -1876,7 +2026,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
                     console.log(error);
                   });
 
-              }else{
+              } else {
 
                 var last = (_arrAreaId.length) - 1;
                 console.log("last", last);
@@ -1887,7 +2037,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
             }
 
-          }else {
+          } else {
             this.upload();
           }
 
@@ -1899,14 +2049,16 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
   protected upload() {
 
-    console.log("Entrou no upload")
-
     var files = (document.querySelector("#input") as HTMLInputElement).files;
     var file = files[0];
 
     console.log("files.length", files.length);
 
     if (files.length != 0) {
+
+      if (_pastaCriada != "Sim") {
+        _web.lists.getByTitle("AnexosSAP").rootFolder.folders.add(`${_idProposta}`);
+      }
 
       for (var i = 0; i < files.length; i++) {
 
@@ -1919,19 +2071,31 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
           //.files.add(files[i].name, files[i], true)
           .files.add(rplNomeArquivo, files[i], true)
           .then(function (data) {
-            if (i == files.length) {
 
-              console.log("anexou:" + rplNomeArquivo);
-              $("#conteudoLoading").modal('hide');
-              jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
-              //window.location.href = `home.aspx`;
-            }
+            data.file.getItem().then(async item => {
+              var idAnexo = item.ID;
+
+              await _web.lists
+                .getByTitle("AnexosSAP")
+                .items.getById(idAnexo).update({
+                  Area: _areaAnexo,
+                })
+                .then(async response => {
+
+                  if (i == files.length) {
+                    console.log("anexou:" + rplNomeArquivo);
+                    $("#conteudoLoading").modal('hide');
+                    jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
+                  }
+                }).catch(err => {
+                  console.log("err", err);
+                });
+
+            })
+
           });
 
       }
-
-      //const folderAddResult = _web.folders.add(`${_caminho}/Anexos/${_idProposta}`);
-      //console.log("foi");
 
     } else {
 
