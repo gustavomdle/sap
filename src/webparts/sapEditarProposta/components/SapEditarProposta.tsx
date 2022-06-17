@@ -68,6 +68,7 @@ var _areaAnexo;
 var _pastaCriada;
 var _siteAntigo;
 var _idAntigo;
+var _numeroProposta;
 
 
 export interface IReactGetItemsState {
@@ -1182,7 +1183,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     console.log("entrou no proposta");
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,Status,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,ResponsavelProposta,Created,Author/Title,Modified,Editor/Title,IDAntigo,SiteAntigo,PastaCriada&$expand=Representante,Cliente,Produto,Author,Editor&$filter=ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('PropostasSAP')/items?$select=ID,Title,TipoAnalise,Status,Numero,IdentificacaoOportunidade,DataEntregaPropostaCliente,DataFinalQuestionamentos,DataValidadeProposta,Representante/ID,Cliente/ID,PropostaRevisadaReferencia,CondicoesPagamento,DadosProposta,Segmento,Setor,Modalidade,NumeroEditalRFPRFQRFI,Instalacao,Quantidade,Garantia,TipoGarantia,PrazoGarantia,OutrosServicos,Produto/ID,ResponsavelProposta,Created,Author/Title,Modified,Editor/Title,IDAntigo,SiteAntigo,PastaCriada&$expand=Representante,Cliente,Produto,Author,Editor&$filter=ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -1197,6 +1198,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
             _siteAntigo = resultData.d.results[i].SiteAntigo;
             _pastaCriada = resultData.d.results[i].PastaCriada;
             _idAntigo = resultData.d.results[i].IDAntigo;
+            _numeroProposta = resultData.d.results[i].Numero;
 
             var tipoAnalise = resultData.d.results[i].TipoAnalise;
 
@@ -1467,7 +1469,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     if (_siteAntigo == "Sim") {
 
       jquery.ajax({
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Anexos')/items?$select=Title,AreaSelecionada,Created,Author/Title,File/ServerRelativeUrl&$expand=Author,File&$filter=Proposta/ID eq ` + _idAntigo,
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Anexos')/items?$select=Title,AreaSelecionada,Created,Author/Title,File/ServerRelativeUrl&$expand=Author,File&$filter=Proposta/Numero eq ` + _numeroProposta,
         type: "GET",
         async: false,
         headers: { 'Accept': 'application/json; odata=verbose;' },

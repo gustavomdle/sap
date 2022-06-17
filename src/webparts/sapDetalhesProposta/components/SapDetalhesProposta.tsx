@@ -45,6 +45,9 @@ var _caminho;
 var _siteAntigo;
 var _pastaCriada;
 var _idAntigo;
+var _arrAreas = [];
+var _montaNotificarArea = "";
+var _arrMontaBotoes = ["Todos"];
 
 export interface IReactGetItemsState {
   itemsTarefas: [
@@ -215,8 +218,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     this.getTarefas();
     this.getAnexos();
     this.getSelecaoAreas();
-    this.getDiscussaoAntiga();
-    this.getDiscussaoNova();
+    this.getDiscussao();
 
   }
 
@@ -611,7 +613,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                               <><tr>
                                 <td className='break-word'>{item.Title}</td>
-                                <td className='break-word'>{item.Status}</td>
+                                <td>{item.Status}</td>
                                 <td>{dtDataPlanejadaTermino}</td>
                                 <td>{dtDataRealTermino}</td>
                                 <td className='break-word'>{vlrJustificativa}</td>
@@ -625,7 +627,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                               <><tr>
                                 <td className='break-word'>{item.Title}</td>
-                                <td className='break-word'>{item.Status}</td>
+                                <td>{item.Status}</td>
                                 <td>{dtDataPlanejadaTermino}</td>
                                 <td>{dtDataRealTermino}</td>
                                 <td className='break-word'>{vlrJustificativa}</td>
@@ -642,7 +644,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                             <><tr>
                               <td className='break-word'>{item.Title}</td>
-                              <td className='break-word'>{item.Status}</td>
+                              <td>{item.Status}</td>
                               <td>{dtDataPlanejadaTermino}</td>
                               <td>{dtDataRealTermino}</td>
                               <td className='break-word'>{vlrJustificativa}</td>
@@ -690,7 +692,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                               <><tr>
                                 <td className='break-word'>{rplTitulo}</td>
-                                <td className='break-word'>{item.Status}</td>
+                                <td>{item.Status}</td>
                                 <td>{dtDataPlanejadaTermino}</td>
                                 <td>{dtDataRealTermino}</td>
                                 <td className='break-word'>{vlrJustificativa}</td>
@@ -704,7 +706,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                               <><tr>
                                 <td className='break-word'>{rplTitulo}</td>
-                                <td className='break-word'>{item.Status}</td>
+                                <td>{item.Status}</td>
                                 <td>{dtDataPlanejadaTermino}</td>
                                 <td>{dtDataRealTermino}</td>
                                 <td className='break-word'>{vlrJustificativa}</td>
@@ -721,7 +723,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                             <><tr>
                               <td className='break-word'>{rplTitulo}</td>
-                              <td className='break-word'>{item.Status}</td>
+                              <td>{item.Status}</td>
                               <td>{dtDataPlanejadaTermino}</td>
                               <td>{dtDataRealTermino}</td>
                               <td className='break-word'>{vlrJustificativa}</td>
@@ -1091,11 +1093,36 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$select=ID,Title,GrupoSharepoint/ID,GrupoSharepoint/Title,Status,DataPlanejadaTermino,Modified,DataRealTermino,Justificativa&$expand=GrupoSharepoint&$filter=AntigoPropostaNumero eq ` + _numeroProposta + `.000000000`,
       type: "GET",
+      async: false,
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
+
         reactHandlerTarefasAntigas.setState({
           itemsTarefasAntigas: resultData.d.results
         });
+
+        if (resultData.d.results.length > 0) {
+
+          for (var i = 0; i < resultData.d.results.length; i++) {
+
+            _arrAreas.push(resultData.d.results[i].GrupoSharepoint.Title);
+
+          }
+
+        }
+
+        for (var i = 0; i < _arrAreas.length; i++) {
+
+          _montaNotificarArea += `<div class="form-check">
+                                  <input class="form-check-input" name="checkNotificarArea" grupo="${resultData.d.results[i].GrupoSharepoint.Title}" type="checkbox" value="${resultData.d.results[i].GrupoSharepoint.ID}">
+                                  <label class="form-check-label">${resultData.d.results[i].GrupoSharepoint.Title}</label>
+                                  </div>`;
+
+        }
+
+
+
+
       },
       error: function (jqXHR, textStatus, errorThrown) {
         console.log(jqXHR.responseText);
@@ -1109,11 +1136,9 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     jquery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$select=ID,Title,GrupoSharepoint/ID,GrupoSharepoint/Title,Status,DataPlanejadaTermino,Modified,DataRealTermino,Justificativa&$expand=GrupoSharepoint&$filter=Proposta/ID eq ` + _idProposta,
       type: "GET",
+      async: false,
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
-
-        var arrAreas = [];
-        var montaNotificarArea = "";
 
         reactHandlerTarefas.setState({
           itemsTarefas: resultData.d.results,
@@ -1124,22 +1149,21 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
           for (var i = 0; i < resultData.d.results.length; i++) {
 
-            arrAreas.push(resultData.d.results[i].GrupoSharepoint.Title);
+            _arrAreas.push(resultData.d.results[i].GrupoSharepoint.Title);
 
           }
 
         }
 
-        for (var i = 0; i < arrAreas.length; i++) {
+        for (var i = 0; i < _arrAreas.length; i++) {
 
-          montaNotificarArea += `<div class="form-check">
+          _montaNotificarArea += `<div class="form-check">
                                   <input class="form-check-input" name="checkNotificarArea" grupo="${resultData.d.results[i].GrupoSharepoint.Title}" type="checkbox" value="${resultData.d.results[i].GrupoSharepoint.ID}">
                                   <label class="form-check-label">${resultData.d.results[i].GrupoSharepoint.Title}</label>
                                   </div>`;
 
         }
 
-        $("#conteudoNotificarArea").append(montaNotificarArea);
 
 
       },
@@ -1147,6 +1171,10 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
         console.log(jqXHR.responseText);
       }
     });
+
+    console.log("_arrAreas.toString()", _arrAreas.toString());
+    jQuery("#txtAreas").html(_arrAreas.toString());
+    $("#conteudoNotificarArea").append(_montaNotificarArea);
 
 
   }
@@ -1360,7 +1388,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     if (_siteAntigo == "Sim") {
 
       jquery.ajax({
-        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Anexos')/items?$select=Title,AreaSelecionada,Created,Author/Title,File/ServerRelativeUrl&$expand=Author,File&$filter=Proposta/ID eq ` + _idAntigo,
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('Anexos')/items?$select=Title,AreaSelecionada,Created,Author/Title,File/ServerRelativeUrl&$expand=Author,File&$filter=Proposta/Numero eq ` + _numeroProposta,
         type: "GET",
         async: false,
         headers: { 'Accept': 'application/json; odata=verbose;' },
@@ -1547,59 +1575,63 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
   }
 
-  protected async getDiscussaoAntiga() {
+  protected async getDiscussao() {
 
-    jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('DiscussaoAntiga')/items?$top=1&$select=ID,Title,Thread&$filter=Title eq ` + _idAntigo,
-      type: "GET",
-      headers: { 'Accept': 'application/json; odata=verbose;' },
-      async: false,
-      success: async (resultData) => {
+    if (_idAntigo != null) {
 
-        var montaDiscussaoAntiga = "";
+      jQuery.ajax({
+        url: `${this.props.siteurl}/_api/web/lists/getbytitle('DiscussaoAntiga')/items?$top=1&$select=ID,Title,Thread&$filter=Title eq ` + _idAntigo,
+        type: "GET",
+        headers: { 'Accept': 'application/json; odata=verbose;' },
+        async: false,
+        success: async (resultData) => {
 
-        console.log("Discussão", resultData);
+          var montaDiscussaoAntiga = "";
 
-        if (resultData.d.results.length > 0) {
+          console.log("Discussão", resultData);
 
-          for (var i = 0; i < resultData.d.results.length; i++) {
+          if (resultData.d.results.length > 0) {
 
-            var thread = resultData.d.results[i].Thread;
+            for (var i = 0; i < resultData.d.results.length; i++) {
 
-            jQuery.ajax({
-              url: `${this.props.siteurl}/_api/web/lists/getbytitle('DiscussaoAntiga')/items?$top=4999&$select=ID,Title,Area,Autor,Created,NotificarArea,Mensagem,Anexos&$filter=(substringof('${thread}', Thread)) and (Thread ne '${thread}')`,
-              type: "GET",
-              headers: { 'Accept': 'application/json; odata=verbose;' },
-              async: false,
-              success: async (resultData) => {
+              var thread = resultData.d.results[i].Thread;
 
-                console.log("Mensagens", resultData);
+              jQuery.ajax({
+                url: `${this.props.siteurl}/_api/web/lists/getbytitle('DiscussaoAntiga')/items?$top=4999&$select=ID,Title,Area,Autor,Created,NotificarArea,Mensagem,Anexos&$filter=(substringof('${thread}', Thread)) and (Thread ne '${thread}')`,
+                type: "GET",
+                headers: { 'Accept': 'application/json; odata=verbose;' },
+                async: false,
+                success: async (resultData) => {
 
-                if (resultData.d.results.length > 0) {
+                  console.log("Mensagens", resultData);
 
-                  for (var x = 0; x < resultData.d.results.length; x++) {
+                  if (resultData.d.results.length > 0) {
 
-                    var area = resultData.d.results[x].Area;
+                    for (var x = 0; x < resultData.d.results.length; x++) {
 
-                    var area2 = "-";
+                      var area = resultData.d.results[x].Area;
 
-                    if (area != null) {
-                      area2 = area.replaceAll(/[^A-Z0-9]+/ig, "_");
-                    }
+                      var area2 = "-";
 
-                    var autor = resultData.d.results[x].Autor;
-                    if (autor == "Gustavo Martins de Lima e Silva, Luis (ND)") autor = "Usuário da ";
-                    else resultData.d.results[x].Autor + " -";
-                    var criado = new Date(resultData.d.results[x].Created);
-                    var criado2 = new Date(criado.setHours(criado.getHours()));
-                    var criadoHora = criado2.getHours() + ":" + ("0" + (criado2.getMinutes() + 1)).slice(-2) + ":" + criado2.getSeconds();
-                    var criadoData = ("0" + criado2.getDate()).slice(-2) + '/' + ("0" + (criado2.getMonth() + 1)).slice(-2) + '/' + criado2.getFullYear();
-                    var notificarArea = resultData.d.results[x].NotificarArea;
-                    var mensagem = resultData.d.results[x].Mensagem;
-                    var anexos = resultData.d.results[x].Anexos;
-                    if(anexos == null) anexos = `<div class="text-secondary">Nenhum anexo encontrado.</div>`;
+                      if (area != null) {
+                        area2 = area.replaceAll(/[^A-Z0-9]+/ig, "_");
 
-                    montaDiscussaoAntiga += `
+                        if (_arrMontaBotoes.indexOf(area) == -1) _arrMontaBotoes.push(area);
+                      }
+
+                      var autor = resultData.d.results[x].Autor;
+                      if (autor == "Gustavo Martins de Lima e Silva, Luis (ND)") autor = "Usuário da ";
+                      else autor = resultData.d.results[x].Autor + " -";
+                      var criado = new Date(resultData.d.results[x].Created);
+                      var criado2 = new Date(criado.setHours(criado.getHours()));
+                      var criadoHora = criado2.getHours() + ":" + ("0" + (criado2.getMinutes() + 1)).slice(-2) + ":" + criado2.getSeconds();
+                      var criadoData = ("0" + criado2.getDate()).slice(-2) + '/' + ("0" + (criado2.getMonth() + 1)).slice(-2) + '/' + criado2.getFullYear();
+                      var notificarArea = resultData.d.results[x].NotificarArea;
+                      var mensagem = resultData.d.results[x].Mensagem;
+                      var anexos = resultData.d.results[x].Anexos;
+                      if (anexos == null) anexos = `<div class="text-secondary">Nenhum anexo encontrado.</div>`;
+
+                      montaDiscussaoAntiga += `
                     <div class="p-0 mb-0 bg-light text-dark rounded comment ${area2}">
         
                     <div class="p-3 mb-2 alert-danger text-dark rounded-top ">
@@ -1618,42 +1650,40 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                     </div>
     
                 `
+                    }
+
+                    $("#conteudoDiscusssaoAntiga").append(montaDiscussaoAntiga);
                   }
 
-                  $("#conteudoDiscusssaoAntiga").append(montaDiscussaoAntiga);
+
+
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                  console.log(jqXHR.responseText);
                 }
 
+              })
 
-
-              },
-              error: function (jqXHR, textStatus, errorThrown) {
-                console.log(jqXHR.responseText);
-              }
-
-            })
-
+            }
           }
+
+
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          console.log(jqXHR.responseText);
         }
 
+      })
 
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        console.log(jqXHR.responseText);
-      }
-
-    })
+    }
 
 
 
-  }
-
-
-  protected getDiscussaoNova() {
 
     $("#conteudoDiscusssaoNova").empty();
 
     jQuery.ajax({
-      url: `${this.props.siteurl}/_api/web/lists/getbytitle('ListaDiscussao_1911')/items?$top=4999&$select=ID,Title,Author/Title,Area/Title,Created,NotificarArea/Title,Mensagem,txtAnexosRelacionados&$expand=Author,Area,NotificarArea&$filter=Proposta/ID eq ` + _idProposta,
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('ListaDiscussao')/items?$top=4999&$select=ID,Title,Author/Title,Area/Title,Created,NotificarArea/Title,Mensagem,txtAnexosRelacionados&$expand=Author,Area,NotificarArea&$filter=Proposta/ID eq ` + _idProposta,
       type: "GET",
       headers: { 'Accept': 'application/json; odata=verbose;' },
       async: false,
@@ -1661,7 +1691,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
         var montaDiscussaoNova = ``;
         var montaBotoes = ``;
-        var arrMontaBotoes = ["Todos"];
         var idBtn = 0;
 
         if (resultData.d.results.length > 0) {
@@ -1703,7 +1732,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
             idBtn++;
 
-            if (arrMontaBotoes.indexOf(area) == -1) arrMontaBotoes.push(area);
+            if (_arrMontaBotoes.indexOf(area) == -1) _arrMontaBotoes.push(area);
 
             montaDiscussaoNova += `
             <div class="p-0 mb-0 bg-light text-dark rounded comment ${area2}">
@@ -1730,7 +1759,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
           var reactHandlerBotoesAreas = this;
 
           reactHandlerBotoesAreas.setState({
-            itemsBotoes: arrMontaBotoes
+            itemsBotoes: _arrMontaBotoes
           });
 
 
@@ -1748,11 +1777,14 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     })
 
 
+    var reactHandlerBotoesAreas = this;
+
+    reactHandlerBotoesAreas.setState({
+      itemsBotoes: _arrMontaBotoes
+    });
 
 
   }
-
-
 
 
   protected modalResponderDiscussao() {
@@ -1827,7 +1859,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     }
 
     await _web.lists
-      .getByTitle("ListaDiscussao_1911")
+      .getByTitle("ListaDiscussao")
       .items.add({
         AreaId: area,
         Mensagem: mensagem,
@@ -1849,7 +1881,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
         $(".ql-editor").empty();
         _mensagemDiscussao = "";
 
-        this.getDiscussaoNova();
+        this.getDiscussao();
 
       }).catch((error: any) => {
         console.log(error);
@@ -1883,7 +1915,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     jQuery("#modalReabrirProposta").modal({ backdrop: 'static', keyboard: false });
 
   }
-
 
   protected async reabrirProposta() {
 
@@ -1986,7 +2017,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
   }
 
-
   protected editarProposta() {
 
     window.location.href = `Propostas-SAP-Editar.aspx?PropostasID=${_idProposta}`;
@@ -1998,7 +2028,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     history.back();
 
   }
-
 
   protected upload() {
 
@@ -2069,7 +2098,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
   }
 
-
   protected fecharSucesso() {
 
     $("#conteudoAnexo").empty();
@@ -2096,7 +2124,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
 
   }
-
 
 
 

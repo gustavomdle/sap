@@ -1,9 +1,9 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
   "solution": {
-    "name": "diebold-sap",
+    "name": "propostas-sap-diebold",
     "id": "cee4ae2a-939c-464e-b309-c4a411dc5e74",
-    "version": "1.0.3.0",
+    "version": "1.0.3.4",
     "includeClientSideAssets": true,
     "isDomainIsolated": false,
     "developer": {
@@ -15,6 +15,6 @@
     }
   },
   "paths": {
-    "zippedPackage": "solution/diebold-sap.sppkg"
+    "zippedPackage": "solution/propostas-sap-diebold.sppkg"
   }
 }

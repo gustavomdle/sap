@@ -4,7 +4,7 @@
     "isCreatingSolution": false,
     "environment": "spo",
     "version": "1.13.0",
-    "libraryName": "diebold-sap",
+    "libraryName": "propostas-sap-diebold",
     "libraryId": "cee4ae2a-939c-464e-b309-c4a411dc5e74",
     "packageManager": "npm",
     "isDomainIsolated": false,

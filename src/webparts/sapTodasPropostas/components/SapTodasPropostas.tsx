@@ -63,7 +63,7 @@ const empTablecolumns = [
   },
   {
     dataField: "IdentificacaoOportunidade",
-    text: "ID",
+    text: "Identificação Oportunidade",
     headerStyle: { backgroundColor: '#bee5eb' },
     sort: true,
     classes: 'text-center',
