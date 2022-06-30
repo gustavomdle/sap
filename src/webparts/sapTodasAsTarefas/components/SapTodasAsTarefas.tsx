@@ -207,11 +207,11 @@ export default class SapTodasAsTarefas extends React.Component<ISapTodasAsTarefa
 
               if (i == resultData.d.results.length - 1) {
 
-                _filter += `(Title eq '${resultData.d.results[i].Title}')`
+                _filter += `(GrupoSharepoint/Title eq '${resultData.d.results[i].Title}')`
 
               } else {
 
-                _filter += `(Title eq '${resultData.d.results[i].Title}') or `
+                _filter += `(GrupoSharepoint/Title eq '${resultData.d.results[i].Title}') or `
 
               }
 
@@ -234,7 +234,7 @@ export default class SapTodasAsTarefas extends React.Component<ISapTodasAsTarefa
 
     var reactHandlerRepresentante = this;
 
-    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/ID,Proposta/Title,Proposta/Numero,Proposta/IdentificacaoOportunidade,Proposta/DataEntregaPropostaCliente,Proposta/ResponsavelProposta,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso,Created,Author/Title,Cliente,Representante&$expand=Proposta,GrupoSharepoint,Author&$filter=((Status eq 'Em análise') and ${_filter})`;
+    var url = `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$orderby=%20ID%20desc&$select=ID,Title,Proposta/ID,Proposta/Title,Proposta/Numero,Proposta/IdentificacaoOportunidade,Proposta/DataEntregaPropostaCliente,Proposta/ResponsavelProposta,GrupoSharepoint/Title,DataPlanejadaTermino,Atraso,Created,Author/Title,Cliente,Representante&$expand=Proposta,GrupoSharepoint,Author&$filter=(Status eq 'Em análise') and (${_filter})`;
     console.log("url", url)
 
     jQuery.ajax({
