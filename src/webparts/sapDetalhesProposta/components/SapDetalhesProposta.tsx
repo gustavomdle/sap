@@ -610,14 +610,18 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                         //console.log("item.Status", item.Status);
 
+                        if (_grupos.indexOf(rplTitulo) !== -1) {
+
+                          jQuery("#conteudoUpload").show();
+
+                        }
+
                         if (item.Status == "Em análise") {
 
                           //console.log("item.Title", item.Title);
                           //console.log("_grupos.indexOf(item.Title)", _grupos.indexOf(item.Title));
 
                           if (_grupos.indexOf(rplTitulo) !== -1) {
-
-                            jQuery("#conteudoUpload").show();
 
                             return (
 
@@ -685,6 +689,12 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                         if (justificativa == null) vlrJustificativa = "-";
                         else vlrJustificativa = justificativa;
 
+                        if (_grupos.indexOf(rplTitulo) !== -1) {
+
+                          jQuery("#conteudoUpload").show();
+
+                        }
+
                         // var status = item.Status;
 
                         //console.log("item.Status", item.Status);
@@ -708,8 +718,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                             //console.log("_grupos.indexOf(item.Title) tarefa antiga", _grupos.indexOf(rplTitulo));
 
                             if (_grupos.indexOf(rplTitulo) !== -1) {
-
-                              jQuery("#conteudoUpload").show();
 
                               return (
 
@@ -1792,7 +1800,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
               }
 
-            } 
+            }
 
             if (anexosRelacionados !== null) {
 
@@ -1804,7 +1812,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
               }
 
-            } 
+            }
             //else montaLinksAnexos = `<div class="text-secondary">Nenhum anexo encontrado.</div>`;
 
             idBtn++;
@@ -2169,16 +2177,16 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
         _web.lists.getByTitle("AnexosSAP").rootFolder.folders.add(`${_idProposta}`);
 
         await _web.lists
-        .getByTitle("PropostasSAP")
-        .items.getById(_idProposta).update({
-          PastaCriada: "Sim",
-        })
-        .then(async response => {
+          .getByTitle("PropostasSAP")
+          .items.getById(_idProposta).update({
+            PastaCriada: "Sim",
+          })
+          .then(async response => {
 
 
-        }).catch(err => {
-          console.log("err", err);
-        });
+          }).catch(err => {
+            console.log("err", err);
+          });
       }
 
       for (var i = 0; i < files.length; i++) {
