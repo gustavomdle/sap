@@ -77,6 +77,11 @@ export interface IReactGetItemsState {
       "ID": "",
       "Title": any,
     }],
+    itemsAreasAnexos: [
+      {
+        "ID": "",
+        "Title": any,
+      }],
   itemsBotoes: any
 }
 
@@ -111,6 +116,11 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
           "ID": "",
           "Title": "",
         }],
+        itemsAreasAnexos: [
+          {
+            "ID": "",
+            "Title": "",
+          }],
       itemsBotoes: []
 
     };
@@ -220,6 +230,22 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     this.getAnexos();
     this.getSelecaoAreas();
     this.getDiscussao();
+
+    var reactHandlerAreas = this;
+
+    jquery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      success: function (resultData) {
+        reactHandlerAreas.setState({
+          itemsAreasAnexos: resultData.d.results
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
+      }
+    });
 
   }
 
@@ -502,7 +528,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
                           <label htmlFor="ddlAreaAnexo">Área </label><span className="required"> *</span>
                           <select id="ddlAreaAnexo" className="form-control" style={{ "width": "300px" }}>
                             <option value="0" selected>Selecione...</option>
-                            {this.state.itemAreas.map(function (item, key) {
+                            {this.state.itemsAreasAnexos.map(function (item, key) {
 
                               var titulo = item.Title;
                               var rplTitulo = titulo.replaceAll("Avaliação da Área (", "");

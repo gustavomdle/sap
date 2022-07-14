@@ -1149,6 +1149,21 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
       }
     });
 
+    jquery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Areas')/items?$top=4999&$filter=Ativo eq 1&$orderby= Title`,
+      type: "GET",
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      success: function (resultData) {
+        reactHandlerAreas.setState({
+          itemsAreasAnexos: resultData.d.results
+        });
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
+      }
+    });
+
+
 
     this.getProposta();
     this.getTarefas();
@@ -1364,6 +1379,45 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
   protected getTarefas() {
 
+    jquery.ajax({
+      url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$top=4999&$select=ID,Title,GrupoSharepoint/ID,GrupoSharepoint/Title,Status,DataPlanejadaTermino,Modified,DataRealTermino,Justificativa&$expand=GrupoSharepoint&$filter=(AntigoPropostaNumero eq ` + _numeroProposta + `.000000000) and (Status ne 'Em análise')`,
+      type: "GET",
+      async: false,
+      headers: { 'Accept': 'application/json; odata=verbose;' },
+      success: async (resultData) => {
+
+        console.log("resultData.d.results tarefas antigas", resultData.d.results);
+
+        //var reactHandlerAreaAnexo = this;
+
+        //reactHandlerAreaAnexo.setState({
+         // itemsAreasAnexos: resultData.d.results
+        //});
+
+        if (resultData.d.results.length > 0) {
+
+          for (var i = 0; i < resultData.d.results.length; i++) {
+
+            var titulo = resultData.d.results[i].Title;
+            var rplTitulo = titulo.replaceAll("Avaliação da Área (", "");
+            var rplTitulo = rplTitulo.replaceAll(")", "");
+
+            _arrAreas.push(resultData.d.results[i].GrupoSharepoint.ID);
+            _arrAreasAntiga.push(rplTitulo);
+
+          }
+
+        }
+
+
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR.responseText);
+      }
+    });
+
+
+
     jQuery.ajax({
       url: `${this.props.siteurl}/_api/web/lists/getbytitle('Tarefas')/items?$select=ID,Title,GrupoSharepoint/ID&$expand=GrupoSharepoint&$orderby=Title&$filter=Proposta/ID eq ` + _idProposta,
       type: "GET",
@@ -1373,11 +1427,11 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
         console.log("resultData Proposta", resultData);
 
-        var reactHandlerAreaAnexo = this;
+        //var reactHandlerAreaAnexo = this;
 
-        reactHandlerAreaAnexo.setState({
-          itemsAreasAnexos: resultData.d.results
-        });
+        //reactHandlerAreaAnexo.setState({
+         // itemsAreasAnexos: resultData.d.results
+       // });
 
         if (resultData.d.results.length > 0) {
 
@@ -1385,8 +1439,13 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
             //_arrSegmento = resultData.d.results[i].Title;
 
+            if (_arrAreas.indexOf(resultData.d.results[i].GrupoSharepoint.ID) == -1) {
             _arrAreas.push(resultData.d.results[i].GrupoSharepoint.ID);
-            _arrAreasAntiga.push(resultData.d.results[i].Title);
+            }
+
+            if (_arrAreasAntiga.indexOf(resultData.d.results[i].Title) == -1) {
+              _arrAreasAntiga.push(resultData.d.results[i].Title);
+            }
 
           }
 
