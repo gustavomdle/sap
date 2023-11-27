@@ -1443,41 +1443,55 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
 
     if (files.length != 0) {
 
-      _web.lists.getByTitle("AnexosSAP").rootFolder.folders.add(`${_idProposta}`).then(data => {
+      _web.lists.getByTitle("AnexosSAP").rootFolder.folders.add(`${_idProposta}`).then(async data => {
 
-        for (var i = 0; i < files.length; i++) {
+        await _web.lists
+        .getByTitle("PropostasSAP")
+        .items.getById(_idProposta).update({
+          PastaCriada: "Sim",
+        })
+        .then(async response => {
 
-          var nomeArquivo = files[i].name;
-          var rplNomeArquivo = nomeArquivo.replace(/[^0123456789.,a-zA-Z]/g, '');
+          for (var i = 0; i < files.length; i++) {
 
-          //alert(rplNomeArquivo);
-          //Upload a file to the SharePoint Library
-          _web.getFolderByServerRelativeUrl(`${_caminho}/AnexosSAP/${_idProposta}`)
-            //.files.add(files[i].name, files[i], true)
-            .files.add(rplNomeArquivo, files[i], true)
-            .then(async data => {
+            var nomeArquivo = files[i].name;
+            var rplNomeArquivo = nomeArquivo.replace(/[^0123456789.,a-zA-Z]/g, '');
+  
+            //alert(rplNomeArquivo);
+            //Upload a file to the SharePoint Library
+            _web.getFolderByServerRelativeUrl(`${_caminho}/AnexosSAP/${_idProposta}`)
+              //.files.add(files[i].name, files[i], true)
+              .files.add(rplNomeArquivo, files[i], true)
+              .then(async data => {
+  
+                data.file.getItem().then(async item => {
+                  var idAnexo = item.ID;
+  
+                  await _web.lists
+                    .getByTitle("AnexosSAP")
+                    .items.getById(idAnexo).update({
+                      Area: _areaAnexo,
+                    })
+                    .then(async response => {
+  
+                      if (i == files.length) {
+                        console.log("anexou:" + rplNomeArquivo);
+                        $("#conteudoLoading").modal('hide');
+                        jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
+                      }
+                    }).catch(err => {
+                      console.log("err", err);
+                    });
+                })
+              });
+          }
 
-              data.file.getItem().then(async item => {
-                var idAnexo = item.ID;
 
-                await _web.lists
-                  .getByTitle("AnexosSAP")
-                  .items.getById(idAnexo).update({
-                    Area: _areaAnexo,
-                  })
-                  .then(async response => {
+        }).catch(err => {
+          console.log("err", err);
+        });
 
-                    if (i == files.length) {
-                      console.log("anexou:" + rplNomeArquivo);
-                      $("#conteudoLoading").modal('hide');
-                      jQuery("#modalSucesso").modal({ backdrop: 'static', keyboard: false })
-                    }
-                  }).catch(err => {
-                    console.log("err", err);
-                  });
-              })
-            });
-        }
+
 
       }).catch(err => {
         console.log("err", err);
@@ -1508,6 +1522,8 @@ export default class SapNovaProposta extends React.Component<ISapNovaPropostaPro
     window.location.href = `Propostas.aspx`;
 
   }
+
+  
 
 
 

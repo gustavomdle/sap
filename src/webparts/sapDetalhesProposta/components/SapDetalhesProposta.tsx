@@ -77,11 +77,11 @@ export interface IReactGetItemsState {
       "ID": "",
       "Title": any,
     }],
-    itemsAreasAnexos: [
-      {
-        "ID": "",
-        "Title": any,
-      }],
+  itemsAreasAnexos: [
+    {
+      "ID": "",
+      "Title": any,
+    }],
   itemsBotoes: any
 }
 
@@ -116,11 +116,11 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
           "ID": "",
           "Title": "",
         }],
-        itemsAreasAnexos: [
-          {
-            "ID": "",
-            "Title": "",
-          }],
+      itemsAreasAnexos: [
+        {
+          "ID": "",
+          "Title": "",
+        }],
       itemsBotoes: []
 
     };
@@ -218,12 +218,21 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       .getElementById("btnAnexar")
       .addEventListener("click", (e: Event) => this.upload());
 
+    document
+      .getElementById("btnSucessoReabrir")
+      .addEventListener("click", (e: Event) => this.fecharSucessoReabrir());
 
-    $("#conteudoLoading").html(`<br/><br/><img style="height: 80px; width: 80px" src='${_caminho}/Images1/loading.gif'/>
+
+
+    $("#conteudoLoading").html(`<br/><br/><img style="height: 80px; width: 80px" src='${_caminho}/SiteAssets/loading.gif'/>
     <br/>Aguarde....<br/><br/>
     Dependendo do tamanho do anexo e a velocidade<br>
      da Internet essa ação pode demorar um pouco. <br>
      Não fechar a janela!<br/><br/>`);
+
+    $("#conteudoLoadingReabrir").html(`<br/><br/><img style="height: 80px; width: 80px" src='${_caminho}/SiteAssets/loading.gif'/>
+     <br/>Aguarde....<br/><br/>
+     `);
 
     this.getProposta();
     this.getTarefas();
@@ -835,6 +844,16 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
           </div>
         </div>
 
+        <div className="modal fade" id="modalCarregandoReabrir" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div>
+            <div className="modal-dialog" role="document">
+              <div className="modal-content">
+                <div id='conteudoLoadingReabrir' className='carregando'></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="modal fade" id="modalDiscussao" tabIndex={-1} role="dialog" aria-labelledby="discussaoTitle" aria-hidden="true">
           <div className="modal-dialog modal-dialog-scrollable" role="document">
             <div className="modal-content">
@@ -965,6 +984,22 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
               </div>
               <div className="modal-footer">
                 <button type="button" id="btnSucesso" className="btn btn-primary">OK</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal fade" id="modalSucessoReabrir" tabIndex={-1} role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="exampleModalLabel">Alerta</h5>
+              </div>
+              <div className="modal-body">
+                Proposta reaberta com sucesso!
+              </div>
+              <div className="modal-footer">
+                <button type="button" id="btnSucessoReabrir" className="btn btn-primary">OK</button>
               </div>
             </div>
           </div>
@@ -1176,7 +1211,6 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
           }
 
 
-
         }
 
         /*
@@ -1208,6 +1242,8 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       async: false,
       headers: { 'Accept': 'application/json; odata=verbose;' },
       success: function (resultData) {
+
+        console.log("Resultado Tarefas", resultData.d.results);
 
         reactHandlerTarefas.setState({
           itemsTarefas: resultData.d.results,
@@ -2031,14 +2067,15 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
   protected modalReabrirProposta() {
 
+    $("#modalReabrirProposta").modal('hide');
     jQuery("#modalReabrirProposta").modal({ backdrop: 'static', keyboard: false });
 
   }
 
-  protected async reabrirProposta() {
+  protected async reabrirProposta(): Promise<boolean> {
 
-    $("#btnModalReabrirProposta").prop("disabled", true);
-    $("#btnModalReabrirPropostaCancelar").prop("disabled", true);
+    $("#modalReabrirProposta").modal('hide');
+    jQuery("#modalCarregandoReabrir").modal({ backdrop: 'static', keyboard: false });
 
     var novoStatus = $("#ddlStatusReabertura").val();
     var motivo = $("#ddlMotivoReabertura").val();
@@ -2087,6 +2124,9 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       })
       .then(response => {
 
+        console.log("novoStatus", novoStatus);
+        console.log("_idProposta", _idProposta);
+
         if (novoStatus == "Em análise") {
 
           jquery.ajax({
@@ -2094,7 +2134,9 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             type: "GET",
             async: false,
             headers: { 'Accept': 'application/json; odata=verbose;' },
-            success: async function (resultData) {
+            success: async (resultData) => {
+
+              var ultimo = resultData.d.results.length - 1;
 
               if (resultData.d.results.length > 0) {
 
@@ -2102,20 +2144,13 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                   var idTarefa = resultData.d.results[i].ID;
 
-                  await _web.lists
-                    .getByTitle("Tarefas")
-                    .items.getById(idTarefa).update({
-                      DataRealTermino: null,
-                      Justificativa: "",
-                      Status: "Em análise",
-                    }).then(response => {
-                      console.log("Atualizou a tarefa");
-                    }).catch((error: any) => {
-                      console.log(error);
-                    });
+                  console.log(`Contagem 1: ${ultimo} - ${i}`);
+
+                  await this.editarTarefa(idTarefa, ultimo, i);
+
                 }
-                $("#modalReabrirProposta").modal('hide');
-                window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
+
+                //window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
               }
             },
             error: function (jqXHR, textStatus, errorThrown) {
@@ -2129,7 +2164,10 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
             type: "GET",
             async: false,
             headers: { 'Accept': 'application/json; odata=verbose;' },
-            success: async function (resultData) {
+
+            success: async (resultData) => {
+
+              var ultimo = resultData.d.results.length - 1;
 
               if (resultData.d.results.length > 0) {
 
@@ -2137,22 +2175,13 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
                   var idTarefa = resultData.d.results[i].ID;
 
-                  await _web.lists
-                    .getByTitle("Tarefas")
-                    .items.getById(idTarefa).update({
-                      DataRealTermino: null,
-                      Justificativa: "",
-                      Status: "Em análise",
-                      PropostaId: _idProposta
-                    }).then(response => {
-                      console.log("Atualizou a tarefa");
-                    }).catch((error: any) => {
-                      console.log(error);
-                    });
+                  console.log(`Contagem 2: ${ultimo} - ${i}`);
+
+                  await this.editarTarefa(idTarefa, ultimo, i);
+
                 }
               }
-              $("#modalReabrirProposta").modal('hide');
-              window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
+              //window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
             },
             error: function (jqXHR, textStatus, errorThrown) {
               console.log(jqXHR.responseText);
@@ -2160,8 +2189,9 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
           });
 
         } else {
-          $("#modalReabrirProposta").modal('hide');
-          window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
+          $("#modalCarregandoReabrir").modal('hide');
+          jQuery("#modalSucessoReabrir").modal({ backdrop: 'static', keyboard: false });
+          //window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
         }
 
 
@@ -2200,6 +2230,7 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
       jQuery("#modalCarregando").modal({ backdrop: 'static', keyboard: false });
 
       if (_pastaCriada != "Sim") {
+
         _web.lists.getByTitle("AnexosSAP").rootFolder.folders.add(`${_idProposta}`);
 
         await _web.lists
@@ -2274,6 +2305,13 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
 
   }
 
+  protected fecharSucessoReabrir() {
+
+    window.location.href = `Proposta-Detalhes.aspx?PropostasID=${_idProposta}`;
+
+  }
+
+
   protected filtrar(area) {
 
     console.log("filtrar area", area);
@@ -2290,6 +2328,42 @@ export default class SapDetalhesProposta extends React.Component<ISapDetalhesPro
     }
 
 
+  }
+
+
+
+  protected editarTarefa(idTarefa, ultimo, i): Promise<number> {
+
+    return new Promise<number>(resolve => {
+
+      setTimeout(async () => {
+
+        resolve(
+
+          await _web.lists
+            .getByTitle("Tarefas")
+            .items.getById(idTarefa).update({
+              DataRealTermino: null,
+              Justificativa: "",
+              Status: "Em análise",
+              PropostaId: _idProposta
+            }).then(response => {
+
+              if (ultimo == i) {
+
+                $("#modalCarregandoReabrir").modal('hide');
+                jQuery("#modalSucessoReabrir").modal({ backdrop: 'static', keyboard: false });
+
+              }
+            }).catch((error: any) => {
+              console.log(error);
+            })
+
+
+
+        );
+      }, 1000);
+    });
   }
 
 

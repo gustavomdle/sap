@@ -2108,7 +2108,7 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
 
   }
 
-  protected upload() {
+  protected async upload() {
 
     var files = (document.querySelector("#input") as HTMLInputElement).files;
     var file = files[0];
@@ -2118,7 +2118,21 @@ export default class SapEditarProposta extends React.Component<ISapEditarPropost
     if (files.length != 0) {
 
       if (_pastaCriada != "Sim") {
+
         _web.lists.getByTitle("AnexosSAP").rootFolder.folders.add(`${_idProposta}`);
+
+        await _web.lists
+        .getByTitle("PropostasSAP")
+        .items.getById(_idProposta).update({
+          PastaCriada: "Sim",
+        })
+        .then(async response => {
+
+
+        }).catch(err => {
+          console.log("err", err);
+        });
+        
       }
 
       for (var i = 0; i < files.length; i++) {

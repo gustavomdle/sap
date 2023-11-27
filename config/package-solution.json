@@ -3,7 +3,7 @@
   "solution": {
     "name": "propostas-sap-diebold",
     "id": "cee4ae2a-939c-464e-b309-c4a411dc5e74",
-    "version": "1.0.4.5",
+    "version": "1.0.4.7",
     "includeClientSideAssets": true,
     "isDomainIsolated": false,
     "developer": {
